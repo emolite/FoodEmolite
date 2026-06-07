@@ -4,6 +4,12 @@ export const URL_ENDPOINT = {
   ADMIN: 'admin',
   ADMIN_STORES: 'stores',
   ADMIN_FOODS: 'foods',
+  AGENT: 'agent',
+  AGENT_PROFILE: 'profile',
+  AGENT_FOODS: 'foods',
+
   USER: 'user',
-  AGENT: 'agent'
+  USER_STORES: 'stores',
+  USER_STORE_FOODS: 'store-foods',
+  USER_HISTORY: 'history'
 } as const;

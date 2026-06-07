@@ -31,7 +31,7 @@ export class PopUpStoreDetail {
   closed = output<void>();
   isOpen = input(false);
   submitted = output<StoreDetailSubmit>();
-  deleted = output<string>();
+  deleted = output<number>();
 
   selectedFile = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
@@ -115,6 +115,6 @@ export class PopUpStoreDetail {
   }
 
   confirmDelete(): void {
-    this.deleted.emit(this.store().refCode);
+    this.deleted.emit(this.store().id);
   }
 }

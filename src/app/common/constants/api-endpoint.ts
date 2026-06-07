@@ -7,12 +7,17 @@ export const API_ENDPOINT = {
   },
   STORE: {
     BASE: 'stores',
-    DETAIL: (refCode: string) => `stores/${refCode}`,
+    DETAIL: (id: number) => `stores/${id}`,
     OWNER: (ownerRefCode: string) => `stores/owner/${ownerRefCode}`
   },
   STORE_FOOD: {
     BASE: 'store-foods',
-    DETAIL: (refCode: string) => `store-foods/${refCode}`,
+    DETAIL: (id: number) => `store-foods/${id}`,
     BY_STORE: (storeRefCode: string) => `store-foods/store/${storeRefCode}`
+  },
+   PROFILE: {
+    ME: 'profile/me',
+    ACCOUNT_PROFILE: 'profile/account-profile',
+    BANK_ACCOUNTS: 'profile/bank-accounts'
   }
 } as const;

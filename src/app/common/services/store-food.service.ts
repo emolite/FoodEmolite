@@ -43,10 +43,10 @@ export class StoreFoodService {
   }
 
   getDetail(
-    refCode: string
+    id: number,
   ): Observable<BaseResponse<StoreFoodResponse>> {
     return this.apiService.get<BaseResponse<StoreFoodResponse>>(
-      API_ENDPOINT.STORE_FOOD.DETAIL(refCode)
+      API_ENDPOINT.STORE_FOOD.DETAIL(id)
     );
   }
 
@@ -62,22 +62,22 @@ export class StoreFoodService {
   }
 
   update(
-    refCode: string,
+    id: number,
     request: UpdateStoreFoodRequest
   ): Observable<BaseResponse<string>> {
     const formData = this.toUpdateFormData(request);
 
     return this.apiService.put<BaseResponse<string>, FormData>(
-      API_ENDPOINT.STORE_FOOD.DETAIL(refCode),
+      API_ENDPOINT.STORE_FOOD.DETAIL(id),
       formData
     );
   }
 
   delete(
-    refCode: string
+    id: number,
   ): Observable<BaseResponse<string>> {
     return this.apiService.delete<BaseResponse<string>>(
-      API_ENDPOINT.STORE_FOOD.DETAIL(refCode)
+      API_ENDPOINT.STORE_FOOD.DETAIL(id)
     );
   }
 

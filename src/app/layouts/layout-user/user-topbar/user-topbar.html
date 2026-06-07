@@ -1,0 +1,135 @@
+<header class="sticky top-0 z-30 border-b border-gray-200 bg-white">
+  <div class="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
+    <button
+      type="button"
+      (click)="goStores()"
+      class="flex shrink-0 items-center gap-3 text-left">
+
+      <div class="flex h-9 w-9 items-center justify-center rounded-md bg-gray-900 text-sm font-bold text-white">
+        F
+      </div>
+
+      <div class="hidden sm:block">
+        <p class="text-sm font-semibold text-gray-900">
+          Food Emolite
+        </p>
+
+        <p class="text-xs text-gray-500">
+          Đặt món trực tuyến
+        </p>
+      </div>
+    </button>
+
+    <div class="min-w-0 flex-1 px-1 sm:max-w-xl sm:px-6">
+      <div class="relative">
+        <input
+          type="text"
+          placeholder="Tìm cửa hàng hoặc món ăn..."
+          class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 pr-9 text-sm outline-none transition placeholder:text-gray-400 focus:border-gray-900 focus:bg-white" />
+
+        <svg
+          class="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m21 21-4.35-4.35M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+      <button
+        type="button"
+        (click)="goHistory()"
+        class="hidden rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-50 md:block">
+        Lịch sử
+      </button>
+
+      <button
+        type="button"
+        class="relative flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-white transition hover:border-gray-900 hover:bg-gray-50">
+
+        <svg
+          class="h-5 w-5 text-gray-800"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+        </svg>
+
+        <span
+          class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gray-900 text-[10px] font-semibold text-white">
+          0
+        </span>
+      </button>
+
+      <div class="relative">
+        <button
+          type="button"
+          (click)="toggleUserMenu($event)"
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white">
+          {{ authService.currentUser()?.username?.charAt(0) || 'U' }}
+        </button>
+
+        @if (isUserMenuOpen()) {
+        <div
+          class="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg">
+
+          <div class="border-b border-gray-100 px-4 py-3">
+            <p class="truncate text-sm font-semibold text-gray-900">
+              {{ authService.currentUser()?.username }}
+            </p>
+
+            <p class="truncate text-xs text-gray-500">
+              {{ authService.currentUser()?.role }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            (click)="goHistory()"
+            class="flex w-full items-center px-4 py-3 text-left text-sm text-gray-700 transition hover:bg-gray-50 md:hidden">
+            Lịch sử
+          </button>
+
+          <button
+            type="button"
+            (click)="logout()"
+            class="flex w-full items-center px-4 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50">
+            Đăng xuất
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t border-gray-100 px-4 pb-3 sm:hidden">
+    <div class="relative mt-3">
+      <input
+        type="text"
+        placeholder="Tìm cửa hàng hoặc món ăn..."
+        class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 pr-9 text-sm outline-none transition placeholder:text-gray-400 focus:border-gray-900 focus:bg-white" />
+
+      <svg
+        class="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m21 21-4.35-4.35M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" />
+      </svg>
+    </div>
+  </div>
+</header>

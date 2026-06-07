@@ -1,45 +1,91 @@
-<div class="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+<div class="flex min-h-screen items-center justify-center bg-slate-950 px-4">
   <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
-    <h1 class="text-3xl font-bold text-slate-900">Đăng nhập</h1>
-    <p class="mt-2 text-sm text-slate-500">Đăng nhập để tiếp tục sử dụng FoodEmolite</p>
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">
+        Đăng nhập
+      </h1>
+      <p class="mt-2 text-sm text-slate-500">
+        Đăng nhập để tiếp tục sử dụng FoodEmolite
+      </p>
+    </div>
 
-    <div class="mt-8 space-y-5">
+    <form class="mt-8 space-y-5" (ngSubmit)="login()">
       <div>
-        <label class="text-sm font-medium text-slate-700">Email hoặc username</label>
+        <label class="text-sm font-medium text-slate-700">
+          Email hoặc username
+        </label>
+
         <input
-          class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900"
+          class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900"
           type="text"
+          autocomplete="username"
+          placeholder="Nhập email hoặc username"
           [ngModel]="input()"
           (ngModelChange)="input.set($event)"
-        />
+          name="input" />
       </div>
 
       <div>
-        <label class="text-sm font-medium text-slate-700">Mật khẩu</label>
-        <input
-          class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900"
-          type="password"
-          [ngModel]="password()"
-          (ngModelChange)="password.set($event)"
-        />
+        <label class="text-sm font-medium text-slate-700">
+          Mật khẩu
+        </label>
+
+        <div class="relative mt-2">
+          <input
+            class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none transition focus:border-slate-900"
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="current-password"
+            placeholder="Nhập mật khẩu"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            name="password" />
+
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            [attr.aria-label]="showPassword() ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'">
+            @if (showPassword()) {
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17.94 17.94A10.94 10.94 0 0112 20C7 20 2.73 16.89 1 12a18.45 18.45 0 014.06-5.94" />
+              <path d="M9.9 4.24A10.67 10.67 0 0112 4c5 0 9.27 3.11 11 8a18.5 18.5 0 01-2.16 3.19" />
+              <path d="M14.12 14.12A3 3 0 019.88 9.88" />
+              <path d="M1 1l22 22" />
+            </svg>
+            } @else {
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            }
+          </button>
+        </div>
       </div>
 
       @if (errorMessage()) {
-        <p class="text-sm text-red-500">{{ errorMessage() }}</p>
+      <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        {{ errorMessage() }}
+      </div>
       }
 
       <button
-        class="w-full rounded-xl bg-slate-900 py-3 font-semibold text-white disabled:opacity-60"
-        [disabled]="isLoading()"
-        (click)="login()"
-      >
-        {{ isLoading() ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+        type="submit"
+        class="flex w-full items-center justify-center rounded-xl bg-slate-900 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+        [disabled]="isLoading()">
+        @if (isLoading()) {
+        <span class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+        Đang đăng nhập...
+        } @else {
+        Đăng nhập
+        }
       </button>
 
       <p class="text-center text-sm text-slate-500">
         Chưa có tài khoản?
-        <a class="font-semibold text-slate-900" routerLink="/register">Đăng ký</a>
+        <a class="font-semibold text-slate-900 hover:underline" routerLink="/register">
+          Đăng ký
+        </a>
       </p>
-    </div>
+    </form>
   </div>
 </div>

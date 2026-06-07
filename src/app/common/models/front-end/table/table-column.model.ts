@@ -5,6 +5,8 @@ export interface TableColumn {
   align?: 'left' | 'center' | 'right';
   type?: 'text' | 'image' | 'date' | 'status' | 'custom';
   sortable?: boolean;
+  trueText?: string;
+  falseText?: string;
 }
 
 export type TableCellValue =

@@ -3,10 +3,11 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
 @Component({
-  selector: 'app-topbar',
-  templateUrl: './topbar.html'
+  selector: 'app-agent-topbar',
+  imports: [],
+  templateUrl: './agent-topbar.html'
 })
-export class TopbarComponent {
+export class AgentTopbarComponent {
   private readonly router = inject(Router);
 
   title = signal('');

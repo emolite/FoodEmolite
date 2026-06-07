@@ -231,11 +231,11 @@ export class PageAdminStoresComponent {
   }
 
   openDetail(row: TableRow): void {
-    const refCode = String(row['refCode']);
+    const id = Number(row['id']);
 
     this.isDetailLoading.set(true);
 
-    this.storeService.getDetail(refCode).subscribe({
+    this.storeService.getDetail(id).subscribe({
       next: response => {
         this.isDetailLoading.set(false);
 
@@ -309,7 +309,7 @@ export class PageAdminStoresComponent {
 
     this.isSubmitting.set(true);
 
-    this.storeService.update(store.refCode, value).subscribe({
+    this.storeService.update(store.id, value).subscribe({
       next: response => {
         this.isSubmitting.set(false);
 
@@ -329,10 +329,10 @@ export class PageAdminStoresComponent {
     });
   }
 
-  deleteStore(refCode: string): void {
+  deleteStore(id: number): void {
     this.isSubmitting.set(true);
 
-    this.storeService.delete(refCode).subscribe({
+    this.storeService.delete(id).subscribe({
       next: response => {
         this.isSubmitting.set(false);
 

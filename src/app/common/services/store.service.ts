@@ -29,10 +29,10 @@ export class StoreService {
   }
 
   getDetail(
-    refCode: string
+    id: number,
   ): Observable<BaseResponse<StoreResponse>> {
     return this.apiService.get<BaseResponse<StoreResponse>>(
-      API_ENDPOINT.STORE.DETAIL(refCode)
+      API_ENDPOINT.STORE.DETAIL(id)
     );
   }
 
@@ -48,22 +48,22 @@ export class StoreService {
   }
 
   update(
-    refCode: string,
+    id: number,
     request: UpdateStoreRequest
   ): Observable<BaseResponse<string>> {
     const formData = this.toUpdateFormData(request);
 
     return this.apiService.put<BaseResponse<string>, FormData>(
-      API_ENDPOINT.STORE.DETAIL(refCode),
+      API_ENDPOINT.STORE.DETAIL(id),
       formData
     );
   }
 
   delete(
-    refCode: string
+    id: number,
   ): Observable<BaseResponse<string>> {
     return this.apiService.delete<BaseResponse<string>>(
-      API_ENDPOINT.STORE.DETAIL(refCode)
+      API_ENDPOINT.STORE.DETAIL(id)
     );
   }
 
