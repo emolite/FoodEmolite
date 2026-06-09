@@ -26,6 +26,7 @@ export const API_ENDPOINT = {
     MY: 'orders/my',
     DETAIL: (id: number) => `orders/${id}`,
     STATUS: (id: number) => `orders/${id}/status`,
+    STATUS_PAYMENT: (id: number) => `orders/${id}/payment-status`,
     BY_STORE: (storeRefCode: string) => `orders/store/${storeRefCode}`
   }
 } as const;

@@ -7,6 +7,15 @@ export interface CreateOrderRequest {
 export interface CreateOrderItemRequest {
   storeFoodId: number;
   quantity: number;
+  options: CreateOrderItemOptionRequest[];
+}
+
+export interface CreateOrderItemOptionRequest {
+  optionGroupId: number;
+  optionGroupName: string;
+  optionId: number;
+  optionName: string;
+  additionalPrice: number;
 }
 
 export interface UpdateOrderStatusRequest {
@@ -14,8 +23,14 @@ export interface UpdateOrderStatusRequest {
   changedNote?: string | null;
 }
 
+export interface UpdatePaymentStatusRequest {
+  newStatus: string;
+  changedNote?: string | null;
+}
+
 export interface OrderResponse {
   id: number;
+  orderCode: string;
   refCode: string;
   customerAccountId: number;
   storeRefCode: string;
@@ -29,8 +44,21 @@ export interface OrderResponse {
 
 export interface OrderItemResponse {
   id: number;
+  orderId: number;
+  storeFoodId: number;
   foodName: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  options: OrderItemOptionResponse[];
+}
+
+export interface OrderItemOptionResponse {
+  id: number;
+  orderItemId: number;
+  optionGroupId: number | null;
+  optionGroupName: string;
+  optionId: number | null;
+  optionName: string;
+  additionalPrice: number;
 }

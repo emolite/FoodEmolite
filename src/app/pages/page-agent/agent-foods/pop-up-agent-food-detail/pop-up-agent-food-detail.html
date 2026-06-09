@@ -1,5 +1,5 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-  <div class="w-full max-w-2xl rounded-md bg-white shadow-xl">
+  <div class="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-md bg-white shadow-xl">
     <div class="flex items-center justify-between border-b border-blue-100 px-5 py-4">
       <div>
         <h2 class="text-base font-semibold text-gray-900">Chi tiết món ăn</h2>
@@ -11,52 +11,121 @@
       </button>
     </div>
 
-    <div class="grid gap-5 p-5 md:grid-cols-[160px_1fr]">
-      <label
-        class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-blue-100 bg-blue-50">
-        @if (thumbnailPreview()) {
-        <img [src]="thumbnailPreview()" class="h-full w-full object-cover" />
-        } @else {
-        <span class="text-sm text-blue-400">Ảnh món</span>
-        }
+    <div class="overflow-y-auto p-5">
+      <div class="grid gap-5 md:grid-cols-[160px_1fr]">
+        <label
+          class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-blue-100 bg-blue-50">
+          @if (thumbnailPreview()) {
+          <img [src]="thumbnailPreview()" class="h-full w-full object-cover" />
+          } @else {
+          <span class="text-sm text-blue-400">Ảnh món</span>
+          }
 
-        <div class="absolute inset-0 flex items-center justify-center bg-blue-950/45 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
-          Chọn ảnh
-        </div>
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-blue-950/45 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
+            Chọn ảnh
+          </div>
 
-        <input type="file" accept="image/*" (change)="onThumbnailChange($event)" class="hidden" />
-      </label>
-
-      <div class="grid gap-4 md:grid-cols-2">
-        <div class="md:col-span-2">
-          <label class="mb-1 block text-sm font-medium text-gray-700">Tên món</label>
-          <input type="text" [(ngModel)]="form().foodName"
-            class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700">Giá</label>
-          <input type="number" [(ngModel)]="form().price"
-            class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700">Số lượng</label>
-          <input type="number" [(ngModel)]="form().quantity"
-            class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
-        </div>
-
-        <div class="md:col-span-2">
-          <label class="mb-1 block text-sm font-medium text-gray-700">Mô tả</label>
-          <textarea rows="3" [(ngModel)]="form().description"
-            class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500"></textarea>
-        </div>
-
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" [(ngModel)]="form().isAvailable"
-            class="h-4 w-4 rounded border-blue-200 text-blue-600" />
-          Đang bán
+          <input type="file" accept="image/*" (change)="onThumbnailChange($event)" class="hidden" />
         </label>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="md:col-span-2">
+            <label class="mb-1 block text-sm font-medium text-gray-700">Tên món</label>
+            <input type="text" [(ngModel)]="form().foodName"
+              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">Giá</label>
+            <input type="number" [(ngModel)]="form().price"
+              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">Số lượng</label>
+            <input type="number" [(ngModel)]="form().quantity"
+              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-1 block text-sm font-medium text-gray-700">Mô tả</label>
+            <textarea rows="3" [(ngModel)]="form().description"
+              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500"></textarea>
+          </div>
+
+          <label class="flex items-center gap-2 text-sm text-gray-700">
+            <input type="checkbox" [(ngModel)]="form().isAvailable"
+              class="h-4 w-4 rounded border-blue-200 text-blue-600" />
+            Đang bán
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-5 rounded-md border border-blue-100 p-4">
+        <div class="mb-3 flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-800">Tùy chọn món</h3>
+            <p class="text-xs text-gray-500">Sửa nhóm option hoặc thêm option mới</p>
+          </div>
+
+          <button type="button" (click)="addOptionGroup()"
+            class="rounded-md bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-100">
+            + Nhóm
+          </button>
+        </div>
+
+        @for (group of form().optionGroups; track $index; let groupIndex = $index) {
+        @if (!group.isDeleted) {
+        <div class="mb-4 rounded-md border border-gray-100 p-3">
+          <div class="mb-3 grid gap-2 md:grid-cols-[1fr_80px]">
+            <input type="text" [(ngModel)]="group.groupName" placeholder="Tên nhóm: Vị, Đá, Size..."
+              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+
+            <button type="button" (click)="removeOptionGroup(groupIndex)"
+              class="rounded-md px-2 py-1 text-sm text-red-500 hover:bg-red-50">
+              Xóa
+            </button>
+          </div>
+
+          <div class="mb-3 grid gap-3 md:grid-cols-[160px_1fr_1fr]">
+            <label class="flex items-center gap-2 text-sm text-gray-600">
+              <input type="checkbox" [(ngModel)]="group.isRequired" />
+              Bắt buộc
+            </label>
+          </div>
+
+          <div class="grid gap-2">
+            @for (option of group.options; track $index; let optionIndex = $index) {
+            @if (!option.isDeleted) {
+            <div class="grid gap-2 md:grid-cols-[1fr_160px_110px_80px]">
+              <input type="text" [(ngModel)]="option.optionName" placeholder="Tên option"
+                class="rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+
+              <input type="number" [(ngModel)]="option.additionalPrice" placeholder="Giá thêm"
+                class="rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+
+              <label class="flex items-center gap-2 text-sm text-gray-600">
+                <input type="checkbox" [(ngModel)]="option.isAvailable" />
+                Bán
+              </label>
+
+              <button type="button" (click)="removeOption(groupIndex, optionIndex)"
+                class="rounded-md text-sm text-red-500 hover:bg-red-50">
+                Xóa
+              </button>
+            </div>
+            }
+            }
+          </div>
+
+          <button type="button" (click)="addOption(groupIndex)"
+            class="mt-3 rounded-md border border-blue-100 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50">
+            + Option
+          </button>
+        </div>
+        }
+        }
       </div>
     </div>
 

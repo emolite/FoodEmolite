@@ -8,21 +8,73 @@
                 Quản lý đơn hàng thuộc cửa hàng của đại lý
             </p>
         </div>
+
+        <div class="flex items-center gap-2">
+            <button
+                type="button"
+                class="rounded-lg border border-green-600 bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="selectedOrderIds().length === 0 || isSubmitting()"
+                (click)="confirmPaymentSelected()"
+            >
+                Xác nhận thanh toán
+            </button>
+
+            <button
+                type="button"
+                class="rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="selectedOrderIds().length === 0 || isSubmitting()"
+                (click)="confirmOrderSelected()"
+            >
+                Xác nhận đơn hàng
+            </button>
+        </div>
     </div>
 
-    <app-filter [fields]="filterFields" [initialValues]="filter()" (filterChange)="onFilterChange($event)">
+    <app-filter
+        [fields]="filterFields"
+        [initialValues]="filter()"
+        (filterChange)="onFilterChange($event)"
+    >
     </app-filter>
-
     <div></div>
-
-    <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
-        [loading]="loading() || isSubmitting()" [sortBy]="sortBy()" [asc]="asc()" emptyText="Không có đơn hàng"
-        (rowClick)="openDetail($event)" (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
+    <app-table
+        [columns]="columns"
+        [rows]="rows()"
+        [currentPage]="page()"
+        [totalPages]="totalPages()"
+        [loading]="loading() || isSubmitting()"
+        [sortBy]="sortBy()"
+        [asc]="asc()"
+        emptyText="Không có đơn hàng"
+        (rowClick)="openDetail($event)"
+        (pageChange)="onPageChange($event)"
+        (sortChange)="onSortChange($event)"
+        (rowCheckChange)="toggleSelected($event.row, $event.checked)"
+        (allCheckChange)="toggleAllSelected($event)"
+    >
     </app-table>
 </div>
 
 @if (isDetailRendered() && selectedOrder()) {
-<app-pop-up-agent-order-detail [order]="selectedOrder()!" [isOpen]="isDetailOpen()" [isSubmitting]="isSubmitting()"
-    (closed)="closeDetail()" (submitted)="updateStatus($event)">
+<app-pop-up-agent-order-detail
+    [order]="selectedOrder()!"
+    [isOpen]="isDetailOpen()"
+    [isSubmitting]="isSubmitting()"
+    (closed)="closeDetail()"
+    (submitted)="updateStatus($event)"
+>
 </app-pop-up-agent-order-detail>
+}
+
+@if (isConfirmOpen()) {
+<app-confirm-popup
+    [title]="confirmTitle()"
+    [message]="confirmMessage()"
+    confirmText="Xác nhận"
+    cancelText="Huỷ"
+    [isSubmitting]="isSubmitting()"
+    (confirmed)="submitConfirm()"
+    (cancelled)="closeConfirm()"
+>
+</app-confirm-popup>
 }

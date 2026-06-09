@@ -33,12 +33,86 @@ export class AppTableComponent {
   @Output() rowClick = new EventEmitter<TableRow>();
   @Output() pageChange = new EventEmitter<number>();
 
+  @Output() rowCheckChange = new EventEmitter<{
+    row: TableRow;
+    checked: boolean;
+  }>();
+
+  @Output() allCheckChange = new EventEmitter<boolean>();
+
   trackByColumn(_: number, item: TableColumn): string {
     return item.key;
   }
 
   getValue(row: TableRow, key: string): TableCellValue {
     return row[key];
+  }
+
+  getDisplayValue(row: TableRow, key: string): string {
+    const value = row[key];
+
+    if (
+      value &&
+      typeof value === 'object' &&
+      'text' in value &&
+      typeof value['text'] === 'string'
+    ) {
+      return value['text'];
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      return String(value);
+    }
+
+    return '';
+  }
+
+  getRawValue(row: TableRow, key: string): string {
+    const value = row[key];
+
+    if (
+      value &&
+      typeof value === 'object' &&
+      'value' in value &&
+      typeof value['value'] === 'string'
+    ) {
+      return value['value'];
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      return String(value);
+    }
+
+    return '';
+  }
+
+  getBadgeClass(row: TableRow, key: string): string {
+    const value = this.getRawValue(row, key);
+
+    switch (value) {
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-700';
+
+      case 'CONFIRMED':
+        return 'bg-blue-100 text-blue-700';
+
+      case 'UNPAID':
+        return 'bg-red-100 text-red-700';
+
+      case 'PAID':
+        return 'bg-green-100 text-green-700';
+
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
   }
 
   getDateValue(row: TableRow, key: string): string | number | Date | null {
@@ -55,6 +129,31 @@ export class AppTableComponent {
     return null;
   }
 
+  isAllChecked(): boolean {
+    return this.rows.length > 0 && this.rows.every(row => !!row['selected']);
+  }
+
+  isIndeterminate(): boolean {
+    const checkedCount = this.rows.filter(row => !!row['selected']).length;
+
+    return checkedCount > 0 && checkedCount < this.rows.length;
+  }
+
+  onToggleRow(row: TableRow, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    this.rowCheckChange.emit({
+      row,
+      checked
+    });
+  }
+
+  onToggleAll(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    this.allCheckChange.emit(checked);
+  }
+
   onRowClick(row: TableRow): void {
     this.rowClick.emit(row);
   }
@@ -64,7 +163,7 @@ export class AppTableComponent {
   }
 
   onSort(column: TableColumn): void {
-    if (!column.sortable) {
+    if (!column.sortable || column.type === 'checkbox') {
       return;
     }
 

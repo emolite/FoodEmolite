@@ -1,10 +1,10 @@
 <div class="fixed inset-0 z-50 bg-black/40" (click)="close()"></div>
 
-<div class="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-3xl -translate-y-1/2 rounded-md bg-white shadow-xl">
+<div class="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-4xl -translate-y-1/2 rounded-md bg-white shadow-xl">
     <div class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
         <div>
             <h2 class="text-lg font-semibold text-gray-900">
-                Thanh toán đơn hàng #{{ order().id }}
+                Thanh toán đơn hàng #{{ order().orderCode }}
             </h2>
 
             <p class="mt-1 text-sm text-gray-500">
@@ -32,6 +32,10 @@
 
                 <p class="mt-4 text-center text-lg font-bold text-gray-900">
                     {{ formatCurrency(paymentInfo()!.amount) }}
+                </p>
+
+                <p class="mt-1 text-center text-xs text-gray-500">
+                    Số tiền cần thanh toán
                 </p>
             </div>
 
@@ -73,28 +77,84 @@
                 </div>
 
                 <div class="rounded-md border border-gray-200 p-4">
-                    <h3 class="text-sm font-semibold text-gray-900">
-                        Danh sách món
-                    </h3>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-gray-900">
+                            Danh sách món
+                        </h3>
 
-                    <div class="mt-3 space-y-2">
+                        <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                            {{ order().items.length }} món
+                        </span>
+                    </div>
+
+                    <div class="mt-4 space-y-3">
                         @for (item of order().items; track item.id) {
-                        <div class="flex items-center justify-between gap-3 text-sm">
-                            <div class="min-w-0">
-                                <p class="truncate font-medium text-gray-900">
-                                 {{ item.foodName }}
-                                </p>
+                        <div class="rounded-md border border-gray-100 bg-gray-50 p-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-sm font-semibold text-gray-900">
+                                        {{ item.foodName }}
+                                    </p>
 
-                                <p class="mt-0.5 text-xs text-gray-500">
-                                    {{ item.quantity }} x {{ formatCurrency(item.unitPrice) }}
+                                    @if (item.options && item.options.length > 0) {
+                                    <div class="mt-2 space-y-1">
+                                        @for (option of item.options; track option.id) {
+                                        <div class="flex items-center justify-between gap-3 rounded bg-white px-2 py-1 text-xs">
+                                            <div class="min-w-0">
+                                                <span class="text-gray-500">
+                                                    {{ option.optionGroupName }}:
+                                                </span>
+
+                                                <span class="font-medium text-gray-800">
+                                                    {{ option.optionName }}
+                                                </span>
+                                            </div>
+
+                                            @if (option.additionalPrice > 0) {
+                                            <span class="shrink-0 font-medium text-gray-700">
+                                                +{{ formatCurrency(option.additionalPrice) }}
+                                            </span>
+                                            } @else {
+                                            <span class="shrink-0 text-gray-400">
+                                                Miễn phí
+                                            </span>
+                                            }
+                                        </div>
+                                        }
+                                    </div>
+                                    }
+
+                                    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                                        <span>
+                                            SL: {{ item.quantity }}
+                                        </span>
+
+                                        <span class="h-1 w-1 rounded-full bg-gray-300"></span>
+
+                                        <span>
+                                            Giá gốc: {{ formatCurrency(getBaseUnitPrice(item)) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <p class="shrink-0 text-sm font-bold text-gray-900">
+                                    {{ formatCurrency(item.totalPrice) }}
                                 </p>
                             </div>
-
-                            <p class="shrink-0 font-semibold text-gray-900">
-                                {{ formatCurrency(item.totalPrice) }}
-                            </p>
                         </div>
                         }
+                    </div>
+
+                    <div class="mt-4 border-t border-gray-200 pt-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-600">
+                                Tổng cộng
+                            </span>
+
+                            <span class="text-base font-bold text-gray-900">
+                                {{ formatCurrency(order().totalAmount) }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

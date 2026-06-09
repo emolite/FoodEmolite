@@ -11,16 +11,29 @@ import { ToastService } from '../../../common/services/toast.service';
 import { OrderService } from '../../../common/services/order.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
+import { PopUpUserFoodOptionsComponent } from './pop-up-user-food-options/pop-up-user-food-options';
+
+export interface CartItemOption {
+    optionGroupId: number;
+    optionGroupName: string;
+    optionId: number;
+    optionName: string;
+    additionalPrice: number;
+}
 
 interface CartItem {
     food: StoreFoodResponse;
     quantity: number;
     note: string;
+    selectedOptions: CartItemOption[];
+    isDetailLoaded: boolean;
 }
 
 @Component({
     selector: 'app-page-user-store-foods',
-    imports: [],
+    imports: [
+        PopUpUserFoodOptionsComponent
+    ],
     templateUrl: './user-store-foods.html'
 })
 export class PageUserStoreFoodsComponent {
@@ -38,6 +51,10 @@ export class PageUserStoreFoodsComponent {
     ordering = signal(false);
     isMobileCartOpen = signal(false);
 
+    isConfirmOrderOpen = signal(false);
+    isOptionPopupOpen = signal(false);
+    selectingCartIndex = signal<number | null>(null);
+
     cartWidth = signal(380);
     isResizing = signal(false);
 
@@ -49,10 +66,14 @@ export class PageUserStoreFoodsComponent {
     );
 
     totalAmount = computed(() =>
-        this.cart().reduce(
-            (total, item) => total + item.food.price * item.quantity,
-            0
-        )
+        this.cart().reduce((total, item) => {
+            const optionAmount = item.selectedOptions.reduce(
+                (sum, option) => sum + option.additionalPrice,
+                0
+            );
+
+            return total + (item.food.price + optionAmount) * item.quantity;
+        }, 0)
     );
 
     constructor() {
@@ -65,9 +86,7 @@ export class PageUserStoreFoodsComponent {
 
     @HostListener('document:mousemove', ['$event'])
     onMouseMove(event: MouseEvent): void {
-        if (!this.isResizing()) {
-            return;
-        }
+        if (!this.isResizing()) return;
 
         const width = window.innerWidth - event.clientX;
         const min = 320;
@@ -111,7 +130,8 @@ export class PageUserStoreFoodsComponent {
 
     addToCart(food: StoreFoodResponse): void {
         const existed = this.cart().find(item =>
-            item.food.id === food.id
+            item.food.id === food.id &&
+            item.selectedOptions.length === 0
         );
 
         if (existed) {
@@ -124,7 +144,9 @@ export class PageUserStoreFoodsComponent {
             {
                 food,
                 quantity: 1,
-                note: ''
+                note: '',
+                selectedOptions: [],
+                isDetailLoaded: false
             }
         ]);
     }
@@ -193,6 +215,115 @@ export class PageUserStoreFoodsComponent {
         );
     }
 
+    openConfirmOrder(): void {
+        if (this.cart().length === 0 || this.ordering()) return;
+
+        this.isConfirmOrderOpen.set(true);
+    }
+
+    closeConfirmOrder(): void {
+        this.isConfirmOrderOpen.set(false);
+    }
+
+    confirmOrder(): void {
+        this.isConfirmOrderOpen.set(false);
+        this.ensureCartItemsHaveOptions();
+    }
+
+    private ensureCartItemsHaveOptions(): void {
+        const itemNeedLoad = this.cart().find(item =>
+            !item.isDetailLoaded
+        );
+
+        if (!itemNeedLoad) {
+            this.checkOptionsBeforeCreateOrder();
+            return;
+        }
+
+        this.storeFoodService.getDetail(itemNeedLoad.food.id).subscribe({
+            next: response => {
+                if (!response.isSuccess || !response.data) {
+                    this.toastService.error(response.message || 'Không tải được tùy chọn món');
+                    return;
+                }
+
+                const foodDetail: StoreFoodResponse = response.data;
+
+                this.cart.update(items =>
+                    items.map(item =>
+                        item.food.id === itemNeedLoad.food.id
+                            ? {
+                                ...item,
+                                food: foodDetail,
+                                isDetailLoaded: true
+                            }
+                            : item
+                    )
+                );
+
+                this.ensureCartItemsHaveOptions();
+            },
+            error: () => {
+                this.toastService.error('Không tải được tùy chọn món');
+            }
+        });
+    }
+
+    private checkOptionsBeforeCreateOrder(): void {
+        const indexNeedOption = this.cart().findIndex(item =>
+            this.isCartItemMissingRequiredOption(item)
+        );
+
+        if (indexNeedOption >= 0) {
+            this.selectingCartIndex.set(indexNeedOption);
+            this.isOptionPopupOpen.set(true);
+            return;
+        }
+
+        this.createOrder();
+    }
+
+    private isCartItemMissingRequiredOption(item: CartItem): boolean {
+        const requiredGroups = (item.food.optionGroups ?? []).filter(group =>
+            group.isRequired
+        );
+
+        if (requiredGroups.length === 0) return false;
+
+        return requiredGroups.some(group =>
+            !item.selectedOptions.some(option =>
+                option.optionGroupId === group.id
+            )
+        );
+    }
+
+    applyOptions(options: CartItemOption[]): void {
+        const index = this.selectingCartIndex();
+
+        if (index === null) return;
+
+        this.cart.update(items =>
+            items.map((item, itemIndex) =>
+                itemIndex === index
+                    ? {
+                        ...item,
+                        selectedOptions: options
+                    }
+                    : item
+            )
+        );
+
+        this.isOptionPopupOpen.set(false);
+        this.selectingCartIndex.set(null);
+
+        this.checkOptionsBeforeCreateOrder();
+    }
+
+    closeOptionPopup(): void {
+        this.isOptionPopupOpen.set(false);
+        this.selectingCartIndex.set(null);
+    }
+
     createOrder(): void {
         if (this.cart().length === 0 || this.ordering()) {
             return;
@@ -205,7 +336,14 @@ export class PageUserStoreFoodsComponent {
             note: null,
             items: this.cart().map(item => ({
                 storeFoodId: item.food.id,
-                quantity: item.quantity
+                quantity: item.quantity,
+                options: item.selectedOptions.map(option => ({
+                    optionGroupId: option.optionGroupId,
+                    optionGroupName: option.optionGroupName,
+                    optionId: option.optionId,
+                    optionName: option.optionName,
+                    additionalPrice: option.additionalPrice
+                }))
             }))
         }).subscribe({
             next: response => {
@@ -231,14 +369,14 @@ export class PageUserStoreFoodsComponent {
         this.isMobileCartOpen.set(true);
     }
 
+    closeMobileCart(): void {
+        this.isMobileCartOpen.set(false);
+    }
+
     onQuantityInput(foodId: number, value: string): void {
         const quantity = Number(value.replace(/\D/g, ''));
 
         this.setQuantity(foodId, quantity);
-    }
-
-    closeMobileCart(): void {
-        this.isMobileCartOpen.set(false);
     }
 
     back(): void {
@@ -247,6 +385,29 @@ export class PageUserStoreFoodsComponent {
             URL_ENDPOINT.USER,
             URL_ENDPOINT.USER_STORES
         ]);
+    }
+
+    getItemAmount(item: CartItem): number {
+        const optionAmount = item.selectedOptions.reduce(
+            (sum, option) => sum + option.additionalPrice,
+            0
+        );
+
+        return (item.food.price + optionAmount) * item.quantity;
+    }
+
+    getOptionText(item: CartItem): string {
+        if (item.selectedOptions.length === 0) {
+            return '';
+        }
+
+        return item.selectedOptions
+            .map(option => `${option.optionGroupName}: ${option.optionName}`)
+            .join(', ');
+    }
+
+    hasOptions(food: StoreFoodResponse): boolean {
+        return (food.optionGroups ?? []).length > 0;
     }
 
     formatCurrency(value: number): string {

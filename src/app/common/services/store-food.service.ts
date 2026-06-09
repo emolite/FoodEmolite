@@ -5,6 +5,8 @@ import { ApiService } from '../constants/api.service';
 import { BaseResponse, BaseTableResponse } from '../models/base-response.model';
 import {
   CreateStoreFoodRequest,
+  StoreFoodOptionGroupRequest,
+  StoreFoodOptionRequest,
   StoreFoodResponse,
   UpdateStoreFoodRequest
 } from '../models/store-food.model';
@@ -43,7 +45,7 @@ export class StoreFoodService {
   }
 
   getDetail(
-    id: number,
+    id: number
   ): Observable<BaseResponse<StoreFoodResponse>> {
     return this.apiService.get<BaseResponse<StoreFoodResponse>>(
       API_ENDPOINT.STORE_FOOD.DETAIL(id)
@@ -74,7 +76,7 @@ export class StoreFoodService {
   }
 
   delete(
-    id: number,
+    id: number
   ): Observable<BaseResponse<string>> {
     return this.apiService.delete<BaseResponse<string>>(
       API_ENDPOINT.STORE_FOOD.DETAIL(id)
@@ -86,18 +88,17 @@ export class StoreFoodService {
   ): FormData {
     const formData = new FormData();
 
-    formData.append('storeRefCode', request.storeRefCode);
-    formData.append('foodName', request.foodName);
-    formData.append('price', String(request.price));
-    formData.append('quantity', String(request.quantity));
+    formData.append('StoreRefCode', request.storeRefCode);
+    formData.append('FoodName', request.foodName);
+    formData.append('Price', String(request.price));
+    formData.append('Quantity', String(request.quantity));
+    formData.append('Description', request.description ?? '');
 
     if (request.thumbnailFile) {
-      formData.append('thumbnailFile', request.thumbnailFile);
+      formData.append('ThumbnailFile', request.thumbnailFile);
     }
 
-    if (request.description) {
-      formData.append('description', request.description);
-    }
+    this.appendOptionGroups(formData, request.optionGroups ?? []);
 
     return formData;
   }
@@ -107,23 +108,68 @@ export class StoreFoodService {
   ): FormData {
     const formData = new FormData();
 
-    formData.append('foodName', request.foodName);
-    formData.append('price', String(request.price));
-    formData.append('quantity', String(request.quantity));
-    formData.append('isAvailable', String(request.isAvailable));
+    formData.append('FoodName', request.foodName);
+    formData.append('Price', String(request.price));
+    formData.append('Quantity', String(request.quantity));
+    formData.append('IsAvailable', String(request.isAvailable));
+    formData.append('Description', request.description ?? '');
 
     if (request.thumbnailFile) {
-      formData.append('thumbnailFile', request.thumbnailFile);
+      formData.append('ThumbnailFile', request.thumbnailFile);
     }
 
     if (request.thumbnailUrl) {
-      formData.append('thumbnailUrl', request.thumbnailUrl);
+      formData.append('ThumbnailUrl', request.thumbnailUrl);
     }
 
-    if (request.description) {
-      formData.append('description', request.description);
-    }
+    this.appendOptionGroups(formData, request.optionGroups ?? []);
 
     return formData;
+  }
+
+  private appendOptionGroups(
+    formData: FormData,
+    optionGroups: StoreFoodOptionGroupRequest[]
+  ): void {
+    optionGroups.forEach((group, groupIndex) => {
+      if (group.id) {
+        formData.append(`OptionGroups[${groupIndex}].Id`, String(group.id));
+      }
+
+      formData.append(`OptionGroups[${groupIndex}].GroupName`, group.groupName);
+      formData.append(`OptionGroups[${groupIndex}].IsRequired`, String(group.isRequired));
+      formData.append(`OptionGroups[${groupIndex}].MinSelect`, String(group.minSelect));
+      formData.append(`OptionGroups[${groupIndex}].MaxSelect`, String(group.maxSelect));
+      formData.append(`OptionGroups[${groupIndex}].SortOrder`, String(group.sortOrder));
+      formData.append(`OptionGroups[${groupIndex}].IsDeleted`, String(group.isDeleted ?? false));
+
+      group.options.forEach((option, optionIndex) => {
+        this.appendOption(
+          formData,
+          option,
+          groupIndex,
+          optionIndex
+        );
+      });
+    });
+  }
+
+  private appendOption(
+    formData: FormData,
+    option: StoreFoodOptionRequest,
+    groupIndex: number,
+    optionIndex: number
+  ): void {
+    const prefix = `OptionGroups[${groupIndex}].Options[${optionIndex}]`;
+
+    if (option.id) {
+      formData.append(`${prefix}.Id`, String(option.id));
+    }
+
+    formData.append(`${prefix}.OptionName`, option.optionName);
+    formData.append(`${prefix}.AdditionalPrice`, String(option.additionalPrice));
+    formData.append(`${prefix}.IsAvailable`, String(option.isAvailable));
+    formData.append(`${prefix}.SortOrder`, String(option.sortOrder));
+    formData.append(`${prefix}.IsDeleted`, String(option.isDeleted ?? false));
   }
 }

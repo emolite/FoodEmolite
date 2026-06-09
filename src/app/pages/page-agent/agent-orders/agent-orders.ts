@@ -11,9 +11,12 @@ import {
 } from '../../../common/models/front-end/table/table-column.model';
 import {
     OrderResponse,
-    UpdateOrderStatusRequest
+    UpdateOrderStatusRequest,
+    UpdatePaymentStatusRequest
 } from '../../../common/models/order.model';
 import { PopUpAgentOrderDetailComponent } from './pop-up-agent-order-detail/pop-up-agent-order-detail';
+import { ConfirmPopupComponent } from '../../../shared/component/confirm-popup/confirm-popup';
+
 interface OrderFilter {
     orderStatus: string;
     paymentStatus: string;
@@ -24,7 +27,8 @@ interface OrderFilter {
     imports: [
         AppTableComponent,
         FilterComponent,
-        PopUpAgentOrderDetailComponent
+        PopUpAgentOrderDetailComponent,
+        ConfirmPopupComponent
     ],
     templateUrl: './agent-orders.html'
 })
@@ -35,6 +39,7 @@ export class PageAgentOrdersComponent {
 
     orders = signal<OrderResponse[]>([]);
     selectedOrder = signal<OrderResponse | null>(null);
+    selectedOrderIds = signal<number[]>([]);
     storeRefCode = signal<string | null>(null);
 
     page = signal(1);
@@ -44,6 +49,10 @@ export class PageAgentOrdersComponent {
     isSubmitting = signal(false);
     isDetailOpen = signal(false);
     isDetailRendered = signal(false);
+    isConfirmOpen = signal(false);
+    confirmTitle = signal('');
+    confirmMessage = signal('');
+    confirmAction = signal<'PAYMENT' | 'ORDER' | null>(null);
 
     sortBy = signal('');
     asc = signal(false);
@@ -55,17 +64,23 @@ export class PageAgentOrdersComponent {
 
     columns: TableColumn[] = [
         {
+            key: 'selected',
+            label: '',
+            width: '60px',
+            align: 'center',
+            type: 'checkbox'
+        },
+        {
             key: 'index',
             label: 'STT',
             width: '80px',
             align: 'center'
         },
         {
-            key: 'id',
+            key: 'orderCode',
             label: 'Mã đơn',
-            width: '100px',
-            align: 'center',
-            sortable: true
+            width: '150px',
+            align: 'left'
         },
         {
             key: 'totalAmount',
@@ -78,13 +93,15 @@ export class PageAgentOrdersComponent {
             key: 'orderStatusText',
             label: 'Trạng thái đơn',
             width: '160px',
-            align: 'center'
+            align: 'center',
+            type: 'badge'
         },
         {
             key: 'paymentStatusText',
             label: 'Thanh toán',
             width: '140px',
-            align: 'center'
+            align: 'center',
+            type: 'badge'
         },
         {
             key: 'note',
@@ -198,15 +215,23 @@ export class PageAgentOrdersComponent {
         }
 
         return data.map((order, index) => ({
+            selected: this.isSelected(order.id),
             index: (this.page() - 1) * this.pageSize() + index + 1,
             id: order.id,
+            orderCode: order.orderCode,
             refCode: order.refCode,
             storeRefCode: order.storeRefCode,
             totalAmount: this.formatCurrency(order.totalAmount),
             orderStatus: order.orderStatus,
-            orderStatusText: this.getOrderStatusText(order.orderStatus),
+            orderStatusText: {
+                text: this.getOrderStatusText(order.orderStatus),
+                value: order.orderStatus
+            },
             paymentStatus: order.paymentStatus,
-            paymentStatusText: this.getPaymentStatusText(order.paymentStatus),
+            paymentStatusText: {
+                text: this.getPaymentStatusText(order.paymentStatus),
+                value: order.paymentStatus
+            },
             note: order.note ?? '',
             createdAt: this.formatDate(order.createdAt)
         }));
@@ -251,6 +276,7 @@ export class PageAgentOrdersComponent {
             next: response => {
                 this.orders.set(response.items);
                 this.totalPages.set(response.totalPages);
+                this.selectedOrderIds.set([]);
                 this.loading.set(false);
             },
             error: () => {
@@ -309,13 +335,208 @@ export class PageAgentOrdersComponent {
         });
     }
 
+    toggleSelected(row: TableRow, checked: boolean): void {
+        const id = Number(row['id']);
+
+        if (!id) {
+            return;
+        }
+
+        if (checked) {
+            this.selectedOrderIds.set([
+                ...new Set([...this.selectedOrderIds(), id])
+            ]);
+            return;
+        }
+
+        this.selectedOrderIds.set(
+            this.selectedOrderIds().filter(selectedId => selectedId !== id)
+        );
+    }
+
+    toggleAllSelected(checked: boolean): void {
+        if (!checked) {
+            this.selectedOrderIds.set([]);
+            return;
+        }
+
+        const ids = this.rows()
+            .map(row => Number(row['id']))
+            .filter(id => !!id);
+
+        this.selectedOrderIds.set(ids);
+    }
+
+    confirmPaymentSelected(): void {
+        const selectedOrders = this.getSelectedOrders();
+
+        const invalidOrders = selectedOrders.filter(
+            order => order.paymentStatus === 'PAID'
+        );
+
+        if (invalidOrders.length) {
+            this.toastService.error('Có đơn đã thanh toán trong danh sách đã chọn');
+            return;
+        }
+
+        this.confirmTitle.set('Xác nhận thanh toán');
+        this.confirmMessage.set(
+            `Bạn có chắc muốn xác nhận thanh toán cho ${selectedOrders.length} đơn hàng đã chọn không?`
+        );
+        this.confirmAction.set('PAYMENT');
+        this.isConfirmOpen.set(true);
+    }
+
+    confirmOrderSelected(): void {
+        const selectedOrders = this.getSelectedOrders();
+
+        const invalidOrders = selectedOrders.filter(
+            order => order.orderStatus !== 'PENDING'
+        );
+
+        if (invalidOrders.length) {
+            this.toastService.error('Chỉ xác nhận được đơn đang chờ xác nhận');
+            return;
+        }
+
+        this.confirmTitle.set('Xác nhận đơn hàng');
+        this.confirmMessage.set(
+            `Bạn có chắc muốn xác nhận ${selectedOrders.length} đơn hàng đã chọn không?`
+        );
+        this.confirmAction.set('ORDER');
+        this.isConfirmOpen.set(true);
+    }
+
+    closeConfirm(): void {
+        if (this.isSubmitting()) {
+            return;
+        }
+
+        this.isConfirmOpen.set(false);
+        this.confirmAction.set(null);
+    }
+
+    submitConfirm(): void {
+        const action = this.confirmAction();
+
+        this.isConfirmOpen.set(false);
+
+        if (action === 'PAYMENT') {
+            this.bulkUpdatePaymentSelected({
+                newStatus: 'PAID',
+                changedNote: 'Đại lý xác nhận đã thanh toán'
+            });
+            return;
+        }
+
+        if (action === 'ORDER') {
+            this.bulkUpdateSelected({
+                newStatus: 'CONFIRMED',
+                changedNote: 'Đại lý xác nhận đơn hàng'
+            });
+        }
+    }
+
+    private bulkUpdateSelected(request: UpdateOrderStatusRequest): void {
+        const ids = this.selectedOrderIds();
+
+        if (!ids.length) {
+            return;
+        }
+
+        this.isSubmitting.set(true);
+
+        let completed = 0;
+        let failed = 0;
+
+        ids.forEach(id => {
+            this.orderService.updateStatus(id, request).subscribe({
+                next: response => {
+                    completed++;
+
+                    if (!response.isSuccess) {
+                        failed++;
+                    }
+
+                    this.finishBulkUpdate(completed, failed, ids.length);
+                },
+                error: () => {
+                    completed++;
+                    failed++;
+                    this.finishBulkUpdate(completed, failed, ids.length);
+                }
+            });
+        });
+    }
+
+    private bulkUpdatePaymentSelected(request: UpdatePaymentStatusRequest): void {
+        const ids = this.selectedOrderIds();
+
+        if (!ids.length) {
+            return;
+        }
+
+        this.isSubmitting.set(true);
+
+        let completed = 0;
+        let failed = 0;
+
+        ids.forEach(id => {
+            this.orderService.updatePaymentStatus(id, request).subscribe({
+                next: response => {
+                    completed++;
+
+                    if (!response.isSuccess) {
+                        failed++;
+                    }
+
+                    this.finishBulkUpdate(completed, failed, ids.length);
+                },
+                error: () => {
+                    completed++;
+                    failed++;
+                    this.finishBulkUpdate(completed, failed, ids.length);
+                }
+            });
+        });
+    }
+
+    private finishBulkUpdate(completed: number, failed: number, total: number): void {
+        if (completed < total) {
+            return;
+        }
+
+        this.isSubmitting.set(false);
+        this.selectedOrderIds.set([]);
+
+        if (failed) {
+            this.toastService.error(`Có ${failed} đơn cập nhật thất bại`);
+        } else {
+            this.toastService.success('Cập nhật đơn hàng thành công');
+        }
+
+        this.loadOrders();
+    }
+
+    private getSelectedOrders(): OrderResponse[] {
+        const ids = this.selectedOrderIds();
+
+        return this.orders().filter(order => ids.includes(order.id));
+    }
+
+    private isSelected(orderId: number): boolean {
+        return this.selectedOrderIds().includes(orderId);
+    }
+
     onPageChange(page: number): void {
         this.page.set(page);
+        this.selectedOrderIds.set([]);
         this.loadOrders();
     }
 
     onFilterChange(value: OrderFilter): void {
         this.filter.set(value);
+        this.selectedOrderIds.set([]);
     }
 
     onSortChange(key: string): void {

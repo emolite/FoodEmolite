@@ -6,7 +6,7 @@ import {
     output,
     signal
 } from '@angular/core';
-import { OrderResponse } from '../../../../common/models/order.model';
+import { OrderItemResponse, OrderResponse } from '../../../../common/models/order.model';
 import { StorePaymentInfoResponse } from '../../../../common/models/profile.model';
 import { ProfileService } from '../../../../common/services/profile.service';
 import { ToastService } from '../../../../common/services/toast.service';
@@ -52,6 +52,25 @@ export class UserOrderPaymentPopupComponent implements OnInit {
                 this.toastService.error('Không tải được thông tin thanh toán');
             }
         });
+    }
+
+    getItemOptionsText(item: OrderItemResponse): string {
+        if (!item.options || item.options.length === 0) {
+            return '';
+        }
+
+        return item.options
+            .map(option => `${option.optionGroupName}: ${option.optionName}`)
+            .join(', ');
+    }
+
+    getBaseUnitPrice(item: OrderItemResponse): number {
+        const optionAmount = (item.options ?? []).reduce(
+            (sum, option) => sum + option.additionalPrice,
+            0
+        );
+
+        return item.unitPrice - optionAmount;
     }
 
     close(): void {

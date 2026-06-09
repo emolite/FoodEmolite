@@ -1,0 +1,101 @@
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
+    <div class="flex max-h-[90vh] w-full max-w-md flex-col rounded-md bg-white shadow-xl">
+        <div class="flex items-start justify-between border-b border-gray-200 px-5 py-4">
+            <div>
+                <h2 class="text-base font-semibold text-gray-900">
+                    Chọn tùy chọn món
+                </h2>
+
+                <p class="mt-1 text-sm text-gray-500">
+                    {{ food.foodName }}
+                </p>
+            </div>
+
+            <button type="button" (click)="close()" class="text-gray-400 hover:text-gray-600">
+                ✕
+            </button>
+        </div>
+
+        <div class="min-h-0 flex-1 overflow-y-auto p-5">
+            @for (group of food.optionGroups; track group.id) {
+            <div class="mb-5">
+                <div class="mb-2 flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-gray-900">
+                        {{ group.groupName }}
+                    </h3>
+
+                    @if (group.isRequired) {
+                    <span class="rounded bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+                        Bắt buộc
+                    </span>
+                    } @else {
+                    <span class="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                        Không bắt buộc
+                    </span>
+                    }
+                </div>
+
+                <div class="space-y-2">
+                    @for (option of group.options; track option.id) {
+                    @if (option.isAvailable) {
+                    <label
+                        class="flex cursor-pointer items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 transition hover:bg-gray-50"
+                        [class.border-gray-900]="selectedOptionIds()[group.id] === option.id">
+                        <div class="flex min-w-0 items-center gap-2">
+                            <input
+                                type="radio"
+                                [name]="'group-' + group.id"
+                                [checked]="selectedOptionIds()[group.id] === option.id"
+                                (change)="selectOption(group.id, option.id)" />
+
+                            <span class="truncate text-sm font-medium text-gray-800">
+                                {{ option.optionName }}
+                            </span>
+                        </div>
+
+                        <span class="shrink-0 text-sm text-gray-600">
+                            @if (option.additionalPrice > 0) {
+                            +{{ formatCurrency(option.additionalPrice) }}
+                            } @else {
+                            Miễn phí
+                            }
+                        </span>
+                    </label>
+                    }
+                    }
+                </div>
+
+                @if (isMissingRequiredGroup(group.id)) {
+                <p class="mt-2 text-xs text-red-500">
+                    Vui lòng chọn {{ group.groupName }}
+                </p>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="border-t border-gray-200 p-5">
+            <div class="mb-4 flex items-center justify-between">
+                <span class="text-sm text-gray-500">
+                    Giá sau tùy chọn
+                </span>
+
+                <span class="text-base font-bold text-gray-900">
+                    {{ formatCurrency(getSelectedTotal()) }}
+                </span>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" (click)="close()"
+                    class="rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                    Hủy
+                </button>
+
+                <button type="button" (click)="submit()"
+                    class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white">
+                    Tiếp tục
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -11,9 +11,7 @@ import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 
 @Component({
   selector: 'app-user-topbar',
-  imports: [
-    RouterLink
-  ],
+  imports: [],
   templateUrl: './user-topbar.html'
 })
 export class UserTopbarComponent {

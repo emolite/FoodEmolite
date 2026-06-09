@@ -7,7 +7,8 @@ import { BaseTableResponse } from '../models/base-response.model';
 import {
     CreateOrderRequest,
     OrderResponse,
-    UpdateOrderStatusRequest
+    UpdateOrderStatusRequest,
+    UpdatePaymentStatusRequest
 } from '../models/order.model';
 
 @Injectable({
@@ -58,6 +59,16 @@ export class OrderService {
     ): Observable<BaseResponse<string>> {
         return this.apiService.put<BaseResponse<string>, UpdateOrderStatusRequest>(
             API_ENDPOINT.ORDER.STATUS(id),
+            request
+        );
+    }
+
+    updatePaymentStatus(
+        id: number,
+        request: UpdatePaymentStatusRequest
+    ): Observable<BaseResponse<string>> {
+        return this.apiService.put<BaseResponse<string>, UpdatePaymentStatusRequest>(
+            API_ENDPOINT.ORDER.STATUS_PAYMENT(id),
             request
         );
     }

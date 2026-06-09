@@ -5,6 +5,7 @@ import {
     signal
 } from '@angular/core';
 import {
+    OrderItemResponse,
     OrderResponse,
     UpdateOrderStatusRequest
 } from '../../../../common/models/order.model';
@@ -40,6 +41,15 @@ export class PopUpAgentOrderDetailComponent {
             newStatus: status,
             changedNote: this.changedNote() || null
         });
+    }
+
+    getBaseUnitPrice(item: OrderItemResponse): number {
+        const optionAmount = (item.options ?? []).reduce(
+            (sum, option) => sum + option.additionalPrice,
+            0
+        );
+
+        return item.unitPrice - optionAmount;
     }
 
     formatCurrency(value: number): string {
