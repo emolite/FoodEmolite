@@ -62,3 +62,7 @@ export interface OrderItemOptionResponse {
   optionName: string;
   additionalPrice: number;
 }
+
+export interface PrintOrdersRequest {
+  orderIds: number[];
+}

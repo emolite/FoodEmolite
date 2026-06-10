@@ -49,6 +49,35 @@
             Danh sách món ăn
           </a>
         </li>
+
+        <li>
+          <a [routerLink]="[urlEndpoint.ADMIN_USERS]" routerLinkActive="bg-gray-100 text-gray-900 font-semibold"
+            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-users-icon lucide-users">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <circle cx="9" cy="7" r="4" />
+            </svg>
+            Danh sách người dùng
+          </a>
+        </li>
+
+        <li>
+          <a [routerLink]="[urlEndpoint.ADMIN_AGENTS]" routerLinkActive="bg-gray-100 text-gray-900 font-semibold"
+            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-user-round-check-icon lucide-user-round-check">
+              <path d="M2 21a8 8 0 0 1 13.292-6" />
+              <circle cx="10" cy="8" r="5" />
+              <path d="m16 19 2 2 4-4" />
+            </svg>
+            Danh sách đại lý
+          </a>
+        </li>
       </ul>
     </div>
 
@@ -66,6 +95,25 @@
               <path d="M4 17a6 6 0 0112 0" stroke-linecap="round" />
             </svg>
             Thông tin
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+        Thống Kê
+      </p>
+
+      <ul class="space-y-0.5">
+        <li>
+          <a routerLink="revenue" routerLinkActive="bg-gray-100 text-gray-900 font-semibold"
+            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-800">
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+              <circle cx="10" cy="7" r="3" />
+              <path d="M4 17a6 6 0 0112 0" stroke-linecap="round" />
+            </svg>
+            Doanh thu
           </a>
         </li>
       </ul>

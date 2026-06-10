@@ -1,0 +1,209 @@
+<div class="space-y-6">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-lg font-medium leading-5 text-gray-900">
+        Doanh Thu Đại Lý
+      </h1>
+      <p class="mt-2 text-md leading-4 text-gray-500">
+        Theo dõi doanh thu, số đơn hàng và tình trạng đơn
+      </p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+      <div>
+        <label class="mb-2 block text-sm font-medium text-gray-700">
+          Từ ngày
+        </label>
+        <input
+          type="date"
+          [ngModel]="fromDate()"
+          (ngModelChange)="fromDate.set($event)"
+          class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400"
+        />
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-medium text-gray-700">
+          Đến ngày
+        </label>
+        <input
+          type="date"
+          [ngModel]="toDate()"
+          (ngModelChange)="toDate.set($event)"
+          class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400"
+        />
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-medium text-gray-700">
+          Hiển thị theo
+        </label>
+
+        <app-dropdown
+          [options]="groupByOptions"
+          [placeholder]="'Chọn kiểu hiển thị'"
+          [value]="groupBy()"
+          (changed)="onGroupByChange($event?.value)"
+        >
+        </app-dropdown>
+      </div>
+
+      <div class="flex items-end gap-2">
+        <button
+          type="button"
+          (click)="loadRevenue()"
+          [disabled]="loading()"
+          class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ loading() ? 'Đang tải...' : 'Lọc' }}
+        </button>
+
+        <button
+          type="button"
+          (click)="resetFilter()"
+          [disabled]="loading()"
+          class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+        >
+          Đặt lại
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">
+            Tổng số đơn hàng
+          </p>
+          <h3 class="mt-2 text-2xl font-semibold text-gray-900">
+            {{ totalOrders() }}
+          </h3>
+        </div>
+
+        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-700">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z" />
+            <path d="M9 7h6" />
+            <path d="M9 11h6" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">
+            Tổng doanh thu
+          </p>
+          <h3 class="mt-2 text-2xl font-semibold text-gray-900">
+            {{ formatCurrency(totalRevenue()) }}
+          </h3>
+        </div>
+
+        <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-700">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 1v22" />
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_380px]">
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 class="text-base font-semibold text-gray-900">
+            Biểu đồ doanh thu
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Thống kê doanh thu đơn hàng
+          </p>
+        </div>
+
+        <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+          {{ groupBy() === 'day' ? 'Theo ngày' : 'Theo tháng' }}
+        </span>
+      </div>
+
+      <div class="mt-6">
+        @if (loading()) {
+        <div class="flex h-[330px] items-center justify-center text-sm text-gray-400">
+          Đang tải dữ liệu...
+        </div>
+        } @else if ((lineChartOptions.series?.[0]?.data?.length ?? 0) === 0) {
+        <div class="flex h-[330px] items-center justify-center rounded-xl border border-dashed border-gray-200 text-sm text-gray-400">
+          Chưa có dữ liệu doanh thu
+        </div>
+        } @else {
+        <apx-chart
+          [series]="lineChartOptions.series!"
+          [chart]="lineChartOptions.chart!"
+          [xaxis]="lineChartOptions.xaxis!"
+          [yaxis]="lineChartOptions.yaxis!"
+          [stroke]="lineChartOptions.stroke!"
+          [dataLabels]="lineChartOptions.dataLabels!"
+          [tooltip]="lineChartOptions.tooltip!"
+          [fill]="lineChartOptions.fill!"
+        >
+        </apx-chart>
+        }
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div>
+        <h2 class="text-base font-semibold text-gray-900">
+          Tỷ trọng đơn hàng
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">
+          Phân bổ doanh thu theo trạng thái đơn
+        </p>
+      </div>
+
+      <div class="mt-6">
+        @if (loading()) {
+        <div class="flex h-[330px] items-center justify-center text-sm text-gray-400">
+          Đang tải dữ liệu...
+        </div>
+        } @else if ((donutChartOptions.series?.length ?? 0) === 0) {
+        <div class="flex h-[330px] items-center justify-center rounded-xl border border-dashed border-gray-200 text-sm text-gray-400">
+          Chưa có dữ liệu
+        </div>
+        } @else {
+        <apx-chart
+          [series]="donutChartOptions.series!"
+          [chart]="donutChartOptions.chart!"
+          [labels]="donutChartOptions.labels!"
+          [legend]="donutChartOptions.legend!"
+          [tooltip]="donutChartOptions.tooltip!"
+          [dataLabels]="donutChartOptions.dataLabels!"
+          [plotOptions]="donutChartOptions.plotOptions!"
+          [responsive]="donutChartOptions.responsive!"
+        >
+        </apx-chart>
+        }
+      </div>
+    </div>
+  </div>
+</div>

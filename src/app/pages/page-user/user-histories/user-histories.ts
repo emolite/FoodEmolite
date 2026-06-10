@@ -117,4 +117,32 @@ export class PageUserOrderHistoryComponent {
                 return status;
         }
     }
+
+    getOrderStatusBadgeClass(status: string): string {
+        switch (status) {
+            case 'PENDING':
+                return 'bg-yellow-50 text-yellow-700 ring-yellow-600/20';
+            case 'CONFIRMED':
+                return 'bg-blue-50 text-blue-700 ring-blue-600/20';
+            case 'PROCESSING':
+                return 'bg-purple-50 text-purple-700 ring-purple-600/20';
+            case 'COMPLETED':
+                return 'bg-green-50 text-green-700 ring-green-600/20';
+            case 'CANCELLED':
+                return 'bg-red-50 text-red-700 ring-red-600/20';
+            default:
+                return 'bg-gray-50 text-gray-700 ring-gray-600/20';
+        }
+    }
+
+    getPaymentStatusBadgeClass(status: string): string {
+        switch (status) {
+            case 'UNPAID':
+                return 'bg-orange-50 text-orange-700 ring-orange-600/20';
+            case 'PAID':
+                return 'bg-emerald-50 text-emerald-700 ring-emerald-600/20';
+            default:
+                return 'bg-gray-50 text-gray-700 ring-gray-600/20';
+        }
+    }
 }

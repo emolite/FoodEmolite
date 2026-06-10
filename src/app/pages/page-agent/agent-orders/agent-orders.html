@@ -10,71 +10,112 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <button
-                type="button"
+            <div class="flex items-center gap-1 pl-2 ml-2">
+                <button type="button" title="In hóa đơn"
+                    class="rounded-md border border-gray-300 bg-white p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    [disabled]="selectedOrderIds().length === 0 || isSubmitting()" (click)="previewInvoiceSelected()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-printer-icon lucide-printer">
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                        <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
+                        <rect x="6" y="14" width="12" height="8" rx="1" />
+                    </svg>
+                </button>
+
+                <button type="button" title="Tải hóa đơn"
+                    class="rounded-md border border-gray-300 bg-white p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    [disabled]="selectedOrderIds().length === 0 || isSubmitting()" (click)="downloadInvoiceSelected()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-download-icon lucide-download">
+                        <path d="M12 15V3" />
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <path d="m7 10 5 5 5-5" />
+                    </svg>
+                </button>
+            </div>
+
+            <button type="button"
                 class="rounded-lg border border-green-600 bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
-                [disabled]="selectedOrderIds().length === 0 || isSubmitting()"
-                (click)="confirmPaymentSelected()"
-            >
+                [disabled]="selectedOrderIds().length === 0 || isSubmitting()" (click)="confirmPaymentSelected()">
                 Xác nhận thanh toán
             </button>
 
-            <button
-                type="button"
+            <button type="button"
                 class="rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                [disabled]="selectedOrderIds().length === 0 || isSubmitting()"
-                (click)="confirmOrderSelected()"
-            >
+                [disabled]="selectedOrderIds().length === 0 || isSubmitting()" (click)="confirmOrderSelected()">
                 Xác nhận đơn hàng
             </button>
         </div>
     </div>
 
-    <app-filter
-        [fields]="filterFields"
-        [initialValues]="filter()"
-        (filterChange)="onFilterChange($event)"
-    >
+    <app-filter [fields]="filterFields" [initialValues]="filter()" (filterChange)="onFilterChange($event)">
     </app-filter>
     <div></div>
-    <app-table
-        [columns]="columns"
-        [rows]="rows()"
-        [currentPage]="page()"
-        [totalPages]="totalPages()"
-        [loading]="loading() || isSubmitting()"
-        [sortBy]="sortBy()"
-        [asc]="asc()"
-        emptyText="Không có đơn hàng"
-        (rowClick)="openDetail($event)"
-        (pageChange)="onPageChange($event)"
-        (sortChange)="onSortChange($event)"
-        (rowCheckChange)="toggleSelected($event.row, $event.checked)"
-        (allCheckChange)="toggleAllSelected($event)"
-    >
+    <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
+        [loading]="loading() || isSubmitting()" [sortBy]="sortBy()" [asc]="asc()" emptyText="Không có đơn hàng"
+        (rowClick)="openDetail($event)" (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)"
+        (rowCheckChange)="toggleSelected($event.row, $event.checked)" (allCheckChange)="toggleAllSelected($event)">
     </app-table>
 </div>
 
 @if (isDetailRendered() && selectedOrder()) {
-<app-pop-up-agent-order-detail
-    [order]="selectedOrder()!"
-    [isOpen]="isDetailOpen()"
-    [isSubmitting]="isSubmitting()"
-    (closed)="closeDetail()"
-    (submitted)="updateStatus($event)"
->
+<app-pop-up-agent-order-detail [order]="selectedOrder()!" [isOpen]="isDetailOpen()" [isSubmitting]="isSubmitting()"
+    (closed)="closeDetail()" (submitted)="updateStatus($event)">
 </app-pop-up-agent-order-detail>
 }
 
 @if (isConfirmOpen()) {
-<app-confirm-popup
-    [title]="confirmTitle()"
-    [message]="confirmMessage()"
-    confirmText="Xác nhận"
-    cancelText="Huỷ"
-    [isSubmitting]="isSubmitting()"
-    (confirmed)="submitConfirm()"
-    (cancelled)="closeConfirm()"
->
+<app-confirm-popup [title]="confirmTitle()" [message]="confirmMessage()" confirmText="Xác nhận" cancelText="Huỷ"
+    [isSubmitting]="isSubmitting()" (confirmed)="submitConfirm()" (cancelled)="closeConfirm()">
 </app-confirm-popup>
+}
+
+@if (isInvoicePreviewOpen()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div class="flex h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+        <div class="flex items-center justify-between border-b px-5 py-4">
+            <div>
+                <h2 class="text-base font-semibold text-gray-900">
+                    Xem trước hoá đơn
+                </h2>
+                <p class="mt-1 text-sm text-gray-500">
+                    Kiểm tra hoá đơn trước khi in hoặc tải xuống
+                </p>
+            </div>
+
+            <button type="button" class="rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-100"
+                (click)="closeInvoicePreview()">
+                Đóng
+            </button>
+        </div>
+
+        <div class="flex-1 bg-gray-100">
+            @if (invoicePreviewUrl()) {
+            <iframe class="h-full w-full" [src]="invoicePreviewUrl()" type="application/pdf"></iframe>
+            }
+        </div>
+
+        <div class="flex justify-end gap-2 border-t px-5 py-4">
+            <button type="button"
+                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                (click)="closeInvoicePreview()">
+                Huỷ
+            </button>
+
+            <button type="button"
+                class="rounded-lg border border-gray-700 bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                (click)="downloadCurrentPreviewInvoice()">
+                Tải hoá đơn
+            </button>
+
+            <button type="button"
+                class="rounded-lg border border-purple-600 bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+                (click)="printCurrentPreviewInvoice()">
+                In
+            </button>
+        </div>
+    </div>
+</div>
 }

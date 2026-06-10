@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_ENDPOINT } from '../constants/api-endpoint';
 import { ApiService } from '../constants/api.service';
-import { BaseResponse } from '../models/base-response.model';
+import { BaseResponse, BaseTableResponse } from '../models/base-response.model';
 import {
   AccountProfileResponse,
   BankAccountResponse,
@@ -11,7 +11,8 @@ import {
   MyProfileResponse,
   StorePaymentInfoResponse,
   UpdateAccountProfileRequest,
-  UpdateBankAccountRequest
+  UpdateBankAccountRequest,
+  UserProfileResponse
 } from '../models/profile.model';
 
 @Injectable({
@@ -68,6 +69,32 @@ export class ProfileService {
     return this.apiService.put<BaseResponse<BankAccountResponse>, UpdateBankAccountRequest>(
       API_ENDPOINT.PROFILE.BANK_ACCOUNTS,
       request
+    );
+  }
+
+  getAllUserProfiles(
+    page: number = 1,
+    pageSize: number = 10
+  ): Observable<BaseTableResponse<UserProfileResponse>> {
+    return this.apiService.get<BaseTableResponse<UserProfileResponse>>(
+      API_ENDPOINT.PROFILE.LIST_ACC,
+      {
+        page,
+        pageSize
+      }
+    );
+  }
+
+  getAllAgentProfiles(
+    page: number = 1,
+    pageSize: number = 10
+  ): Observable<BaseTableResponse<MyProfileResponse>> {
+    return this.apiService.get<BaseTableResponse<MyProfileResponse>>(
+      API_ENDPOINT.PROFILE.LIST_ACC_AGENTS,
+      {
+        page,
+        pageSize
+      }
     );
   }
 

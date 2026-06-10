@@ -14,6 +14,10 @@ import { PageUserStoresComponent } from './pages/page-user/user-stores/user-stor
 import { PageUserStoreFoodsComponent } from './pages/page-user/user-store-foods/user-store-foods';
 import { PageUserOrderHistoryComponent } from './pages/page-user/user-histories/user-histories';
 import { PageAgentOrdersComponent } from './pages/page-agent/agent-orders/agent-orders';
+import { UsersComponent } from './pages/page-admin/users/users';
+import { AgentsComponent } from './pages/page-admin/agents/agents';
+import { AgentRevenueComponent } from './pages/page-agent/agent-revenue/agent-revenue';
+import { RevenueComponent } from './pages/page-admin/revenue/revenue';
 
 export const routes: Routes = [
   {
@@ -51,7 +55,28 @@ export const routes: Routes = [
         data: {
           title: 'Danh sách món ăn'
         }
-      }
+      },
+      {
+        path: URL_ENDPOINT.ADMIN_USERS,
+        component: UsersComponent,
+        data: {
+          title: 'Danh sách người dùng'
+        }
+      },
+      {
+        path: URL_ENDPOINT.ADMIN_AGENTS,
+        component: AgentsComponent,
+        data: {
+          title: 'Danh sách đại lý'
+        }
+      },
+      {
+        path: URL_ENDPOINT.ADMIN_REVENUE,
+        component: RevenueComponent,
+        data: {
+          title: 'Doanh thu'
+        }
+      },
     ]
   },
 
@@ -83,6 +108,13 @@ export const routes: Routes = [
         component: PageAgentOrdersComponent,
         data: {
           title: 'Danh sách đơn hàng'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_REVENUE,
+        component: AgentRevenueComponent,
+        data: {
+          title: 'Thống kê'
         }
       },
     ]

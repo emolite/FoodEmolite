@@ -86,3 +86,8 @@ export interface StorePaymentInfoResponse {
   amount: number;
   vietQrUrl: string;
 }
+
+export interface UserProfileResponse {
+  account: AccountResponse;
+  profile: AccountProfileResponse | null;
+}

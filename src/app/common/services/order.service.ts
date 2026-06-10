@@ -7,6 +7,7 @@ import { BaseTableResponse } from '../models/base-response.model';
 import {
     CreateOrderRequest,
     OrderResponse,
+    PrintOrdersRequest,
     UpdateOrderStatusRequest,
     UpdatePaymentStatusRequest
 } from '../models/order.model';
@@ -69,6 +70,13 @@ export class OrderService {
     ): Observable<BaseResponse<string>> {
         return this.apiService.put<BaseResponse<string>, UpdatePaymentStatusRequest>(
             API_ENDPOINT.ORDER.STATUS_PAYMENT(id),
+            request
+        );
+    }
+
+    printOrders(request: PrintOrdersRequest): Observable<Blob> {
+        return this.apiService.postBlob(
+            API_ENDPOINT.ORDER.PRINT,
             request
         );
     }

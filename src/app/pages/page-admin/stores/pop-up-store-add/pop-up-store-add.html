@@ -10,9 +10,7 @@
         </p>
       </div>
 
-      <button
-        type="button"
-        (click)="close()"
+      <button type="button" (click)="close()"
         class="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700">
         ✕
       </button>
@@ -25,21 +23,19 @@
         </label>
 
         <div class="flex items-center gap-4">
-          <div class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+          <div
+            class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
             @if (previewUrl()) {
-              <img [src]="previewUrl()" class="h-full w-full object-cover">
+            <img [src]="previewUrl()" class="h-full w-full object-cover">
             } @else {
-              <span class="text-xs text-gray-400">Chưa có ảnh</span>
+            <span class="text-xs text-gray-400">Chưa có ảnh</span>
             }
           </div>
 
-          <label class="cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+          <label
+            class="cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
             Chọn ảnh
-            <input
-              type="file"
-              accept="image/*"
-              class="hidden"
-              (change)="onFileChange($event)">
+            <input type="file" accept="image/*" class="hidden" (change)="onFileChange($event)">
           </label>
         </div>
       </div>
@@ -47,12 +43,20 @@
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
           <label class="mb-2 block text-sm font-medium text-gray-700">
+            Đại lý sở hữu
+          </label>
+
+          <app-dropdown [options]="agentOptions()"
+            [placeholder]="isLoadingAgents() ? 'Đang tải đại lý...' : 'Chọn đại lý'" [searchable]="true"
+            searchPlaceholder="Tìm đại lý..." [value]="formOwnerAccountId()" [disabled]="isLoadingAgents()"
+            (changed)="onAgentChange($event?.value)">
+          </app-dropdown>
+        </div>
+        <div>
+          <label class="mb-2 block text-sm font-medium text-gray-700">
             Tên cửa hàng
           </label>
-          <input
-            type="text"
-            [ngModel]="formStoreName()"
-            (ngModelChange)="formStoreName.set($event)"
+          <input type="text" [ngModel]="formStoreName()" (ngModelChange)="formStoreName.set($event)"
             class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400">
         </div>
 
@@ -60,10 +64,7 @@
           <label class="mb-2 block text-sm font-medium text-gray-700">
             Số điện thoại
           </label>
-          <input
-            type="text"
-            [ngModel]="formPhoneNumber()"
-            (ngModelChange)="formPhoneNumber.set($event)"
+          <input type="text" [ngModel]="formPhoneNumber()" (ngModelChange)="formPhoneNumber.set($event)"
             class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400">
         </div>
       </div>
@@ -72,10 +73,7 @@
         <label class="mb-2 block text-sm font-medium text-gray-700">
           Địa chỉ
         </label>
-        <input
-          type="text"
-          [ngModel]="formAddress()"
-          (ngModelChange)="formAddress.set($event)"
+        <input type="text" [ngModel]="formAddress()" (ngModelChange)="formAddress.set($event)"
           class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400">
       </div>
 
@@ -83,27 +81,19 @@
         <label class="mb-2 block text-sm font-medium text-gray-700">
           Mô tả
         </label>
-        <textarea
-          rows="4"
-          [ngModel]="formDescription()"
-          (ngModelChange)="formDescription.set($event)"
+        <textarea rows="4" [ngModel]="formDescription()" (ngModelChange)="formDescription.set($event)"
           class="w-full resize-none rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400">
         </textarea>
       </div>
     </div>
 
     <div class="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-5">
-      <button
-        type="button"
-        (click)="close()"
+      <button type="button" (click)="close()"
         class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
         Huỷ
       </button>
 
-      <button
-        type="button"
-        (click)="submit()"
-        [disabled]="isSubmitting()"
+      <button type="button" (click)="submit()" [disabled]="isSubmitting()"
         class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-60">
         {{ isSubmitting() ? 'Đang lưu...' : 'Thêm cửa hàng' }}
       </button>

@@ -14,6 +14,7 @@ export interface StoreResponse {
 
 export interface CreateStoreRequest {
   storeName: string;
+  ownerAccountId: number;
   thumbnailFile: File | null;
   phoneNumber: string | null;
   address: string | null;

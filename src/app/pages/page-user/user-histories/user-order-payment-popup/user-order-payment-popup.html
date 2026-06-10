@@ -8,12 +8,13 @@
             </h2>
 
             <p class="mt-1 text-sm text-gray-500">
-                Quét mã QR để thanh toán đúng số tiền
+                {{ order().paymentStatus === 'PAID'
+                ? 'Đơn hàng đã được thanh toán'
+                : 'Quét mã QR để thanh toán đúng số tiền' }}
             </p>
         </div>
 
-        <button type="button" (click)="close()"
-            class="h-9 w-9 rounded-md text-gray-500 hover:bg-gray-100">
+        <button type="button" (click)="close()" class="h-9 w-9 rounded-md text-gray-500 hover:bg-gray-100">
             ✕
         </button>
     </div>
@@ -25,10 +26,12 @@
         </div>
         } @else {
         @if (paymentInfo()) {
-        <div class="grid gap-5 md:grid-cols-[260px_1fr]">
+        <div [class]="order().paymentStatus === 'PAID'
+    ? 'grid gap-5'
+    : 'grid gap-5 md:grid-cols-[260px_1fr]'">
+            @if (order().paymentStatus !== 'PAID') {
             <div class="rounded-md border border-gray-200 bg-gray-50 p-4">
-                <img [src]="paymentInfo()!.vietQrUrl"
-                    class="mx-auto h-56 w-56 rounded-md bg-white object-contain" />
+                <img [src]="paymentInfo()!.vietQrUrl" class="mx-auto h-56 w-56 rounded-md bg-white object-contain" />
 
                 <p class="mt-4 text-center text-lg font-bold text-gray-900">
                     {{ formatCurrency(paymentInfo()!.amount) }}
@@ -38,6 +41,17 @@
                     Số tiền cần thanh toán
                 </p>
             </div>
+            } @else {
+            <div class="rounded-md border border-emerald-200 bg-emerald-50 p-4">
+                <p class="text-sm font-semibold text-emerald-800">
+                    Đã thanh toán
+                </p>
+
+                <p class="mt-1 text-sm text-emerald-700">
+                    Đơn hàng này đã được ghi nhận thanh toán thành công.
+                </p>
+            </div>
+            }
 
             <div class="space-y-4">
                 <div class="rounded-md border border-gray-200 p-4">
@@ -99,7 +113,8 @@
                                     @if (item.options && item.options.length > 0) {
                                     <div class="mt-2 space-y-1">
                                         @for (option of item.options; track option.id) {
-                                        <div class="flex items-center justify-between gap-3 rounded bg-white px-2 py-1 text-xs">
+                                        <div
+                                            class="flex items-center justify-between gap-3 rounded bg-white px-2 py-1 text-xs">
                                             <div class="min-w-0">
                                                 <span class="text-gray-500">
                                                     {{ option.optionGroupName }}:

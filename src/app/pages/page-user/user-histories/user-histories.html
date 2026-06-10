@@ -49,11 +49,15 @@
                     </div>
 
                     <div class="mt-4 flex flex-wrap gap-2">
-                        <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                        <span
+                            class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset"
+                            [class]="getOrderStatusBadgeClass(order.orderStatus)">
                             {{ getOrderStatusText(order.orderStatus) }}
                         </span>
 
-                        <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                        <span
+                            class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset"
+                            [class]="getPaymentStatusBadgeClass(order.paymentStatus)">
                             {{ getPaymentStatusText(order.paymentStatus) }}
                         </span>
                     </div>
@@ -72,10 +76,7 @@
 
         @if (totalPages() > 1) {
         <div class="border-t border-gray-200">
-            <app-pagination
-                [currentPage]="page()"
-                [totalPages]="totalPages()"
-                variant="admin"
+            <app-pagination [currentPage]="page()" [totalPages]="totalPages()" variant="admin"
                 (pageChange)="onPageChange($event)">
             </app-pagination>
         </div>
@@ -84,8 +85,6 @@
 </div>
 
 @if (selectedOrder()) {
-<app-user-order-payment-popup
-    [order]="selectedOrder()!"
-    (closed)="closePayment()">
+<app-user-order-payment-popup [order]="selectedOrder()!" (closed)="closePayment()">
 </app-user-order-payment-popup>
 }

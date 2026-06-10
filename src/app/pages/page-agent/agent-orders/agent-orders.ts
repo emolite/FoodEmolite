@@ -16,6 +16,7 @@ import {
 } from '../../../common/models/order.model';
 import { PopUpAgentOrderDetailComponent } from './pop-up-agent-order-detail/pop-up-agent-order-detail';
 import { ConfirmPopupComponent } from '../../../shared/component/confirm-popup/confirm-popup';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 interface OrderFilter {
     orderStatus: string;
@@ -36,11 +37,17 @@ export class PageAgentOrdersComponent {
     private readonly orderService = inject(OrderService);
     private readonly profileService = inject(ProfileService);
     private readonly toastService = inject(ToastService);
+    private readonly sanitizer = inject(DomSanitizer);
 
     orders = signal<OrderResponse[]>([]);
     selectedOrder = signal<OrderResponse | null>(null);
     selectedOrderIds = signal<number[]>([]);
     storeRefCode = signal<string | null>(null);
+    readonly isInvoicePreviewOpen = signal(false);
+    readonly invoicePreviewUrl = signal<SafeResourceUrl | null>(null);
+
+    private invoiceBlob: Blob | null = null;
+    private invoiceObjectUrl: string | null = null;
 
     page = signal(1);
     pageSize = signal(10);
@@ -130,18 +137,6 @@ export class PageAgentOrdersComponent {
                 {
                     label: 'Đã xác nhận',
                     value: 'CONFIRMED'
-                },
-                {
-                    label: 'Đang chuẩn bị',
-                    value: 'PROCESSING'
-                },
-                {
-                    label: 'Hoàn thành',
-                    value: 'COMPLETED'
-                },
-                {
-                    label: 'Đã hủy',
-                    value: 'CANCELLED'
                 }
             ]
         },
@@ -297,6 +292,105 @@ export class PageAgentOrdersComponent {
         this.selectedOrder.set(order);
         this.isDetailRendered.set(true);
         this.isDetailOpen.set(true);
+    }
+
+    previewInvoiceSelected(): void {
+        const orderIds = this.selectedOrderIds();
+
+        if (orderIds.length === 0) return;
+
+        this.isSubmitting.set(true);
+
+        this.orderService.printOrders({ orderIds }).subscribe({
+            next: (blob) => {
+                this.clearInvoiceObjectUrl();
+
+                this.invoiceBlob = blob;
+                this.invoiceObjectUrl = URL.createObjectURL(blob);
+
+                this.invoicePreviewUrl.set(
+                    this.sanitizer.bypassSecurityTrustResourceUrl(this.invoiceObjectUrl)
+                );
+
+                this.isInvoicePreviewOpen.set(true);
+            },
+            complete: () => {
+                this.isSubmitting.set(false);
+            },
+            error: () => {
+                this.isSubmitting.set(false);
+            }
+        });
+    }
+
+    downloadInvoiceSelected(): void {
+        const orderIds = this.selectedOrderIds();
+
+        if (orderIds.length === 0) return;
+
+        this.isSubmitting.set(true);
+
+        this.orderService.printOrders({ orderIds }).subscribe({
+            next: (blob) => {
+                this.downloadBlob(blob);
+            },
+            complete: () => {
+                this.isSubmitting.set(false);
+            },
+            error: () => {
+                this.isSubmitting.set(false);
+            }
+        });
+    }
+
+    downloadCurrentPreviewInvoice(): void {
+        if (!this.invoiceBlob) return;
+
+        this.downloadBlob(this.invoiceBlob);
+    }
+
+    printCurrentPreviewInvoice(): void {
+        if (!this.invoiceObjectUrl) return;
+
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = this.invoiceObjectUrl;
+
+        document.body.appendChild(iframe);
+
+        iframe.onload = () => {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        };
+    }
+
+    closeInvoicePreview(): void {
+        this.isInvoicePreviewOpen.set(false);
+        this.invoicePreviewUrl.set(null);
+        this.invoiceBlob = null;
+        this.clearInvoiceObjectUrl();
+    }
+
+    private downloadBlob(blob: Blob): void {
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `orders-${Date.now()}.pdf`;
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    private clearInvoiceObjectUrl(): void {
+        if (this.invoiceObjectUrl) {
+            URL.revokeObjectURL(this.invoiceObjectUrl);
+            this.invoiceObjectUrl = null;
+        }
     }
 
     closeDetail(): void {

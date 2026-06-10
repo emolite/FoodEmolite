@@ -29,6 +29,15 @@ export class AuthService {
     );
   }
 
+  addagent(
+    request: RegisterRequest
+  ): Observable<BaseResponse<string>> {
+    return this.apiService.post<BaseResponse<string>, RegisterRequest>(
+      API_ENDPOINT.AUTH.CREATE_AGENT,
+      request
+    );
+  }
+
   login(
     request: LoginRequest
   ): Observable<BaseResponse<LoginResponse>> {

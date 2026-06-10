@@ -42,6 +42,19 @@ export class ApiService {
     );
   }
 
+  postBlob<TRequest>(
+    endpoint: string,
+    body: TRequest
+  ): Observable<Blob> {
+    return this.http.post(
+      `${this.baseUrl}/${endpoint}`,
+      body,
+      {
+        responseType: 'blob'
+      }
+    );
+  }
+
   put<TResponse, TRequest>(
     endpoint: string,
     body: TRequest
