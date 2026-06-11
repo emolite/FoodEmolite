@@ -31,9 +31,7 @@ interface CartItem {
 
 @Component({
     selector: 'app-page-user-store-foods',
-    imports: [
-        PopUpUserFoodOptionsComponent
-    ],
+    imports: [PopUpUserFoodOptionsComponent],
     templateUrl: './user-store-foods.html'
 })
 export class PageUserStoreFoodsComponent {
@@ -59,10 +57,7 @@ export class PageUserStoreFoodsComponent {
     isResizing = signal(false);
 
     totalQuantity = computed(() =>
-        this.cart().reduce(
-            (total, item) => total + item.quantity,
-            0
-        )
+        this.cart().reduce((total, item) => total + item.quantity, 0)
     );
 
     totalAmount = computed(() =>
@@ -92,9 +87,7 @@ export class PageUserStoreFoodsComponent {
         const min = 320;
         const max = 560;
 
-        this.cartWidth.set(
-            Math.min(Math.max(width, min), max)
-        );
+        this.cartWidth.set(Math.min(Math.max(width, min), max));
     }
 
     @HostListener('document:mouseup')
@@ -117,9 +110,7 @@ export class PageUserStoreFoodsComponent {
         ).subscribe({
             next: response => {
                 this.loading.set(false);
-                this.foods.set(
-                    response.items.filter(food => food.isAvailable)
-                );
+                this.foods.set(response.items.filter(food => food.isAvailable));
             },
             error: () => {
                 this.loading.set(false);
@@ -139,26 +130,43 @@ export class PageUserStoreFoodsComponent {
             return;
         }
 
-        this.cart.update(items => [
-            ...items,
-            {
-                food,
-                quantity: 1,
-                note: '',
-                selectedOptions: [],
-                isDetailLoaded: false
+        this.storeFoodService.getDetail(food.id).subscribe({
+            next: response => {
+                const foodDetail = response.isSuccess && response.data
+                    ? response.data
+                    : food;
+
+                this.cart.update(items => [
+                    ...items,
+                    {
+                        food: foodDetail,
+                        quantity: 1,
+                        note: '',
+                        selectedOptions: [],
+                        isDetailLoaded: true
+                    }
+                ]);
+            },
+            error: () => {
+                this.cart.update(items => [
+                    ...items,
+                    {
+                        food,
+                        quantity: 1,
+                        note: '',
+                        selectedOptions: [],
+                        isDetailLoaded: false
+                    }
+                ]);
             }
-        ]);
+        });
     }
 
     increase(foodId: number): void {
         this.cart.update(items =>
             items.map(item =>
                 item.food.id === foodId
-                    ? {
-                        ...item,
-                        quantity: item.quantity + 1
-                    }
+                    ? { ...item, quantity: item.quantity + 1 }
                     : item
             )
         );
@@ -169,10 +177,7 @@ export class PageUserStoreFoodsComponent {
             items
                 .map(item =>
                     item.food.id === foodId
-                        ? {
-                            ...item,
-                            quantity: item.quantity - 1
-                        }
+                        ? { ...item, quantity: item.quantity - 1 }
                         : item
                 )
                 .filter(item => item.quantity > 0)
@@ -187,10 +192,7 @@ export class PageUserStoreFoodsComponent {
         this.cart.update(items =>
             items.map(item =>
                 item.food.id === foodId
-                    ? {
-                        ...item,
-                        quantity: nextQuantity
-                    }
+                    ? { ...item, quantity: nextQuantity }
                     : item
             )
         );
@@ -206,17 +208,101 @@ export class PageUserStoreFoodsComponent {
         this.cart.update(items =>
             items.map(item =>
                 item.food.id === foodId
-                    ? {
-                        ...item,
-                        note
-                    }
+                    ? { ...item, note }
                     : item
             )
         );
     }
 
+    blockInvalidQuantityKey(event: KeyboardEvent): void {
+        const allowedKeys = [
+            'Backspace',
+            'Delete',
+            'Tab',
+            'ArrowLeft',
+            'ArrowRight',
+            'Home',
+            'End'
+        ];
+
+        if (allowedKeys.includes(event.key)) return;
+
+        if (!/^\d$/.test(event.key)) {
+            event.preventDefault();
+        }
+    }
+
+    onQuantityInput(foodId: number, input: HTMLInputElement): void {
+        const sanitizedValue = input.value.replace(/\D/g, '');
+
+        if (!sanitizedValue) {
+            input.value = '1';
+            this.setQuantity(foodId, 1);
+            return;
+        }
+
+        const quantity = Number(sanitizedValue);
+
+        if (quantity < 1) {
+            input.value = '1';
+            this.setQuantity(foodId, 1);
+            return;
+        }
+
+        input.value = quantity.toString();
+        this.setQuantity(foodId, quantity);
+    }
+
+    openOptionPopup(foodId: number): void {
+        const index = this.cart().findIndex(item => item.food.id === foodId);
+
+        if (index < 0) return;
+
+        const item = this.cart()[index];
+
+        if (item.isDetailLoaded) {
+            this.selectingCartIndex.set(index);
+            this.isOptionPopupOpen.set(true);
+            return;
+        }
+
+        this.storeFoodService.getDetail(item.food.id).subscribe({
+            next: response => {
+                if (!response.isSuccess || !response.data) {
+                    this.toastService.error(response.message || 'Không tải được tùy chọn món');
+                    return;
+                }
+
+                const foodDetail: StoreFoodResponse = response.data;
+
+                this.cart.update(items =>
+                    items.map((cartItem, itemIndex) =>
+                        itemIndex === index
+                            ? {
+                                ...cartItem,
+                                food: foodDetail,
+                                isDetailLoaded: true
+                            }
+                            : cartItem
+                    )
+                );
+
+                this.selectingCartIndex.set(index);
+                this.isOptionPopupOpen.set(true);
+            },
+            error: () => {
+                this.toastService.error('Không tải được tùy chọn món');
+            }
+        });
+    }
+
     openConfirmOrder(): void {
         if (this.cart().length === 0 || this.ordering()) return;
+
+        if (this.hasMissingRequiredOptions()) {
+            this.toastService.error('Vui lòng chọn đầy đủ option bắt buộc');
+            return;
+        }
 
         this.isConfirmOrderOpen.set(true);
     }
@@ -227,60 +313,11 @@ export class PageUserStoreFoodsComponent {
 
     confirmOrder(): void {
         this.isConfirmOrderOpen.set(false);
-        this.ensureCartItemsHaveOptions();
-    }
-
-    private ensureCartItemsHaveOptions(): void {
-        const itemNeedLoad = this.cart().find(item =>
-            !item.isDetailLoaded
-        );
-
-        if (!itemNeedLoad) {
-            this.checkOptionsBeforeCreateOrder();
-            return;
-        }
-
-        this.storeFoodService.getDetail(itemNeedLoad.food.id).subscribe({
-            next: response => {
-                if (!response.isSuccess || !response.data) {
-                    this.toastService.error(response.message || 'Không tải được tùy chọn món');
-                    return;
-                }
-
-                const foodDetail: StoreFoodResponse = response.data;
-
-                this.cart.update(items =>
-                    items.map(item =>
-                        item.food.id === itemNeedLoad.food.id
-                            ? {
-                                ...item,
-                                food: foodDetail,
-                                isDetailLoaded: true
-                            }
-                            : item
-                    )
-                );
-
-                this.ensureCartItemsHaveOptions();
-            },
-            error: () => {
-                this.toastService.error('Không tải được tùy chọn món');
-            }
-        });
-    }
-
-    private checkOptionsBeforeCreateOrder(): void {
-        const indexNeedOption = this.cart().findIndex(item =>
-            this.isCartItemMissingRequiredOption(item)
-        );
-
-        if (indexNeedOption >= 0) {
-            this.selectingCartIndex.set(indexNeedOption);
-            this.isOptionPopupOpen.set(true);
-            return;
-        }
-
         this.createOrder();
+    }
+
+    hasMissingRequiredOptions(): boolean {
+        return this.cart().some(item => this.isCartItemMissingRequiredOption(item));
     }
 
     private isCartItemMissingRequiredOption(item: CartItem): boolean {
@@ -305,18 +342,13 @@ export class PageUserStoreFoodsComponent {
         this.cart.update(items =>
             items.map((item, itemIndex) =>
                 itemIndex === index
-                    ? {
-                        ...item,
-                        selectedOptions: options
-                    }
+                    ? { ...item, selectedOptions: options }
                     : item
             )
         );
 
         this.isOptionPopupOpen.set(false);
         this.selectingCartIndex.set(null);
-
-        this.checkOptionsBeforeCreateOrder();
     }
 
     closeOptionPopup(): void {
@@ -325,9 +357,7 @@ export class PageUserStoreFoodsComponent {
     }
 
     createOrder(): void {
-        if (this.cart().length === 0 || this.ordering()) {
-            return;
-        }
+        if (this.cart().length === 0 || this.ordering()) return;
 
         this.ordering.set(true);
 
@@ -373,12 +403,6 @@ export class PageUserStoreFoodsComponent {
         this.isMobileCartOpen.set(false);
     }
 
-    onQuantityInput(foodId: number, value: string): void {
-        const quantity = Number(value.replace(/\D/g, ''));
-
-        this.setQuantity(foodId, quantity);
-    }
-
     back(): void {
         this.router.navigate([
             '/',
@@ -397,9 +421,7 @@ export class PageUserStoreFoodsComponent {
     }
 
     getOptionText(item: CartItem): string {
-        if (item.selectedOptions.length === 0) {
-            return '';
-        }
+        if (item.selectedOptions.length === 0) return '';
 
         return item.selectedOptions
             .map(option => `${option.optionGroupName}: ${option.optionName}`)

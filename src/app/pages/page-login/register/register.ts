@@ -23,11 +23,16 @@ export class PageRegisterComponent {
   successMessage = signal('');
   isLoading = signal(false);
   isCheckingEmail = signal(false);
-
+  confirmPassword = signal('');
   checkEmail(): void {
     this.errorMessage.set('');
 
     if (!this.email()) {
+      return;
+    }
+
+    if (!this.isEmailValid()) {
+      this.errorMessage.set('Email không đúng định dạng');
       return;
     }
 
@@ -47,12 +52,31 @@ export class PageRegisterComponent {
     });
   }
 
+  onEmailChange(value: string): void {
+    this.email.set(value.trim());
+    this.errorMessage.set('');
+  }
+
+  isEmailValid(): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email());
+  }
+
   register(): void {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    if (!this.username() || !this.email() || !this.password()) {
+    if (!this.username() || !this.email() || !this.password() || !this.confirmPassword()) {
       this.errorMessage.set('Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    if (this.password() !== this.confirmPassword()) {
+      this.errorMessage.set('Mật khẩu nhập lại không khớp');
+      return;
+    }
+
+    if (!this.isEmailValid()) {
+      this.errorMessage.set('Email không đúng định dạng');
       return;
     }
 

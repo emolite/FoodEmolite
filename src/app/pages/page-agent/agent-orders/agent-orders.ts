@@ -97,6 +97,12 @@ export class PageAgentOrdersComponent {
             sortable: true
         },
         {
+            key: 'customerName',
+            label: 'Tên khách hàng',
+            width: '140px',
+            align: 'left'
+        },
+        {
             key: 'orderStatusText',
             label: 'Trạng thái đơn',
             width: '160px',
@@ -215,6 +221,7 @@ export class PageAgentOrdersComponent {
             id: order.id,
             orderCode: order.orderCode,
             refCode: order.refCode,
+            customerName: order.customerName,
             storeRefCode: order.storeRefCode,
             totalAmount: this.formatCurrency(order.totalAmount),
             orderStatus: order.orderStatus,

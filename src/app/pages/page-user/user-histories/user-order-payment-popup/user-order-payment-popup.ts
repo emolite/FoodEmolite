@@ -1,6 +1,6 @@
 import {
     Component,
-    OnInit,
+    effect,
     inject,
     input,
     output,
@@ -16,7 +16,7 @@ import { ToastService } from '../../../../common/services/toast.service';
     imports: [],
     templateUrl: './user-order-payment-popup.html'
 })
-export class UserOrderPaymentPopupComponent implements OnInit {
+export class UserOrderPaymentPopupComponent {
     private readonly profileService = inject(ProfileService);
     private readonly toastService = inject(ToastService);
 
@@ -26,16 +26,24 @@ export class UserOrderPaymentPopupComponent implements OnInit {
     paymentInfo = signal<StorePaymentInfoResponse | null>(null);
     loading = signal(false);
 
-    ngOnInit(): void {
-        this.loadPaymentInfo();
+    constructor() {
+        effect(() => {
+            const order = this.order();
+
+            if (!order) return;
+
+            this.loadPaymentInfo();
+        });
     }
 
     loadPaymentInfo(): void {
+        this.paymentInfo.set(null);
         this.loading.set(true);
 
         this.profileService.getStorePaymentInfo(
             this.order().storeRefCode,
-            this.order().totalAmount
+            this.order().totalAmount,
+            this.order().orderCode
         ).subscribe({
             next: response => {
                 this.loading.set(false);

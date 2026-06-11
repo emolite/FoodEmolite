@@ -33,6 +33,7 @@ export interface OrderResponse {
   orderCode: string;
   refCode: string;
   customerAccountId: number;
+  customerName: string;
   storeRefCode: string;
   totalAmount: number;
   orderStatus: string;

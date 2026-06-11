@@ -22,7 +22,7 @@ export const API_ENDPOINT = {
     ME: 'profile/me',
     ACCOUNT_PROFILE: 'profile/account-profile',
     BANK_ACCOUNTS: 'profile/bank-accounts',
-    STORE_PAYMENT: (storeRefCode: string, amount: number) => `profile/store-payment/${storeRefCode}?amount=${amount}`
+    STORE_PAYMENT: (storeRefCode: string, amount: number, orderCode: string) => `profile/store-payment/${storeRefCode}?amount=${amount}&orderCode=${encodeURIComponent(orderCode)}`
   },
   ORDER: {
     BASE: 'orders',

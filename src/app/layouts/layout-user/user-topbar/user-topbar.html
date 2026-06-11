@@ -1,6 +1,6 @@
 <header class="sticky top-0 z-30 border-b border-gray-200 bg-white">
   <div class="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
-    <button type="button" (click)="goStores()" class="flex shrink-0 items-center gap-3 text-left">
+    <button type="button" (click)="goStores()" class="flex shrink-0 items-center gap-3 text-left cursor-pointer">
 
       <div class="flex h-12 w-12 items-center justify-center rounded-md bg-gray-900 text-sm font-bold text-white">
         <img src="ei2.webp" class="h-8 w-8 rounded-md object-cover" />
@@ -12,27 +12,14 @@
         </p>
 
         <p class="text-xs text-gray-500">
-          Đặt món trực tuyến
+          Đặt món ngay
         </p>
       </div>
     </button>
 
-    <div class="min-w-0 flex-1 px-1 sm:max-w-xl sm:px-6">
-      <div class="relative">
-        <input type="text" placeholder="Tìm cửa hàng hoặc món ăn..."
-          class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 pr-9 text-sm outline-none transition placeholder:text-gray-400 focus:border-gray-900 focus:bg-white" />
-
-        <svg class="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor"
-          viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="m21 21-4.35-4.35M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" />
-        </svg>
-      </div>
-    </div>
-
     <div class="flex shrink-0 items-center gap-2 sm:gap-3">
       <button type="button" (click)="goHistory()"
-        class="hidden rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-50 md:block">
+        class="hidden rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 cursor-pointer transition hover:border-gray-900 hover:bg-gray-50 md:block">
         Lịch sử
       </button>
 

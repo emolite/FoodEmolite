@@ -29,10 +29,11 @@ export class ProfileService {
 
   getStorePaymentInfo(
     storeRefCode: string,
-    amount: number
+    amount: number,
+    orderCode: string
   ): Observable<BaseResponse<StorePaymentInfoResponse>> {
     return this.apiService.get<BaseResponse<StorePaymentInfoResponse>>(
-      API_ENDPOINT.PROFILE.STORE_PAYMENT(storeRefCode, amount)
+      API_ENDPOINT.PROFILE.STORE_PAYMENT(storeRefCode, amount, orderCode)
     );
   }
 

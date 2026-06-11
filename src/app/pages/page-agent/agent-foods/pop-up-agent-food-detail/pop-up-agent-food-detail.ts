@@ -183,6 +183,42 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
     }));
   }
 
+  addDefaultOptions(): void {
+    this.form.update(value => ({
+      ...value,
+      optionGroups: [
+        ...value.optionGroups,
+        {
+          groupName: 'Độ ngọt',
+          isRequired: true,
+          minSelect: 1,
+          maxSelect: 1,
+          sortOrder: value.optionGroups.length,
+          options: [
+            { optionName: '0%', additionalPrice: 0, isAvailable: true, sortOrder: 0 },
+            { optionName: '25%', additionalPrice: 0, isAvailable: true, sortOrder: 1 },
+            { optionName: '50%', additionalPrice: 0, isAvailable: true, sortOrder: 2 },
+            { optionName: '75%', additionalPrice: 0, isAvailable: true, sortOrder: 3 },
+            { optionName: '100%', additionalPrice: 0, isAvailable: true, sortOrder: 4 }
+          ]
+        },
+        {
+          groupName: 'Lượng đá',
+          isRequired: true,
+          minSelect: 1,
+          maxSelect: 1,
+          sortOrder: value.optionGroups.length + 1,
+          options: [
+            { optionName: 'Ít đá', additionalPrice: 0, isAvailable: true, sortOrder: 0 },
+            { optionName: 'Không đá', additionalPrice: 0, isAvailable: true, sortOrder: 1 },
+            { optionName: 'Nhiều đá', additionalPrice: 0, isAvailable: true, sortOrder: 2 },
+            { optionName: 'Bình thường', additionalPrice: 0, isAvailable: true, sortOrder: 3 }
+          ]
+        }
+      ]
+    }));
+  }
+
   submit(): void {
     this.normalizeOptionGroups();
     this.submitted.emit(this.form());

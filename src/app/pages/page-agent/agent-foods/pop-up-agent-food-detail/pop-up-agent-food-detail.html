@@ -69,10 +69,17 @@
             <p class="text-xs text-gray-500">Sửa nhóm option hoặc thêm option mới</p>
           </div>
 
-          <button type="button" (click)="addOptionGroup()"
-            class="rounded-md bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-100">
-            + Nhóm
-          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" (click)="addDefaultOptions()"
+              class="rounded-md border border-blue-100 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50">
+              + Option mặc định
+            </button>
+
+            <button type="button" (click)="addOptionGroup()"
+              class="rounded-md bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-100">
+              + Nhóm
+            </button>
+          </div>
         </div>
 
         @for (group of form().optionGroups; track $index; let groupIndex = $index) {

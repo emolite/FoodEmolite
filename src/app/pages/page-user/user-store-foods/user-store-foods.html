@@ -36,8 +36,10 @@
                     Đang tải món ăn...
                 </div>
                 } @else {
-
-                <div class="hidden grid-cols-3 gap-3 sm:grid lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                <div class="hidden gap-3 sm:grid
+            grid-cols-2
+            md:grid-cols-3
+            lg:[grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
                     @for (food of foods(); track food.id) {
                     <button type="button" (click)="addToCart(food)"
                         class="group cursor-pointer overflow-hidden rounded-md border border-gray-200 bg-white text-left transition hover:shadow-sm">
@@ -116,7 +118,6 @@
                     </button>
                     }
                 </div>
-
                 }
             </div>
         </section>
@@ -161,15 +162,22 @@
                                 {{ formatCurrency(item.food.price) }}
                             </p>
 
+                            @if (hasOptions(item.food)) {
+                            <button type="button" (click)="openOptionPopup(item.food.id)"
+                                class="mt-2 rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-700 hover:border-gray-900 hover:bg-gray-50">
+                                {{ item.selectedOptions.length > 0 ? 'Sửa option' : 'Chọn option' }}
+                            </button>
+                            }
+
                             @if (getOptionText(item)) {
-                            <p class="mt-1 line-clamp-2 text-xs text-gray-500">
+                            <p class="mt-2 line-clamp-2 text-xs text-gray-500">
                                 {{ getOptionText(item) }}
                             </p>
                             }
                         </div>
 
                         <button type="button" (click)="remove(item.food.id)"
-                            class="h-7 w-7 rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500">
+                            class="h-7 w-7 rounded-md text-gray-400 cursor-pointer hover:bg-red-50 hover:text-red-500">
                             ✕
                         </button>
                     </div>
@@ -177,16 +185,17 @@
                     <div class="mt-3 flex items-center justify-between">
                         <div class="flex items-center overflow-hidden rounded-md border border-gray-200">
                             <button type="button" (click)="decrease(item.food.id)"
-                                class="h-8 w-8 text-gray-500 hover:bg-gray-50">
+                                class="h-8 w-8 text-gray-500 hover:bg-gray-50 cursor-pointer">
                                 -
                             </button>
 
                             <input type="text" inputmode="numeric" pattern="[0-9]*" [value]="item.quantity"
-                                (input)="onQuantityInput(item.food.id, $any($event.target).value)"
-                                class="h-8 w-14 border-x border-gray-200 text-center text-sm font-medium text-gray-800 outline-none focus:bg-gray-50" />
+                                (input)="onQuantityInput(item.food.id, $any($event.target))"
+                                (keydown)="blockInvalidQuantityKey($event)"
+                                class="h-8 w-14 border-x border-gray-200 text-center text-sm font-medium outline-none" />
 
                             <button type="button" (click)="increase(item.food.id)"
-                                class="h-8 w-8 text-gray-500 hover:bg-gray-50">
+                                class="h-8 w-8 text-gray-500 hover:bg-gray-50 cursor-pointer">
                                 +
                             </button>
                         </div>
@@ -215,7 +224,8 @@
                     </span>
                 </div>
 
-                <button type="button" [disabled]="cart().length === 0 || ordering()" (click)="openConfirmOrder()"
+                <button type="button" [disabled]="cart().length === 0 || ordering() || hasMissingRequiredOptions()"
+                    (click)="openConfirmOrder()"
                     class="w-full rounded-md bg-gray-900 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
                     {{ ordering() ? 'Đang đặt đơn...' : 'Đặt đơn' }}
                 </button>
@@ -225,8 +235,7 @@
 </div>
 
 @if (isMobileCartOpen()) {
-<div class="fixed inset-0 z-50 bg-black/40 lg:hidden" (click)="closeMobileCart()">
-</div>
+<div class="fixed inset-0 z-50 bg-black/40 lg:hidden" (click)="closeMobileCart()"></div>
 
 <aside class="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] rounded-t-md bg-white lg:hidden">
     <div class="flex items-center justify-between border-b border-gray-200 px-4 py-4">
@@ -270,8 +279,15 @@
                         {{ formatCurrency(item.food.price) }}
                     </p>
 
+                    @if (hasOptions(item.food)) {
+                    <button type="button" (click)="openOptionPopup(item.food.id)"
+                        class="mt-2 rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-700 hover:border-gray-900 hover:bg-gray-50">
+                        {{ item.selectedOptions.length > 0 ? 'Sửa option' : 'Chọn option' }}
+                    </button>
+                    }
+
                     @if (getOptionText(item)) {
-                    <p class="mt-1 line-clamp-2 text-xs text-gray-500">
+                    <p class="mt-2 line-clamp-2 text-xs text-gray-500">
                         {{ getOptionText(item) }}
                     </p>
                     }
@@ -288,8 +304,9 @@
                         -
                     </button>
 
-                    <input type="number" inputmode="numeric" min="1" [value]="item.quantity"
-                        (input)="setQuantity(item.food.id, +$any($event.target).value)"
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" [value]="item.quantity"
+                        (input)="onQuantityInput(item.food.id, $any($event.target))"
+                        (keydown)="blockInvalidQuantityKey($event)"
                         class="h-8 w-14 border-x border-gray-200 text-center text-sm font-medium outline-none" />
 
                     <button type="button" (click)="increase(item.food.id)" class="h-8 w-8">
@@ -321,7 +338,8 @@
             </span>
         </div>
 
-        <button type="button" [disabled]="cart().length === 0 || ordering()" (click)="openConfirmOrder()"
+        <button type="button" [disabled]="cart().length === 0 || ordering() || hasMissingRequiredOptions()"
+            (click)="openConfirmOrder()"
             class="w-full rounded-md bg-gray-900 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
             {{ ordering() ? 'Đang đặt đơn...' : 'Đặt đơn' }}
         </button>
@@ -337,7 +355,7 @@
         </h2>
 
         <p class="mt-2 text-sm text-gray-500">
-            Hệ thống sẽ kiểm tra các món có tùy chọn trước khi tạo đơn.
+            Bạn có chắc muốn tạo đơn hàng này không?
         </p>
 
         <div class="mt-5 flex justify-end gap-2">
@@ -356,10 +374,8 @@
 }
 
 @if (isOptionPopupOpen() && selectingCartIndex() !== null) {
-<app-pop-up-user-food-options
-    [food]="cart()[selectingCartIndex()!].food"
-    [selectedOptions]="cart()[selectingCartIndex()!].selectedOptions"
-    (closed)="closeOptionPopup()"
+<app-pop-up-user-food-options [food]="cart()[selectingCartIndex()!].food"
+    [selectedOptions]="cart()[selectingCartIndex()!].selectedOptions" (closed)="closeOptionPopup()"
     (submitted)="applyOptions($event)">
 </app-pop-up-user-food-options>
 }

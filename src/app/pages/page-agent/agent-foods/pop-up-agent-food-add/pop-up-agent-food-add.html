@@ -13,14 +13,16 @@
 
     <div class="overflow-y-auto p-5">
       <div class="grid gap-5 md:grid-cols-[160px_1fr]">
-        <label class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-blue-100 bg-blue-50">
+        <label
+          class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-blue-100 bg-blue-50">
           @if (thumbnailPreview()) {
           <img [src]="thumbnailPreview()" class="h-full w-full object-cover" />
           } @else {
           <span class="text-sm text-blue-400">Ảnh món</span>
           }
 
-          <div class="absolute inset-0 flex items-center justify-center bg-blue-950/45 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-blue-950/45 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
             Chọn ảnh
           </div>
 
@@ -61,10 +63,17 @@
             <p class="text-xs text-gray-500">Ví dụ: Vị, Đá, Size, Topping</p>
           </div>
 
-          <button type="button" (click)="addOptionGroup()"
-            class="rounded-md bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-100">
-            + Nhóm
-          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" (click)="addDefaultOptions()"
+              class="rounded-md border border-blue-100 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50">
+              + Option mặc định
+            </button>
+
+            <button type="button" (click)="addOptionGroup()"
+              class="rounded-md bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-100">
+              + Nhóm
+            </button>
+          </div>
         </div>
 
         @for (group of form().optionGroups; track $index; let groupIndex = $index) {
