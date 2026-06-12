@@ -26,6 +26,7 @@ export const API_ENDPOINT = {
   },
   ORDER: {
     BASE: 'orders',
+    GUEST: 'orders/guest',
     MY: 'orders/my',
     DETAIL: (id: number) => `orders/${id}`,
     STATUS: (id: number) => `orders/${id}/status`,

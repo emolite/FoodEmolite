@@ -22,12 +22,12 @@ import { RevenueComponent } from './pages/page-admin/revenue/revenue';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: URL_ENDPOINT.LOGIN,
+    redirectTo: `${URL_ENDPOINT.USER}/${URL_ENDPOINT.USER_STORES}`,
     pathMatch: 'full'
   },
   {
     path: URL_ENDPOINT.LOGIN,
-    component: PageLoginComponent
+    component: PageLoginComponent 
   },
   {
     path: URL_ENDPOINT.REGISTER,

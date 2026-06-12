@@ -204,16 +204,15 @@
                             {{ formatCurrency(getItemAmount(item)) }}
                         </p>
                     </div>
-
-                    <textarea rows="2" placeholder="Ghi chú cho món này..." [value]="item.note"
-                        (input)="updateNote(item.food.id, $any($event.target).value)"
-                        class="mt-3 w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-xs text-gray-700 outline-none placeholder:text-gray-400 focus:border-gray-900">
-                    </textarea>
                 </div>
                 }
             </div>
 
             <div class="border-t border-gray-200 p-4">
+                <textarea rows="3" placeholder="Ghi chú cho đơn hàng..." [value]="orderNote()"
+                    (input)="updateOrderNote($any($event.target).value)"
+                    class="mb-4 w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400 focus:border-gray-900">
+    </textarea>
                 <div class="mb-4 flex items-center justify-between">
                     <span class="text-sm text-gray-500">
                         Tổng tiền
@@ -318,16 +317,15 @@
                     {{ formatCurrency(getItemAmount(item)) }}
                 </p>
             </div>
-
-            <textarea rows="2" placeholder="Ghi chú cho món này..." [value]="item.note"
-                (input)="updateNote(item.food.id, $any($event.target).value)"
-                class="mt-3 w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-xs outline-none focus:border-gray-900">
-            </textarea>
         </div>
         }
     </div>
 
     <div class="border-t border-gray-200 p-4">
+        <textarea rows="3" placeholder="Ghi chú cho đơn hàng..." [value]="orderNote()"
+            (input)="updateOrderNote($any($event.target).value)"
+            class="mb-4 w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-gray-900">
+    </textarea>
         <div class="mb-4 flex items-center justify-between">
             <span class="text-sm text-gray-500">
                 Tổng tiền
@@ -357,6 +355,22 @@
         <p class="mt-2 text-sm text-gray-500">
             Bạn có chắc muốn tạo đơn hàng này không?
         </p>
+
+        @if (!isLoggedIn()) {
+        <div class="mt-4">
+            <label class="mb-1 block text-sm font-medium text-gray-700">
+                Tên khách hàng
+            </label>
+
+            <input type="text" [value]="guestCustomerName()"
+                (input)="updateGuestCustomerName($any($event.target).value)" placeholder="Nhập tên của bạn"
+                class="w-full rounded-md border border-gray-200 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-gray-900" />
+
+            <p class="mt-1 text-xs text-gray-400">
+                Bạn đang đặt đơn với tư cách khách.
+            </p>
+        </div>
+        }
 
         <div class="mt-5 flex justify-end gap-2">
             <button type="button" (click)="closeConfirmOrder()"

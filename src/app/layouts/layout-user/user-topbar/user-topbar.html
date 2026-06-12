@@ -18,6 +18,7 @@
     </button>
 
     <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+      @if (authService.isLoggedIn()) {
       <button type="button" (click)="goHistory()"
         class="hidden rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 cursor-pointer transition hover:border-gray-900 hover:bg-gray-50 md:block">
         Lịch sử
@@ -60,6 +61,12 @@
         </div>
         }
       </div>
+      } @else {
+      <button type="button" (click)="goLogin()"
+        class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white">
+        Đăng nhập
+      </button>
+      }
     </div>
   </div>
 

@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StoreFoodService } from '../../../common/services/store-food.service';
 import { ToastService } from '../../../common/services/toast.service';
 import { OrderService } from '../../../common/services/order.service';
+import { AuthService } from '../../../common/services/auth.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { PopUpUserFoodOptionsComponent } from './pop-up-user-food-options/pop-up-user-food-options';
@@ -40,6 +41,7 @@ export class PageUserStoreFoodsComponent {
     private readonly storeFoodService = inject(StoreFoodService);
     private readonly toastService = inject(ToastService);
     private readonly orderService = inject(OrderService);
+    private readonly authService = inject(AuthService);
 
     storeRefCode = signal('');
     foods = signal<StoreFoodResponse[]>([]);
@@ -48,13 +50,18 @@ export class PageUserStoreFoodsComponent {
     loading = signal(false);
     ordering = signal(false);
     isMobileCartOpen = signal(false);
+    orderNote = signal('');
 
     isConfirmOrderOpen = signal(false);
     isOptionPopupOpen = signal(false);
     selectingCartIndex = signal<number | null>(null);
 
+    guestCustomerName = signal('');
+
     cartWidth = signal(380);
     isResizing = signal(false);
+
+    isLoggedIn = computed(() => this.authService.isLoggedIn());
 
     totalQuantity = computed(() =>
         this.cart().reduce((total, item) => total + item.quantity, 0)
@@ -117,6 +124,10 @@ export class PageUserStoreFoodsComponent {
                 this.toastService.error('Không tải được danh sách món ăn');
             }
         });
+    }
+
+    updateOrderNote(value: string): void {
+        this.orderNote.set(value);
     }
 
     addToCart(food: StoreFoodResponse): void {
@@ -212,6 +223,10 @@ export class PageUserStoreFoodsComponent {
                     : item
             )
         );
+    }
+
+    updateGuestCustomerName(value: string): void {
+        this.guestCustomerName.set(value);
     }
 
     blockInvalidQuantityKey(event: KeyboardEvent): void {
@@ -312,6 +327,11 @@ export class PageUserStoreFoodsComponent {
     }
 
     confirmOrder(): void {
+        if (!this.isLoggedIn() && !this.guestCustomerName().trim()) {
+            this.toastService.error('Vui lòng nhập tên khách hàng');
+            return;
+        }
+
         this.isConfirmOrderOpen.set(false);
         this.createOrder();
     }
@@ -361,9 +381,9 @@ export class PageUserStoreFoodsComponent {
 
         this.ordering.set(true);
 
-        this.orderService.create({
+        const request = {
             storeRefCode: this.storeRefCode(),
-            note: null,
+            note: this.orderNote().trim() || null,
             items: this.cart().map(item => ({
                 storeFoodId: item.food.id,
                 quantity: item.quantity,
@@ -375,7 +395,16 @@ export class PageUserStoreFoodsComponent {
                     additionalPrice: option.additionalPrice
                 }))
             }))
-        }).subscribe({
+        };
+
+        const createOrder$ = this.isLoggedIn()
+            ? this.orderService.create(request)
+            : this.orderService.createGuest({
+                ...request,
+                customerName: this.guestCustomerName().trim()
+            });
+
+        createOrder$.subscribe({
             next: response => {
                 this.ordering.set(false);
 
@@ -386,6 +415,7 @@ export class PageUserStoreFoodsComponent {
 
                 this.toastService.success('Đặt đơn thành công');
                 this.cart.set([]);
+                this.guestCustomerName.set('');
                 this.closeMobileCart();
             },
             error: () => {

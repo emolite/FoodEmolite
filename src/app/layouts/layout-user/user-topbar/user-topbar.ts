@@ -31,10 +31,14 @@ export class UserTopbarComponent {
   profileAvatar = signal('');
 
   constructor() {
-    this.loadProfile();
+    if (this.authService.isLoggedIn()) {
+      this.loadProfile();
+    }
   }
 
   loadProfile(): void {
+    if (!this.authService.isLoggedIn()) return;
+
     this.profileService.getMyProfile().subscribe({
       next: res => {
         const profile = res.data?.profile;
@@ -56,6 +60,10 @@ export class UserTopbarComponent {
 
   get avatarLetter(): string {
     return this.displayName.charAt(0).toUpperCase();
+  }
+
+  goLogin(): void {
+    this.router.navigateByUrl(URL_ENDPOINT.LOGIN);
   }
 
   @HostListener('document:click', ['$event'])

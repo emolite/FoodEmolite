@@ -5,6 +5,7 @@ import { ApiService } from '../constants/api.service';
 import { BaseResponse } from '../models/base-response.model';
 import { BaseTableResponse } from '../models/base-response.model';
 import {
+    CreateGuestOrderRequest,
     CreateOrderRequest,
     OrderResponse,
     PrintOrdersRequest,
@@ -23,6 +24,15 @@ export class OrderService {
     ): Observable<BaseResponse<string>> {
         return this.apiService.post<BaseResponse<string>, CreateOrderRequest>(
             API_ENDPOINT.ORDER.BASE,
+            request
+        );
+    }
+
+    createGuest(
+        request: CreateGuestOrderRequest
+    ): Observable<BaseResponse<string>> {
+        return this.apiService.post<BaseResponse<string>, CreateGuestOrderRequest>(
+            API_ENDPOINT.ORDER.GUEST,
             request
         );
     }

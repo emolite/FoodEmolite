@@ -189,30 +189,34 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
       optionGroups: [
         ...value.optionGroups,
         {
+          id: null,
           groupName: 'Độ ngọt',
           isRequired: true,
           minSelect: 1,
           maxSelect: 1,
           sortOrder: value.optionGroups.length,
+          isDeleted: false,
           options: [
-            { optionName: '0%', additionalPrice: 0, isAvailable: true, sortOrder: 0 },
-            { optionName: '25%', additionalPrice: 0, isAvailable: true, sortOrder: 1 },
-            { optionName: '50%', additionalPrice: 0, isAvailable: true, sortOrder: 2 },
-            { optionName: '75%', additionalPrice: 0, isAvailable: true, sortOrder: 3 },
-            { optionName: '100%', additionalPrice: 0, isAvailable: true, sortOrder: 4 }
+            { id: null, optionName: '0%', additionalPrice: 0, isAvailable: true, sortOrder: 0, isDeleted: false },
+            { id: null, optionName: '25%', additionalPrice: 0, isAvailable: true, sortOrder: 1, isDeleted: false },
+            { id: null, optionName: '50%', additionalPrice: 0, isAvailable: true, sortOrder: 2, isDeleted: false },
+            { id: null, optionName: '75%', additionalPrice: 0, isAvailable: true, sortOrder: 3, isDeleted: false },
+            { id: null, optionName: '100%', additionalPrice: 0, isAvailable: true, sortOrder: 4, isDeleted: false }
           ]
         },
         {
+          id: null,
           groupName: 'Lượng đá',
           isRequired: true,
           minSelect: 1,
           maxSelect: 1,
           sortOrder: value.optionGroups.length + 1,
+          isDeleted: false,
           options: [
-            { optionName: 'Ít đá', additionalPrice: 0, isAvailable: true, sortOrder: 0 },
-            { optionName: 'Không đá', additionalPrice: 0, isAvailable: true, sortOrder: 1 },
-            { optionName: 'Nhiều đá', additionalPrice: 0, isAvailable: true, sortOrder: 2 },
-            { optionName: 'Bình thường', additionalPrice: 0, isAvailable: true, sortOrder: 3 }
+            { id: null, optionName: 'Ít đá', additionalPrice: 0, isAvailable: true, sortOrder: 0, isDeleted: false },
+            { id: null, optionName: 'Không đá', additionalPrice: 0, isAvailable: true, sortOrder: 1, isDeleted: false },
+            { id: null, optionName: 'Nhiều đá', additionalPrice: 0, isAvailable: true, sortOrder: 2, isDeleted: false },
+            { id: null, optionName: 'Bình thường', additionalPrice: 0, isAvailable: true, sortOrder: 3, isDeleted: false }
           ]
         }
       ]
@@ -221,7 +225,22 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
 
   submit(): void {
     this.normalizeOptionGroups();
-    this.submitted.emit(this.form());
+
+    const request = this.form();
+
+    this.submitted.emit({
+      ...request,
+      optionGroups: request.optionGroups.filter(group =>
+        group.id !== null ||
+        group.isDeleted ||
+        group.groupName.trim() ||
+        group.options.some(option =>
+          option.id !== null ||
+          option.isDeleted ||
+          option.optionName.trim()
+        )
+      )
+    });
   }
 
   delete(): void {

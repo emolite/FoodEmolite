@@ -18,6 +18,10 @@ export interface CreateOrderItemOptionRequest {
   additionalPrice: number;
 }
 
+export interface CreateGuestOrderRequest extends CreateOrderRequest {
+  customerName: string;
+}
+
 export interface UpdateOrderStatusRequest {
   newStatus: string;
   changedNote?: string | null;
