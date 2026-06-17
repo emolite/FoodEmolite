@@ -32,7 +32,7 @@ export const API_ENDPOINT = {
     STATUS: (id: number) => `orders/${id}/status`,
     STATUS_PAYMENT: (id: number) => `orders/${id}/payment-status`,
     PRINT: 'orders/print',
-    BY_STORE: (storeRefCode: string) => `orders/store/${storeRefCode}`
+    BY_STORE: 'orders/store/search'
   },
   REVENUE: {
     ADMIN: 'revenue/admin',

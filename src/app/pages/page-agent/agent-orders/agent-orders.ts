@@ -11,16 +11,21 @@ import {
 } from '../../../common/models/front-end/table/table-column.model';
 import {
     OrderResponse,
+    OrderSearchRequest,
     UpdateOrderStatusRequest,
     UpdatePaymentStatusRequest
 } from '../../../common/models/order.model';
 import { PopUpAgentOrderDetailComponent } from './pop-up-agent-order-detail/pop-up-agent-order-detail';
 import { ConfirmPopupComponent } from '../../../shared/component/confirm-popup/confirm-popup';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { BaseSearchRequest } from '../../../common/models/base-search.model';
 
 interface OrderFilter {
     orderStatus: string;
     paymentStatus: string;
+    fromDate: string;
+    toDate: string;
+    keyword: string;
 }
 
 @Component({
@@ -50,7 +55,7 @@ export class PageAgentOrdersComponent {
     private invoiceObjectUrl: string | null = null;
 
     page = signal(1);
-    pageSize = signal(10);
+    pageSize = signal(30);
     totalPages = signal(1);
     loading = signal(false);
     isSubmitting = signal(false);
@@ -63,10 +68,13 @@ export class PageAgentOrdersComponent {
 
     sortBy = signal('');
     asc = signal(false);
-
+    private readonly today = new Date().toISOString().split('T')[0];
     filter = signal<OrderFilter>({
         orderStatus: '',
-        paymentStatus: ''
+        paymentStatus: '',
+        fromDate: this.today,
+        toDate: this.today,
+        keyword: ''
     });
 
     columns: TableColumn[] = [
@@ -131,6 +139,24 @@ export class PageAgentOrdersComponent {
 
     filterFields: FilterField[] = [
         {
+            key: 'keyword',
+            label: 'Tìm kiếm',
+            type: 'text',
+            placeholder: 'Tìm kiếm ...'
+        },
+        {
+            key: 'fromDate',
+            label: 'Từ ngày',
+            type: 'date',
+            placeholder: 'Từ ngày'
+        },
+        {
+            key: 'toDate',
+            label: 'Đến ngày',
+            type: 'date',
+            placeholder: 'Đến ngày'
+        },
+        {
             key: 'orderStatus',
             label: 'Trạng thái đơn',
             type: 'select',
@@ -169,53 +195,7 @@ export class PageAgentOrdersComponent {
     }
 
     rows(): TableRow[] {
-        const filter = this.filter();
-
-        let data = this.orders().filter(order => {
-            const matchOrderStatus =
-                !filter.orderStatus ||
-                order.orderStatus === filter.orderStatus;
-
-            const matchPaymentStatus =
-                !filter.paymentStatus ||
-                order.paymentStatus === filter.paymentStatus;
-
-            return matchOrderStatus && matchPaymentStatus;
-        });
-
-        if (this.sortBy()) {
-            data = [...data].sort((a, b) => {
-                let aValue: string | number = '';
-                let bValue: string | number = '';
-
-                if (this.sortBy() === 'id') {
-                    aValue = a.id;
-                    bValue = b.id;
-                }
-
-                if (this.sortBy() === 'totalAmount') {
-                    aValue = a.totalAmount;
-                    bValue = b.totalAmount;
-                }
-
-                if (this.sortBy() === 'createdAt') {
-                    aValue = new Date(a.createdAt).getTime();
-                    bValue = new Date(b.createdAt).getTime();
-                }
-
-                if (aValue < bValue) {
-                    return this.asc() ? -1 : 1;
-                }
-
-                if (aValue > bValue) {
-                    return this.asc() ? 1 : -1;
-                }
-
-                return 0;
-            });
-        }
-
-        return data.map((order, index) => ({
+        return this.orders().map((order, index) => ({
             selected: this.isSelected(order.id),
             index: (this.page() - 1) * this.pageSize() + index + 1,
             id: order.id,
@@ -270,11 +250,22 @@ export class PageAgentOrdersComponent {
 
         this.loading.set(true);
 
-        this.orderService.getByStoreRefCode(
-            refCode,
-            this.page(),
-            this.pageSize()
-        ).subscribe({
+        const request: BaseSearchRequest<OrderSearchRequest> = {
+            page: this.page(),
+            pageSize: this.pageSize(),
+            sortBy: this.sortBy() || null,
+            asc: this.asc(),
+            searchParams: {
+                storeRefCode: refCode,
+                keyword: this.filter().keyword || null,
+                orderStatus: this.filter().orderStatus || null,
+                paymentStatus: this.filter().paymentStatus || null,
+                fromDate: this.filter().fromDate || null,
+                toDate: this.filter().toDate || null
+            }
+        };
+
+        this.orderService.getByStoreRefCode(request).subscribe({
             next: response => {
                 this.orders.set(response.items);
                 this.totalPages.set(response.totalPages);
@@ -637,17 +628,22 @@ export class PageAgentOrdersComponent {
 
     onFilterChange(value: OrderFilter): void {
         this.filter.set(value);
+        this.page.set(1);
         this.selectedOrderIds.set([]);
+        this.loadOrders();
     }
 
     onSortChange(key: string): void {
         if (this.sortBy() === key) {
             this.asc.set(!this.asc());
-            return;
+        } else {
+            this.sortBy.set(key);
+            this.asc.set(true);
         }
 
-        this.sortBy.set(key);
-        this.asc.set(true);
+        this.page.set(1);
+        this.selectedOrderIds.set([]);
+        this.loadOrders();
     }
 
     getOrderStatusText(status: string): string {

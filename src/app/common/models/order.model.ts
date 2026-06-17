@@ -71,3 +71,12 @@ export interface OrderItemOptionResponse {
 export interface PrintOrdersRequest {
   orderIds: number[];
 }
+
+export interface OrderSearchRequest {
+  keyword?: string | null;
+  storeRefCode?: string | null;
+  orderStatus?: string | null;
+  paymentStatus?: string | null;
+  fromDate?: string | null;
+  toDate?: string | null;
+}

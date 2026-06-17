@@ -1,4 +1,4 @@
-export type FilterFieldType = 'text' | 'select';
+export type FilterFieldType = 'text' | 'select' | 'date';
 
 export type FilterValue = string | number | boolean | null;
 

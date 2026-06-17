@@ -8,10 +8,12 @@ import {
     CreateGuestOrderRequest,
     CreateOrderRequest,
     OrderResponse,
+    OrderSearchRequest,
     PrintOrdersRequest,
     UpdateOrderStatusRequest,
     UpdatePaymentStatusRequest
 } from '../models/order.model';
+import { BaseSearchRequest } from '../models/base-search.model';
 
 @Injectable({
     providedIn: 'root'
@@ -55,12 +57,14 @@ export class OrderService {
     }
 
     getByStoreRefCode(
-        storeRefCode: string,
-        page: number = 1,
-        pageSize: number = 10
+        request: BaseSearchRequest<OrderSearchRequest>
     ): Observable<BaseTableResponse<OrderResponse>> {
-        return this.apiService.get<BaseTableResponse<OrderResponse>>(
-            `${API_ENDPOINT.ORDER.BY_STORE(storeRefCode)}?page=${page}&pageSize=${pageSize}`
+        return this.apiService.post<
+            BaseTableResponse<OrderResponse>,
+            BaseSearchRequest<OrderSearchRequest>
+        >(
+            API_ENDPOINT.ORDER.BY_STORE,
+            request
         );
     }
 
