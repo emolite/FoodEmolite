@@ -18,6 +18,7 @@ import { UsersComponent } from './pages/page-admin/users/users';
 import { AgentsComponent } from './pages/page-admin/agents/agents';
 import { AgentRevenueComponent } from './pages/page-agent/agent-revenue/agent-revenue';
 import { RevenueComponent } from './pages/page-admin/revenue/revenue';
+import { PageOrderSuccessComponent } from './pages/page-user/order-success/order-success';
 
 export const routes: Routes = [
   {
@@ -27,11 +28,15 @@ export const routes: Routes = [
   },
   {
     path: URL_ENDPOINT.LOGIN,
-    component: PageLoginComponent 
+    component: PageLoginComponent
   },
   {
     path: URL_ENDPOINT.REGISTER,
     component: PageRegisterComponent
+  },
+  {
+    path: URL_ENDPOINT.SUCCESS,
+    component: PageOrderSuccessComponent
   },
   {
     path: URL_ENDPOINT.ADMIN,

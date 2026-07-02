@@ -42,7 +42,9 @@ export class PageUserStoreFoodsComponent {
     private readonly toastService = inject(ToastService);
     private readonly orderService = inject(OrderService);
     private readonly authService = inject(AuthService);
-
+    private paymentInterval: any;
+    isQrPopupOpen = signal(false);
+    qrData = signal<any>(null);
     storeRefCode = signal('');
     foods = signal<StoreFoodResponse[]>([]);
     cart = signal<CartItem[]>([]);
@@ -84,6 +86,13 @@ export class PageUserStoreFoodsComponent {
 
         this.storeRefCode.set(storeRefCode);
         this.loadFoods();
+    }
+
+    ngOnDestroy() {
+        if (this.paymentInterval) {
+            clearInterval(this.paymentInterval);
+            this.paymentInterval = null;
+        }
     }
 
     @HostListener('document:mousemove', ['$event'])
@@ -406,21 +415,47 @@ export class PageUserStoreFoodsComponent {
 
         createOrder$.subscribe({
             next: response => {
-                this.ordering.set(false);
-
                 if (!response.isSuccess) {
+                    this.ordering.set(false);
                     this.toastService.error(response.message);
                     return;
                 }
 
-                this.toastService.success('Đặt đơn thành công');
+                const order = response.data;
+                if (!order) {
+                    this.ordering.set(false);
+                    this.toastService.error('Không tạo được đơn hàng');
+                    return;
+                }
                 this.cart.set([]);
                 this.guestCustomerName.set('');
                 this.closeMobileCart();
+
+                this.orderService.getStorePaymentInfo(
+                    this.storeRefCode(),
+                    order.totalAmount,
+                    order.orderCode
+                ).subscribe({
+                    next: (res) => {
+                        if (!res.isSuccess) {
+                            this.toastService.error(res.message);
+                            return;
+                        }
+
+                        this.qrData.set(res.data);
+                        this.isQrPopupOpen.set(true);
+                        this.startPaymentPolling(order.orderCode);
+                    },
+                    error: () => {
+                        this.toastService.error('Không tạo được QR thanh toán');
+                    }
+                });
+
+                this.ordering.set(false);
             },
             error: () => {
                 this.ordering.set(false);
-                this.toastService.error('Không thể đặt đơn');
+                this.toastService.error('Không thể tạo đơn hàng');
             }
         });
     }
@@ -464,5 +499,31 @@ export class PageUserStoreFoodsComponent {
 
     formatCurrency(value: number): string {
         return `${value.toLocaleString('vi-VN')}đ`;
+    }
+
+    private startPaymentPolling(orderCode: string) {
+        this.paymentInterval = setInterval(() => {
+            this.orderService.getPaymentStatus(orderCode).subscribe({
+                next: res => {
+                    if (res.isSuccess && res.data === 'PAID') {
+                        clearInterval(this.paymentInterval);
+
+                        this.isQrPopupOpen.set(false);
+                        this.toastService.success('Thanh toán thành công');
+
+                        this.router.navigate(['/success'], {
+                            queryParams: {
+                                orderCode,
+                                amount: this.qrData()?.amount ?? null
+                            }
+                        });
+                    }
+                },
+                error: () => {
+                    clearInterval(this.paymentInterval);
+                    this.toastService.error('Lỗi kiểm tra thanh toán');
+                }
+            });
+        }, 3000);
     }
 }

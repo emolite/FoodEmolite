@@ -1,6 +1,7 @@
 export const URL_ENDPOINT = {
   LOGIN: 'login',
   REGISTER: 'register',
+  SUCCESS: 'success',
   ADMIN: 'admin',
   ADMIN_STORES: 'stores',
   ADMIN_FOODS: 'foods',

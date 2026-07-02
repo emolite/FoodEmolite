@@ -80,3 +80,10 @@ export interface OrderSearchRequest {
   fromDate?: string | null;
   toDate?: string | null;
 }
+
+export interface CreateOrderResponse {
+    orderId: number;
+    orderCode: string;
+    paymentStatus: string;
+    totalAmount: number;
+}

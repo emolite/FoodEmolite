@@ -7,6 +7,7 @@ import { BaseTableResponse } from '../models/base-response.model';
 import {
     CreateGuestOrderRequest,
     CreateOrderRequest,
+    CreateOrderResponse,
     OrderResponse,
     OrderSearchRequest,
     PrintOrdersRequest,
@@ -23,8 +24,11 @@ export class OrderService {
 
     create(
         request: CreateOrderRequest
-    ): Observable<BaseResponse<string>> {
-        return this.apiService.post<BaseResponse<string>, CreateOrderRequest>(
+    ): Observable<BaseResponse<CreateOrderResponse>> {
+        return this.apiService.post<
+            BaseResponse<CreateOrderResponse>,
+            CreateOrderRequest
+        >(
             API_ENDPOINT.ORDER.BASE,
             request
         );
@@ -32,10 +36,19 @@ export class OrderService {
 
     createGuest(
         request: CreateGuestOrderRequest
-    ): Observable<BaseResponse<string>> {
-        return this.apiService.post<BaseResponse<string>, CreateGuestOrderRequest>(
+    ): Observable<BaseResponse<CreateOrderResponse>> {
+        return this.apiService.post<
+            BaseResponse<CreateOrderResponse>,
+            CreateGuestOrderRequest
+        >(
             API_ENDPOINT.ORDER.GUEST,
             request
+        );
+    }
+
+    getPaymentStatus(orderCode: string) {
+        return this.apiService.get<BaseResponse<string>>(
+            API_ENDPOINT.ORDER.PAYMENT_STATUS(orderCode)
         );
     }
 
@@ -53,6 +66,12 @@ export class OrderService {
     ): Observable<BaseResponse<OrderResponse>> {
         return this.apiService.get<BaseResponse<OrderResponse>>(
             API_ENDPOINT.ORDER.DETAIL(id)
+        );
+    }
+
+    getStorePaymentInfo(storeRefCode: string, amount: number, orderCode: string) {
+        return this.apiService.get<any>(
+            API_ENDPOINT.PROFILE.STORE_PAYMENT(storeRefCode, amount, orderCode)
         );
     }
 
