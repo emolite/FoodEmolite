@@ -269,7 +269,7 @@ export class AgentRevenueComponent {
             },
             dataLabels: {
                 enabled: true,
-                formatter: (value: number) => `${value.toFixed(0)}%`
+                // formatter: (value: number) => `${value.toFixed(0)}%`
             },
             tooltip: {
                 y: {
@@ -282,10 +282,20 @@ export class AgentRevenueComponent {
                         size: '68%',
                         labels: {
                             show: true,
+                            value: {
+                                formatter: (value: string) =>
+                                    this.formatCurrency(Number(value))
+                            },
                             total: {
                                 show: true,
                                 label: 'Tổng',
-                                formatter: () => this.formatCurrency(this.totalRevenue())
+                                formatter: () => {
+                                    const total =
+                                        (this.donutChartOptions.series as number[])
+                                            ?.reduce((a, b) => a + b, 0) ?? 0;
+
+                                    return this.formatCurrency(total);
+                                }
                             }
                         }
                     }
@@ -309,7 +319,8 @@ export class AgentRevenueComponent {
 
     private readonly orderStatusMap: Record<string, string> = {
         PENDING: 'Chờ xác nhận',
-        CONFIRMED: 'Đã xác nhận'
+        CONFIRMED: 'Đã xác nhận',
+        CANCELLED: 'Đã huỷ'
     };
 
     private readonly paymentStatusMap: Record<string, string> = {

@@ -19,6 +19,7 @@ import { AgentsComponent } from './pages/page-admin/agents/agents';
 import { AgentRevenueComponent } from './pages/page-agent/agent-revenue/agent-revenue';
 import { RevenueComponent } from './pages/page-admin/revenue/revenue';
 import { PageOrderSuccessComponent } from './pages/page-user/order-success/order-success';
+import { PageAgentFoodCategoriesComponent } from './pages/page-agent/agent-food-categories/agent-food-categories';
 
 export const routes: Routes = [
   {
@@ -99,6 +100,13 @@ export const routes: Routes = [
         component: PageAgentInfoComponent,
         data: {
           title: 'Thông tin'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_FOOD_CATEGORIES,
+        component: PageAgentFoodCategoriesComponent,
+        data: {
+          title: 'Danh sách danh mục'
         }
       },
       {

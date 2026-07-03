@@ -107,6 +107,13 @@ export class OrderService {
         );
     }
 
+    cancelOrder(id: number): Observable<BaseResponse<string>> {
+        return this.apiService.put<BaseResponse<string>, null>(
+            API_ENDPOINT.ORDER.ORDER_CANCEL(id),
+            null
+        );
+    }
+
     printOrders(request: PrintOrdersRequest): Observable<Blob> {
         return this.apiService.postBlob(
             API_ENDPOINT.ORDER.PRINT,

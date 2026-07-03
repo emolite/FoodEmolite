@@ -32,15 +32,22 @@ export class StoreFoodService {
 
   getByStoreRefCode(
     storeRefCode: string,
+    storeFoodCategoryId: number | null,
     page: number,
-    pageSize: number
+    pageSize: number,
   ): Observable<BaseTableResponse<StoreFoodResponse>> {
+    const params: Record<string, string | number | boolean> = {
+      page,
+      pageSize
+    };
+
+    if (storeFoodCategoryId != null) {
+      params['storeFoodCategoryId'] = storeFoodCategoryId;
+    }
+
     return this.apiService.get<BaseTableResponse<StoreFoodResponse>>(
       API_ENDPOINT.STORE_FOOD.BY_STORE(storeRefCode),
-      {
-        page,
-        pageSize
-      }
+      params
     );
   }
 
