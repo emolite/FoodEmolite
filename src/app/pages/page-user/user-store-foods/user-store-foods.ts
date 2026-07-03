@@ -13,6 +13,8 @@ import { AuthService } from '../../../common/services/auth.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { PopUpUserFoodOptionsComponent } from './pop-up-user-food-options/pop-up-user-food-options';
+import { StoreFoodCategoryService } from '../../../common/services/store-food-category.service';
+import { StoreFoodCategoryResponse } from '../../../common/models/store-food-category.model';
 
 export interface CartItemOption {
     optionGroupId: number;
@@ -42,7 +44,11 @@ export class PageUserStoreFoodsComponent {
     private readonly toastService = inject(ToastService);
     private readonly orderService = inject(OrderService);
     private readonly authService = inject(AuthService);
+    private readonly categoryService = inject(StoreFoodCategoryService);
     private paymentInterval: any;
+
+    categories = signal<StoreFoodCategoryResponse[]>([]);
+    selectedCategoryId = signal<number | null>(null);
     isQrPopupOpen = signal(false);
     qrData = signal<any>(null);
     storeRefCode = signal('');
@@ -85,6 +91,15 @@ export class PageUserStoreFoodsComponent {
             this.route.snapshot.paramMap.get('storeRefCode') ?? '';
 
         this.storeRefCode.set(storeRefCode);
+        this.loadCategories();
+        this.loadFoods();
+    }
+
+    selectCategory(
+        categoryId: number | null
+    ): void {
+        this.selectedCategoryId.set(categoryId);
+
         this.loadFoods();
     }
 
@@ -116,23 +131,59 @@ export class PageUserStoreFoodsComponent {
         this.isResizing.set(true);
     }
 
+    loadCategories(): void {
+        this.categoryService
+            .getByStoreRefCode(this.storeRefCode())
+            .subscribe({
+                next: response => {
+                    if (
+                        response.isSuccess &&
+                        response.data
+                    ) {
+                        this.categories.set(
+                            response.data
+                        );
+                    }
+                }
+            });
+    }
+
     loadFoods(): void {
         this.loading.set(true);
 
-        this.storeFoodService.getByStoreRefCode(
-            this.storeRefCode(),
-            1,
-            100
-        ).subscribe({
-            next: response => {
-                this.loading.set(false);
-                this.foods.set(response.items.filter(food => food.isAvailable));
-            },
-            error: () => {
-                this.loading.set(false);
-                this.toastService.error('Không tải được danh sách món ăn');
-            }
-        });
+        this.storeFoodService
+            .getByStoreRefCode(
+                this.storeRefCode(),
+                this.selectedCategoryId(),
+                1,
+                100
+            )
+            .subscribe({
+                next: response => {
+                    this.loading.set(false);
+
+                    this.foods.set(
+                        response.items.filter(
+                            food => food.isAvailable
+                        )
+                    );
+                },
+                error: () => {
+                    this.loading.set(false);
+
+                    this.toastService.error(
+                        'Không tải được danh sách món ăn'
+                    );
+                }
+            });
+    }
+
+    changeCategory(categoryId: number | null): void {
+        this.selectedCategoryId.set(
+            categoryId
+        );
+
+        this.loadFoods();
     }
 
     updateOrderNote(value: string): void {

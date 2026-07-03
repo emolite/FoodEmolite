@@ -64,7 +64,7 @@ export class PageAgentOrdersComponent {
     isConfirmOpen = signal(false);
     confirmTitle = signal('');
     confirmMessage = signal('');
-    confirmAction = signal<'PAYMENT' | 'ORDER' | null>(null);
+    confirmAction = signal<'PAYMENT' | 'ORDER' | 'CANCEL' | null>(null);
 
     sortBy = signal('');
     asc = signal(false);
@@ -169,6 +169,10 @@ export class PageAgentOrdersComponent {
                 {
                     label: 'Đã xác nhận',
                     value: 'CONFIRMED'
+                },
+                {
+                    label: 'Đã huỷ',
+                    value: 'CANCELLED'
                 }
             ]
         },
@@ -499,6 +503,26 @@ export class PageAgentOrdersComponent {
         this.isConfirmOpen.set(true);
     }
 
+    confirmCancelSelected(): void {
+        const selectedOrders = this.getSelectedOrders();
+
+        const invalidOrders = selectedOrders.filter(
+            order => order.orderStatus === 'CANCELLED' || order.orderStatus === 'COMPLETED'
+        );
+
+        if (invalidOrders.length) {
+            this.toastService.error('Có đơn không thể huỷ trong danh sách đã chọn');
+            return;
+        }
+
+        this.confirmTitle.set('Huỷ đơn hàng');
+        this.confirmMessage.set(
+            `Bạn có chắc muốn huỷ ${selectedOrders.length} đơn hàng đã chọn không?`
+        );
+        this.confirmAction.set('CANCEL');
+        this.isConfirmOpen.set(true);
+    }
+
     closeConfirm(): void {
         if (this.isSubmitting()) {
             return;
@@ -526,6 +550,11 @@ export class PageAgentOrdersComponent {
                 newStatus: 'CONFIRMED',
                 changedNote: 'Đại lý xác nhận đơn hàng'
             });
+            return;
+        }
+
+        if (action === 'CANCEL') {
+            this.bulkCancelSelected();
         }
     }
 
@@ -575,6 +604,38 @@ export class PageAgentOrdersComponent {
 
         ids.forEach(id => {
             this.orderService.updatePaymentStatus(id, request).subscribe({
+                next: response => {
+                    completed++;
+
+                    if (!response.isSuccess) {
+                        failed++;
+                    }
+
+                    this.finishBulkUpdate(completed, failed, ids.length);
+                },
+                error: () => {
+                    completed++;
+                    failed++;
+                    this.finishBulkUpdate(completed, failed, ids.length);
+                }
+            });
+        });
+    }
+
+    private bulkCancelSelected(): void {
+        const ids = this.selectedOrderIds();
+
+        if (!ids.length) {
+            return;
+        }
+
+        this.isSubmitting.set(true);
+
+        let completed = 0;
+        let failed = 0;
+
+        ids.forEach(id => {
+            this.orderService.cancelOrder(id).subscribe({
                 next: response => {
                     completed++;
 

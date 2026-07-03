@@ -16,10 +16,17 @@ import {
 } from '../../../common/models/store-food.model';
 import { PopUpAgentFoodAddComponent } from './pop-up-agent-food-add/pop-up-agent-food-add';
 import { PopUpAgentFoodDetailComponent } from './pop-up-agent-food-detail/pop-up-agent-food-detail';
+import { StoreFoodCategoryService } from '../../../common/services/store-food-category.service';
 
 interface StoreFoodFilter {
     foodName: string;
     isAvailable: boolean | '';
+}
+
+interface StoreFoodFilter {
+    foodName: string;
+    isAvailable: boolean | '';
+    categoryId: number | '';
 }
 
 @Component({
@@ -36,6 +43,7 @@ export class PageAgentFoodsComponent {
     private readonly storeFoodService = inject(StoreFoodService);
     private readonly profileService = inject(ProfileService);
     private readonly toastService = inject(ToastService);
+    private readonly categoryService = inject(StoreFoodCategoryService);
 
     storeFoods = signal<StoreFoodResponse[]>([]);
     selectedFood = signal<StoreFoodResponse | null>(null);
@@ -57,9 +65,14 @@ export class PageAgentFoodsComponent {
 
     filter = signal<StoreFoodFilter>({
         foodName: '',
-        isAvailable: ''
+        isAvailable: '',
+        categoryId: ''
     });
 
+    categoryOptions: {
+        label: string;
+        value: number | '';
+    }[] = [];
     columns: TableColumn[] = [
         {
             key: 'index',
@@ -110,31 +123,40 @@ export class PageAgentFoodsComponent {
         }
     ];
 
-    filterFields: FilterField[] = [
-        {
-            key: 'foodName',
-            label: 'Tên món',
-            type: 'text',
-            placeholder: 'Nhập tên món'
-        },
-        {
-            key: 'isAvailable',
-            label: 'Trạng thái',
-            type: 'select',
-            placeholder: 'Tất cả trạng thái',
-            options: [
-                {
-                    label: 'Đang bán',
-                    value: true
-                },
-                {
-                    label: 'Ngừng bán',
-                    value: false
-                }
-            ]
-        }
-    ];
-
+    filterFields: FilterField[] = [];
+    private updateFilterFields(): void {
+        this.filterFields = [
+            {
+                key: 'foodName',
+                label: 'Tên món',
+                type: 'text',
+                placeholder: 'Nhập tên món'
+            },
+            {
+                key: 'categoryId',
+                label: 'Danh mục',
+                type: 'select',
+                placeholder: 'Tất cả danh mục',
+                options: this.categoryOptions
+            },
+            {
+                key: 'isAvailable',
+                label: 'Trạng thái',
+                type: 'select',
+                placeholder: 'Tất cả trạng thái',
+                options: [
+                    {
+                        label: 'Đang bán',
+                        value: true
+                    },
+                    {
+                        label: 'Ngừng bán',
+                        value: false
+                    }
+                ]
+            }
+        ];
+    }
     constructor() {
         this.loadMyStore();
     }
@@ -214,6 +236,7 @@ export class PageAgentFoodsComponent {
                 }
 
                 this.storeRefCode.set(response.data.store.refCode);
+                this.loadCategories();
                 this.loadStoreFoods();
             },
             error: () => {
@@ -221,6 +244,40 @@ export class PageAgentFoodsComponent {
                 this.toastService.error('Không tải được thông tin đại lý');
             }
         });
+    }
+
+    loadCategories(): void {
+        const refCode =
+            this.storeRefCode();
+
+        if (!refCode) {
+            return;
+        }
+
+        this.categoryService
+            .getByStoreRefCode(refCode)
+            .subscribe({
+                next: response => {
+                    if (
+                        response.isSuccess &&
+                        response.data
+                    ) {
+                        this.categoryOptions = [
+                            {
+                                label: 'Tất cả danh mục',
+                                value: ''
+                            },
+
+                            ...response.data.map(x => ({
+                                label: x.categoryName,
+                                value: x.id
+                            }))
+                        ];
+
+                        this.updateFilterFields();
+                    }
+                }
+            });
     }
 
     loadStoreFoods(): void {
@@ -235,8 +292,9 @@ export class PageAgentFoodsComponent {
 
         this.storeFoodService.getByStoreRefCode(
             refCode,
+            this.filter().categoryId || null,
             this.page(),
-            this.pageSize()
+            this.pageSize(),
         ).subscribe({
             next: response => {
                 this.storeFoods.set(response.items);
