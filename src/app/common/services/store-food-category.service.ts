@@ -23,12 +23,11 @@ export class StoreFoodCategoryService {
   getByStoreRefCode(
     storeRefCode: string
   ): Observable<BaseResponse<StoreFoodCategoryResponse[]>> {
-    return this.apiService.get<
-      BaseResponse<StoreFoodCategoryResponse[]>
-    >(
-      API_ENDPOINT.STORE_FOOD_CATEGORY.BY_STORE(
-        storeRefCode
-      )
+    const body: { storeRefCode: string } = { storeRefCode };
+
+    return this.apiService.post<BaseResponse<StoreFoodCategoryResponse[]>, typeof body>(
+      API_ENDPOINT.STORE_FOOD_CATEGORY.BY_STORE,
+      body
     );
   }
 

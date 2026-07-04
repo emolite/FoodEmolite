@@ -73,6 +73,12 @@ export class PageAgentFoodsComponent {
         label: string;
         value: number | '';
     }[] = [];
+
+    categoryDropdownOptions: {
+        label: string;
+        value: number;
+    }[] = [];
+    
     columns: TableColumn[] = [
         {
             key: 'index',
@@ -158,6 +164,7 @@ export class PageAgentFoodsComponent {
         ];
     }
     constructor() {
+        this.updateFilterFields();
         this.loadMyStore();
     }
 
@@ -247,8 +254,7 @@ export class PageAgentFoodsComponent {
     }
 
     loadCategories(): void {
-        const refCode =
-            this.storeRefCode();
+        const refCode = this.storeRefCode();
 
         if (!refCode) {
             return;
@@ -258,21 +264,19 @@ export class PageAgentFoodsComponent {
             .getByStoreRefCode(refCode)
             .subscribe({
                 next: response => {
-                    if (
-                        response.isSuccess &&
-                        response.data
-                    ) {
+                    if (response.isSuccess && response.data) {
                         this.categoryOptions = [
-                            {
-                                label: 'Tất cả danh mục',
-                                value: ''
-                            },
-
+                            { label: 'Tất cả danh mục', value: '' },
                             ...response.data.map(x => ({
                                 label: x.categoryName,
                                 value: x.id
                             }))
                         ];
+
+                        this.categoryDropdownOptions = response.data.map(x => ({
+                            label: x.categoryName,
+                            value: x.id
+                        }));
 
                         this.updateFilterFields();
                     }
@@ -430,6 +434,7 @@ export class PageAgentFoodsComponent {
 
     onFilterChange(value: StoreFoodFilter): void {
         this.filter.set(value);
+        this.loadStoreFoods();
     }
 
     onSortChange(key: string): void {

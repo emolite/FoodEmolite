@@ -1,16 +1,18 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CreateStoreFoodRequest } from '../../../../common/models/store-food.model';
+import { DropdownComponent, DropdownOption } from '../../../../shared/component/dropdown/dropdown';
 
 @Component({
   selector: 'app-pop-up-agent-food-add',
-  imports: [FormsModule],
+  imports: [FormsModule, DropdownComponent],
   templateUrl: './pop-up-agent-food-add.html'
 })
 export class PopUpAgentFoodAddComponent {
   @Input() storeRefCode = '';
   @Input() isSubmitting = false;
-
+  @Input() categoryOptions: DropdownOption[] = [];
+  
   @Output() closed = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<CreateStoreFoodRequest>();
 
@@ -23,6 +25,7 @@ export class PopUpAgentFoodAddComponent {
     description: '',
     price: 0,
     quantity: 0,
+    storeFoodCategoryId: 0,
     optionGroups: []
   });
 

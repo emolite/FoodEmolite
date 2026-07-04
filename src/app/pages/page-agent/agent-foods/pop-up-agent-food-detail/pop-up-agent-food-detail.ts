@@ -4,16 +4,18 @@ import {
   StoreFoodResponse,
   UpdateStoreFoodRequest
 } from '../../../../common/models/store-food.model';
+import { DropdownComponent, DropdownOption } from '../../../../shared/component/dropdown/dropdown';
 
 @Component({
   selector: 'app-pop-up-agent-food-detail',
-  imports: [FormsModule],
+  imports: [FormsModule, DropdownComponent],
   templateUrl: './pop-up-agent-food-detail.html'
 })
 export class PopUpAgentFoodDetailComponent implements OnChanges {
   @Input() food!: StoreFoodResponse;
   @Input() isOpen = false;
   @Input() isSubmitting = false;
+  @Input() categoryOptions: DropdownOption[] = [];
 
   @Output() closed = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<UpdateStoreFoodRequest>();
@@ -29,6 +31,7 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
     price: 0,
     quantity: 0,
     isAvailable: true,
+    storeFoodCategoryId: null,
     optionGroups: []
   });
 
@@ -42,6 +45,7 @@ export class PopUpAgentFoodDetailComponent implements OnChanges {
         price: this.food.price,
         quantity: this.food.quantity,
         isAvailable: this.food.isAvailable,
+        storeFoodCategoryId: this.food.storeFoodCategoryId ?? null,
         optionGroups: (this.food.optionGroups ?? []).map(group => ({
           id: group.id,
           groupName: group.groupName,

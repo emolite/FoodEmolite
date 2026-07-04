@@ -14,13 +14,13 @@ export const API_ENDPOINT = {
   STORE_FOOD: {
     BASE: 'store-foods',
     DETAIL: (id: number) => `store-foods/${id}`,
-    BY_STORE: (storeRefCode: string) => `store-foods/store/${storeRefCode}`
+    BY_STORE:`store-foods/store`
   },
   STORE_FOOD_CATEGORY: {
     BASE: 'store-food-categories',
     DETAIL: (id: number) => `store-food-categories/${id}`,
     SEARCH: 'store-food-categories/search',
-    BY_STORE: (storeRefCode: string) => `store-food-categories/${storeRefCode}`
+    BY_STORE: `store-food-categories/get`
   },
   PROFILE: {
     LIST_ACC: 'profile/accounts-users',

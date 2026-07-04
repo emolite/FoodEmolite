@@ -15,6 +15,7 @@ import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { PopUpUserFoodOptionsComponent } from './pop-up-user-food-options/pop-up-user-food-options';
 import { StoreFoodCategoryService } from '../../../common/services/store-food-category.service';
 import { StoreFoodCategoryResponse } from '../../../common/models/store-food-category.model';
+import { SelectedStoreService } from '../../../common/services/selectedstore.service';
 
 export interface CartItemOption {
     optionGroupId: number;
@@ -45,6 +46,7 @@ export class PageUserStoreFoodsComponent {
     private readonly orderService = inject(OrderService);
     private readonly authService = inject(AuthService);
     private readonly categoryService = inject(StoreFoodCategoryService);
+    private readonly selectedStoreService = inject(SelectedStoreService);
     private paymentInterval: any;
 
     categories = signal<StoreFoodCategoryResponse[]>([]);
@@ -87,8 +89,13 @@ export class PageUserStoreFoodsComponent {
     );
 
     constructor() {
-        const storeRefCode =
-            this.route.snapshot.paramMap.get('storeRefCode') ?? '';
+        const storeRefCode = this.selectedStoreService.storeRefCode() ?? '';
+
+        if (!storeRefCode) {
+            this.toastService.error('Không tìm thấy cửa hàng, vui lòng chọn lại');
+            this.back();
+            return;
+        }
 
         this.storeRefCode.set(storeRefCode);
         this.loadCategories();

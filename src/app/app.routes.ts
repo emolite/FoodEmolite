@@ -150,7 +150,7 @@ export const routes: Routes = [
         }
       },
       {
-        path: `${URL_ENDPOINT.USER_STORE_FOODS}/:storeRefCode`,
+        path: `${URL_ENDPOINT.USER_STORE_FOODS}/${URL_ENDPOINT.USER_ORDER}`,
         component: PageUserStoreFoodsComponent
       },
       {

@@ -9,12 +9,15 @@ import {
   LoginResponse,
   RegisterRequest
 } from '../models/auth.model';
+import { Router } from '@angular/router';
+import { URL_ENDPOINT } from '../constants/url-endpoint';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly apiService = inject(ApiService);
+  private router = inject(Router);
 
   currentUser = signal<CurrentUserResponse | null>(null);
   token = signal<string | null>(localStorage.getItem('access_token'));
@@ -85,8 +88,12 @@ export class AuthService {
     this.isVerifying.set(true);
 
     return this.verify().pipe(
-      tap(() => {
+      tap((res) => {
         this.isVerifying.set(false);
+        const role = res?.data?.role;
+        if (role) {
+          this.redirectByRole(role);
+        }
       }),
       catchError(() => {
         this.isVerifying.set(false);
@@ -113,5 +120,25 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.token();
+  }
+
+  private redirectByRole(role: string): void {
+    const currentUrl = this.router.url;
+    const isOnNeutralPage = currentUrl === '/' || currentUrl.startsWith(`/${URL_ENDPOINT.LOGIN}`);
+
+    if (!isOnNeutralPage) return;
+
+    switch (role) {
+      case 'Admin':
+        this.router.navigate([`/${URL_ENDPOINT.ADMIN}`]);
+        break;
+      case 'Agent':
+        this.router.navigate([`/${URL_ENDPOINT.AGENT}`]);
+        break;
+      case 'User':
+      default:
+        this.router.navigate([`/${URL_ENDPOINT.USER}`]);
+        break;
+    }
   }
 }
