@@ -4,6 +4,7 @@ import { StoreService } from '../../../common/services/store.service';
 import { ToastService } from '../../../common/services/toast.service';
 import { StoreResponse } from '../../../common/models/store.model';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
+import { SelectedStoreService } from '../../../common/services/selectedstore.service';
 
 @Component({
   selector: 'app-page-user-stores',
@@ -14,6 +15,7 @@ export class PageUserStoresComponent {
   private readonly storeService = inject(StoreService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly selectedStoreService = inject(SelectedStoreService);
 
   stores = signal<StoreResponse[]>([]);
   loading = signal(false);
@@ -46,11 +48,12 @@ export class PageUserStoresComponent {
   }
 
   openStoreFoods(store: StoreResponse): void {
+    this.selectedStoreService.setStoreRefCode(store.refCode);
     this.router.navigate([
       '/',
       URL_ENDPOINT.USER,
       URL_ENDPOINT.USER_STORE_FOODS,
-      store.refCode
+      URL_ENDPOINT.USER_ORDER
     ]);
   }
 }

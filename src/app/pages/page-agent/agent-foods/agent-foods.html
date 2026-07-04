@@ -26,12 +26,13 @@
 
 @if (isAddOpen() && storeRefCode()) {
 <app-pop-up-agent-food-add [storeRefCode]="storeRefCode()!" [isSubmitting]="isSubmitting()"
-  (closed)="closeCreateModal()" (submitted)="createFood($event)">
+  [categoryOptions]="categoryDropdownOptions" (closed)="closeCreateModal()" (submitted)="createFood($event)">
 </app-pop-up-agent-food-add>
 }
 
 @if (isDetailRendered() && selectedFood()) {
 <app-pop-up-agent-food-detail [food]="selectedFood()!" [isOpen]="isDetailOpen()" [isSubmitting]="isSubmitting()"
-  (closed)="closeDetail()" (submitted)="updateFood($event)" (deleted)="deleteFood($event)">
+  [categoryOptions]="categoryDropdownOptions" (closed)="closeDetail()" (submitted)="updateFood($event)"
+  (deleted)="deleteFood($event)">
 </app-pop-up-agent-food-detail>
 }

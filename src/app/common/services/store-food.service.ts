@@ -36,18 +36,24 @@ export class StoreFoodService {
     page: number,
     pageSize: number,
   ): Observable<BaseTableResponse<StoreFoodResponse>> {
-    const params: Record<string, string | number | boolean> = {
+    const body: {
+      storeRefCode: string;
+      page: number;
+      pageSize: number;
+      storeFoodCategoryId?: number;
+    } = {
+      storeRefCode,
       page,
-      pageSize
+      pageSize,
     };
 
     if (storeFoodCategoryId != null) {
-      params['storeFoodCategoryId'] = storeFoodCategoryId;
+      body.storeFoodCategoryId = storeFoodCategoryId;
     }
 
-    return this.apiService.get<BaseTableResponse<StoreFoodResponse>>(
-      API_ENDPOINT.STORE_FOOD.BY_STORE(storeRefCode),
-      params
+    return this.apiService.post<BaseTableResponse<StoreFoodResponse>, typeof body>(
+      API_ENDPOINT.STORE_FOOD.BY_STORE,
+      body
     );
   }
 
@@ -100,6 +106,7 @@ export class StoreFoodService {
     formData.append('Price', String(request.price));
     formData.append('Quantity', String(request.quantity));
     formData.append('Description', request.description ?? '');
+    formData.append('StoreFoodCategoryId', String(request.storeFoodCategoryId));
 
     if (request.thumbnailFile) {
       formData.append('ThumbnailFile', request.thumbnailFile);
@@ -120,7 +127,8 @@ export class StoreFoodService {
     formData.append('Quantity', String(request.quantity));
     formData.append('IsAvailable', String(request.isAvailable));
     formData.append('Description', request.description ?? '');
-
+    formData.append('StoreFoodCategoryId', String(request.storeFoodCategoryId));
+    
     if (request.thumbnailFile) {
       formData.append('ThumbnailFile', request.thumbnailFile);
     }

@@ -29,6 +29,7 @@ export interface StoreFoodResponse {
   price: number;
   quantity: number;
   isAvailable: boolean;
+  storeFoodCategoryId: number;
   optionGroups: StoreFoodOptionGroupResponse[];
 }
 
@@ -59,6 +60,7 @@ export interface CreateStoreFoodRequest {
   description?: string | null;
   price: number;
   quantity: number;
+  storeFoodCategoryId: number | null;
   optionGroups: StoreFoodOptionGroupRequest[];
 }
 
@@ -70,5 +72,6 @@ export interface UpdateStoreFoodRequest {
   price: number;
   quantity: number;
   isAvailable: boolean;
+  storeFoodCategoryId: number | null;
   optionGroups: StoreFoodOptionGroupRequest[];
 }

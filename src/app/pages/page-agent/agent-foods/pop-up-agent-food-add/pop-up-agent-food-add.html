@@ -48,6 +48,13 @@
               class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
           </div>
 
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">Danh mục</label>
+            <app-dropdown [options]="categoryOptions" [(ngModel)]="form().storeFoodCategoryId"
+              placeholder="Chọn danh mục">
+            </app-dropdown>
+          </div>
+
           <div class="md:col-span-2">
             <label class="mb-1 block text-sm font-medium text-gray-700">Mô tả</label>
             <textarea rows="3" [(ngModel)]="form().description"

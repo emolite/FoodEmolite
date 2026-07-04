@@ -19,5 +19,6 @@ export const URL_ENDPOINT = {
   USER: 'user',
   USER_STORES: 'stores',
   USER_STORE_FOODS: 'store-foods',
+  USER_ORDER: 'order',
   USER_HISTORY: 'history'
 } as const;
