@@ -36,7 +36,8 @@ interface CartItem {
 @Component({
     selector: 'app-page-user-store-foods',
     imports: [PopUpUserFoodOptionsComponent],
-    templateUrl: './user-store-foods.html'
+    templateUrl: './user-store-foods.html',
+    styleUrl: './user-store-foods.css'
 })
 export class PageUserStoreFoodsComponent {
     private readonly route = inject(ActivatedRoute);
@@ -208,36 +209,16 @@ export class PageUserStoreFoodsComponent {
             return;
         }
 
-        this.storeFoodService.getDetail(food.id).subscribe({
-            next: response => {
-                const foodDetail = response.isSuccess && response.data
-                    ? response.data
-                    : food;
-
-                this.cart.update(items => [
-                    ...items,
-                    {
-                        food: foodDetail,
-                        quantity: 1,
-                        note: '',
-                        selectedOptions: [],
-                        isDetailLoaded: true
-                    }
-                ]);
-            },
-            error: () => {
-                this.cart.update(items => [
-                    ...items,
-                    {
-                        food,
-                        quantity: 1,
-                        note: '',
-                        selectedOptions: [],
-                        isDetailLoaded: false
-                    }
-                ]);
+        this.cart.update(items => [
+            ...items,
+            {
+                food,
+                quantity: 1,
+                note: '',
+                selectedOptions: [],
+                isDetailLoaded: true
             }
-        });
+        ]);
     }
 
     increase(foodId: number): void {
@@ -340,42 +321,8 @@ export class PageUserStoreFoodsComponent {
 
         if (index < 0) return;
 
-        const item = this.cart()[index];
-
-        if (item.isDetailLoaded) {
-            this.selectingCartIndex.set(index);
-            this.isOptionPopupOpen.set(true);
-            return;
-        }
-
-        this.storeFoodService.getDetail(item.food.id).subscribe({
-            next: response => {
-                if (!response.isSuccess || !response.data) {
-                    this.toastService.error(response.message || 'Không tải được tùy chọn món');
-                    return;
-                }
-
-                const foodDetail: StoreFoodResponse = response.data;
-
-                this.cart.update(items =>
-                    items.map((cartItem, itemIndex) =>
-                        itemIndex === index
-                            ? {
-                                ...cartItem,
-                                food: foodDetail,
-                                isDetailLoaded: true
-                            }
-                            : cartItem
-                    )
-                );
-
-                this.selectingCartIndex.set(index);
-                this.isOptionPopupOpen.set(true);
-            },
-            error: () => {
-                this.toastService.error('Không tải được tùy chọn món');
-            }
-        });
+        this.selectingCartIndex.set(index);
+        this.isOptionPopupOpen.set(true);
     }
 
     openConfirmOrder(): void {
@@ -559,6 +506,21 @@ export class PageUserStoreFoodsComponent {
         return `${value.toLocaleString('vi-VN')}đ`;
     }
 
+    flyToCart(food: StoreFoodResponse): void {
+
+    // Desktop
+    if (window.innerWidth >= 1024) {
+        this.addToCart(food);
+        return;
+    }
+
+    this.animateFly(food.id);
+
+    setTimeout(() => {
+        this.addToCart(food);
+    }, 450);
+}
+
     private startPaymentPolling(orderCode: string) {
         this.paymentInterval = setInterval(() => {
             this.orderService.getPaymentStatus(orderCode).subscribe({
@@ -583,5 +545,61 @@ export class PageUserStoreFoodsComponent {
                 }
             });
         }, 3000);
+    }
+
+    private animateFly(foodId: number) {
+
+        const img = document.getElementById(`food-img-${foodId}`);
+        const cart = document.getElementById("mobile-cart-btn");
+
+        if (!img || !cart) return;
+
+        const imgRect = img.getBoundingClientRect();
+        const cartRect = cart.getBoundingClientRect();
+
+        const clone = img.cloneNode(true) as HTMLImageElement;
+
+        clone.style.position = "fixed";
+        clone.style.left = imgRect.left + "px";
+        clone.style.top = imgRect.top + "px";
+        clone.style.width = imgRect.width + "px";
+        clone.style.height = imgRect.height + "px";
+        clone.style.borderRadius = "14px";
+        clone.style.pointerEvents = "none";
+        clone.style.zIndex = "9999";
+        clone.style.transition =
+            "all .55s cubic-bezier(.22,.8,.3,1)";
+
+        document.body.appendChild(clone);
+
+        requestAnimationFrame(() => {
+
+            clone.style.left =
+                cartRect.left + cartRect.width / 2 - 18 + "px";
+
+            clone.style.top =
+                cartRect.top + cartRect.height / 2 - 18 + "px";
+
+            clone.style.width = "36px";
+            clone.style.height = "36px";
+
+            clone.style.opacity = "0";
+
+            clone.style.transform = "rotate(360deg) scale(.2)";
+
+        });
+
+        clone.addEventListener("transitionend", () => {
+
+            clone.remove();
+
+            cart.classList.add("cart-bounce");
+
+            setTimeout(() => {
+                cart.classList.remove("cart-bounce");
+            }, 500);
+
+        });
+
     }
 }

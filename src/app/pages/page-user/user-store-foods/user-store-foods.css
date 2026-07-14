@@ -1,0 +1,29 @@
+.cart-bounce {
+
+    animation: cartBounce .45s;
+
+}
+
+@keyframes cartBounce {
+
+    0% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.18);
+    }
+
+    50% {
+        transform: scale(.9);
+    }
+
+    70% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+}

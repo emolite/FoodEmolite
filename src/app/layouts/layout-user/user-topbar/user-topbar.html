@@ -1,26 +1,36 @@
-<header class="sticky top-0 z-30 border-b border-gray-200 bg-white">
+<header class="sticky top-0 z-30 bg-[#0f0d1a] backdrop-blur-xl border-b border-white/5">
   <div class="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
     <button type="button" (click)="goStores()" class="flex shrink-0 items-center gap-3 text-left cursor-pointer">
 
-      <div class="flex h-12 w-12 items-center justify-center rounded-md bg-gray-900 text-sm font-bold text-white">
+      <div class="flex h-12 w-12 items-center justify-center rounded-md bg-violet-600 text-sm font-bold text-white">
         <img src="ei2.webp" class="h-8 w-8 rounded-md object-cover" />
       </div>
 
       <div class="hidden sm:block">
-        <p class="text-sm font-semibold text-gray-900">
-          Emolite Food
-        </p>
-
-        <p class="text-xs text-gray-500">
-          Đặt món ngay
-        </p>
+        <p class="text-base font-bold tracking-tight leading-none text-white">Food</p>
+        <p class="text-xs text-violet-400 font-medium tracking-widest uppercase">Emolite</p>
       </div>
     </button>
 
     <div class="flex shrink-0 items-center gap-2 sm:gap-3">
       @if (authService.isLoggedIn()) {
-      <button type="button" (click)="goHistory()"
-        class="hidden rounded-md border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 cursor-pointer transition hover:border-gray-900 hover:bg-gray-50 md:block">
+      <button type="button" (click)="goHistory()" class="relative flex items-center gap-2 rounded-xl
+               border border-violet-500/30
+               bg-violet-600 h-10 w-25 justify-center
+               text-sm font-semibold text-white
+               shadow-lg shadow-violet-600/25
+               transition-all duration-200
+               hover:-translate-y-0.5
+               hover:bg-violet-500
+               hover:shadow-violet-600/40
+               active:translate-y-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="lucide lucide-history-icon lucide-history">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+          <path d="M12 7v5l4 2" />
+        </svg>
         Lịch sử
       </button>
 
@@ -62,15 +72,24 @@
         }
       </div>
       } @else {
-      <button type="button" (click)="goLogin()"
-        class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white">
+      <button type="button" (click)="goLogin()" class="relative flex items-center gap-2 rounded-xl
+               border border-violet-500/30
+               bg-violet-600 h-10 w-30 justify-center
+               text-sm font-semibold text-white
+               shadow-lg shadow-violet-600/25
+               transition-all duration-200
+               hover:-translate-y-0.5
+               hover:bg-violet-500
+               hover:shadow-violet-600/40
+               active:translate-y-0">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in-icon lucide-log-in"><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg>
         Đăng nhập
       </button>
       }
     </div>
   </div>
 
-  <div class="border-t border-gray-100 px-4 pb-3 sm:hidden">
+  <!-- <div class="border-t border-gray-100 px-4 pb-3 sm:hidden">
     <div class="relative mt-3">
       <input type="text" placeholder="Tìm cửa hàng hoặc món ăn..."
         class="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 pr-9 text-sm outline-none transition placeholder:text-gray-400 focus:border-gray-900 focus:bg-white" />
@@ -81,7 +100,7 @@
           d="m21 21-4.35-4.35M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" />
       </svg>
     </div>
-  </div>
+  </div> -->
 </header>
 
 @if (isProfilePopupOpen()) {
