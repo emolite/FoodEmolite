@@ -53,6 +53,11 @@ export interface StoreFoodOptionGroupRequest {
   options: StoreFoodOptionRequest[];
 }
 
+export interface GetStoreFoodsRequest {
+  storeRefCode: string;
+  storeFoodCategoryId?: number | null;
+}
+
 export interface CreateStoreFoodRequest {
   storeRefCode: string;
   foodName: string;

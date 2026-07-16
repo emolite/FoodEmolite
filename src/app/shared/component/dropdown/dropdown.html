@@ -3,69 +3,131 @@
     type="button"
     (click)="toggle()"
     [disabled]="disabled"
-    class="w-full min-w-[160px] rounded-md border bg-gray-50 px-4 py-2.5 text-left text-sm text-gray-800 flex items-center justify-between outline-none transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-    [class.border-gray-400]="isOpen"
-    [class.bg-white]="isOpen"
-    [class.border-gray-200]="!isOpen">
+    class="flex w-full min-w-[160px] cursor-pointer items-center justify-between
+           rounded-lg border border-[#322a4a]
+           bg-[#1a1628]
+           px-4 py-2.5
+           text-left text-sm text-white
+           outline-none transition
+           hover:border-violet-500/60
+           focus:border-violet-500
+           focus:ring-2 focus:ring-violet-500/20
+           disabled:cursor-not-allowed
+           disabled:opacity-50"
 
-    <span [class.text-gray-400]="!selectedOption">
+    [class.border-violet-500]="isOpen">
+
+    <span
+      [class.text-gray-500]="!selectedOption"
+      [class.text-white]="selectedOption">
       {{ selectedOption?.label || placeholder }}
     </span>
 
     <svg
-      class="w-4 h-4 text-gray-400 transition-transform duration-200"
+      class="h-4 w-4 text-violet-300 transition-transform duration-200"
       [class.rotate-180]="isOpen"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M19 9l-7 7-7-7" />
     </svg>
+
   </button>
 
   @if (isOpen) {
-    <div class="absolute z-50 min-w-[40px] mt-1 overflow-hidden rounded-md bg-white border border-gray-200 shadow-lg">
 
-      @if (searchable) {
-        <div class="p-2 border-b border-gray-100">
-          <input
-            type="text"
-            [(ngModel)]="searchQuery"
-            (ngModelChange)="onSearch()"
-            [placeholder]="searchPlaceholder"
-            class="w-full rounded-md bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-colors focus:border-gray-400 focus:bg-white"
-            (click)="$event.stopPropagation()">
-        </div>
+  <div
+    class="absolute z-50 mt-2 min-w-full overflow-hidden
+           rounded-xl border border-[#322a4a]
+           bg-[#171322]
+           shadow-2xl">
+
+    @if (searchable) {
+
+    <div class="border-b border-[#322a4a] p-2">
+
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        [placeholder]="searchPlaceholder"
+        (click)="$event.stopPropagation()"
+
+        class="w-full rounded-lg
+               border border-[#322a4a]
+               bg-[#1a1628]
+               px-3 py-2
+               text-sm text-white
+               placeholder:text-gray-500
+               outline-none transition
+               focus:border-violet-500
+               focus:ring-2 focus:ring-violet-500/20" />
+
+    </div>
+
+    }
+
+    <ul class="custom-scroll max-h-56 overflow-y-auto">
+
+      @if (filteredOptions.length === 0) {
+
+      <li class="px-4 py-3 text-center text-sm text-gray-500">
+        Không có kết quả
+      </li>
+
       }
 
-      <ul class="max-h-56 overflow-y-auto">
-        @if (filteredOptions.length === 0) {
-          <li class="px-4 py-3 text-sm text-center text-gray-400">
-            Không có kết quả
-          </li>
+      @for (option of filteredOptions; track option.value) {
+
+      <li
+        (click)="select(option)"
+
+        class="flex items-center justify-between
+               px-4 py-2.5
+               text-sm
+               transition"
+
+        [class.cursor-pointer]="!option.disabled"
+        [class.cursor-not-allowed]="option.disabled"
+
+        [class.opacity-40]="option.disabled"
+
+        [class.bg-violet-600]="option.value === value"
+        [class.text-white]="option.value === value"
+
+        [class.text-gray-200]="option.value !== value"
+        [class.hover:bg-violet-500/15]="option.value !== value">
+
+        {{ option.label }}
+
+        @if (option.value === value) {
+
+        <svg
+          class="h-4 w-4 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7" />
+        </svg>
+
         }
 
-        @for (option of filteredOptions; track option.value) {
-          <li
-            (click)="select(option)"
-            class="px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
-            [class.bg-gray-900]="option.value === value"
-            [class.text-white]="option.value === value"
-            [class.text-gray-700]="option.value !== value"
-            [class.hover:bg-gray-50]="option.value !== value"
-            [class.cursor-pointer]="!option.disabled"
-            [class.opacity-40]="option.disabled"
-            [class.cursor-not-allowed]="option.disabled">
+      </li>
 
-            {{ option.label }}
+      }
 
-            @if (option.value === value) {
-              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-            }
-          </li>
-        }
-      </ul>
-    </div>
+    </ul>
+
+  </div>
+
   }
+
 </div>

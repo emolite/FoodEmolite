@@ -32,6 +32,7 @@ export class AppTableComponent {
   @Output() sortChange = new EventEmitter<string>();
   @Output() rowClick = new EventEmitter<TableRow>();
   @Output() pageChange = new EventEmitter<number>();
+  @Output() toggleChange = new EventEmitter<{ row: TableRow; value: boolean }>();
 
   @Output() rowCheckChange = new EventEmitter<{
     row: TableRow;
@@ -146,6 +147,12 @@ export class AppTableComponent {
       row,
       checked
     });
+  }
+
+  onToggle(row: TableRow, key: string, event: Event): void {
+    event.stopPropagation();
+    const current = !!row[key];
+    this.toggleChange.emit({ row, value: !current });
   }
 
   onToggleAll(event: Event): void {
