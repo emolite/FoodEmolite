@@ -16,6 +16,7 @@ import { PopUpUserFoodOptionsComponent } from './pop-up-user-food-options/pop-up
 import { StoreFoodCategoryService } from '../../../common/services/store-food-category.service';
 import { StoreFoodCategoryResponse } from '../../../common/models/store-food-category.model';
 import { SelectedStoreService } from '../../../common/services/selectedstore.service';
+import { GuestService } from '../../../common/services/guest.service';
 
 export interface CartItemOption {
     optionGroupId: number;
@@ -48,6 +49,7 @@ export class PageUserStoreFoodsComponent {
     private readonly authService = inject(AuthService);
     private readonly categoryService = inject(StoreFoodCategoryService);
     private readonly selectedStoreService = inject(SelectedStoreService);
+    private readonly guestService = inject(GuestService)
     private paymentInterval: any;
 
     categories = signal<StoreFoodCategoryResponse[]>([]);
@@ -67,7 +69,7 @@ export class PageUserStoreFoodsComponent {
     isOptionPopupOpen = signal(false);
     selectingCartIndex = signal<number | null>(null);
 
-    guestCustomerName = signal('');
+    guestCustomerName = computed(() => this.guestService.customerName());
 
     cartWidth = signal(380);
     isResizing = signal(false);
@@ -97,6 +99,15 @@ export class PageUserStoreFoodsComponent {
             this.back();
             return;
         }
+
+        this.route.queryParamMap.subscribe(params => {
+            const orderCode = params.get('orderCode');
+            const resume = params.get('resume');
+
+            if (resume === 'true' && orderCode) {
+                this.resumePayment(orderCode);
+            }
+        });
 
         this.storeRefCode.set(storeRefCode);
         this.loadCategories();
@@ -274,7 +285,7 @@ export class PageUserStoreFoodsComponent {
     }
 
     updateGuestCustomerName(value: string): void {
-        this.guestCustomerName.set(value);
+        this.guestService.customerName.set(value);
     }
 
     blockInvalidQuantityKey(event: KeyboardEvent): void {
@@ -415,7 +426,8 @@ export class PageUserStoreFoodsComponent {
             ? this.orderService.create(request)
             : this.orderService.createGuest({
                 ...request,
-                customerName: this.guestCustomerName().trim()
+                customerName: this.guestCustomerName().trim(),
+                deviceId: this.guestService.getGuestToken()
             });
 
         createOrder$.subscribe({
@@ -433,12 +445,9 @@ export class PageUserStoreFoodsComponent {
                     return;
                 }
                 this.cart.set([]);
-                this.guestCustomerName.set('');
                 this.closeMobileCart();
 
                 this.orderService.getStorePaymentInfo(
-                    this.storeRefCode(),
-                    order.totalAmount,
                     order.orderCode
                 ).subscribe({
                     next: (res) => {
@@ -464,6 +473,10 @@ export class PageUserStoreFoodsComponent {
             }
         });
     }
+
+    hasGuestProfile = computed(() =>
+        this.guestService.customerName().trim().length > 0
+    );
 
     openMobileCart(): void {
         this.isMobileCartOpen.set(true);
@@ -508,18 +521,18 @@ export class PageUserStoreFoodsComponent {
 
     flyToCart(food: StoreFoodResponse): void {
 
-    // Desktop
-    if (window.innerWidth >= 1024) {
-        this.addToCart(food);
-        return;
+        // Desktop
+        if (window.innerWidth >= 1024) {
+            this.addToCart(food);
+            return;
+        }
+
+        this.animateFly(food.id);
+
+        setTimeout(() => {
+            this.addToCart(food);
+        }, 450);
     }
-
-    this.animateFly(food.id);
-
-    setTimeout(() => {
-        this.addToCart(food);
-    }, 450);
-}
 
     private startPaymentPolling(orderCode: string) {
         this.paymentInterval = setInterval(() => {
@@ -601,5 +614,27 @@ export class PageUserStoreFoodsComponent {
 
         });
 
+    }
+
+    private resumePayment(orderCode: string): void {
+        this.orderService.getPaymentStatus(orderCode).subscribe({
+            next: status => {
+                if (!status.isSuccess || status.data !== 'UNPAID') {
+                    return;
+                }
+
+                this.orderService.getStorePaymentInfo(orderCode).subscribe({
+                    next: res => {
+                        if (!res.isSuccess) {
+                            return;
+                        }
+
+                        this.qrData.set(res.data);
+                        this.isQrPopupOpen.set(true);
+                        this.startPaymentPolling(orderCode);
+                    }
+                });
+            }
+        });
     }
 }

@@ -20,6 +20,7 @@ export interface CreateOrderItemOptionRequest {
 
 export interface CreateGuestOrderRequest extends CreateOrderRequest {
   customerName: string;
+  deviceId: string;
 }
 
 export interface UpdateOrderStatusRequest {

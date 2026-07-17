@@ -69,9 +69,9 @@ export class OrderService {
         );
     }
 
-    getStorePaymentInfo(storeRefCode: string, amount: number, orderCode: string) {
+    getStorePaymentInfo(orderCode: string) {
         return this.apiService.get<any>(
-            API_ENDPOINT.PROFILE.STORE_PAYMENT(storeRefCode, amount, orderCode)
+            API_ENDPOINT.PROFILE.STORE_PAYMENT(orderCode)
         );
     }
 
@@ -118,6 +118,15 @@ export class OrderService {
         return this.apiService.postBlob(
             API_ENDPOINT.ORDER.PRINT,
             request
+        );
+    }
+
+    checkPendingOrder(deviceId: string): Observable<BaseResponse<string | null>> {
+        return this.apiService.get<BaseResponse<string | null>>(
+            API_ENDPOINT.ORDER.PENDING_ORDER,
+            {
+                deviceId
+            }
         );
     }
 }

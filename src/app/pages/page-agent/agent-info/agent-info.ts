@@ -11,6 +11,7 @@ import {
 } from '../../../common/models/profile.model';
 import { VietQrService } from '../../../common/services/vietqr.service';
 import { DropdownComponent, DropdownOption } from '../../../shared/component/dropdown/dropdown';
+import { DatePickerComponent } from "../../../shared/component/date-picker/date-picker";
 
 type ProfileTab = 'personal' | 'bank' | 'store';
 
@@ -18,7 +19,8 @@ type ProfileTab = 'personal' | 'bank' | 'store';
   selector: 'app-agent-info',
   imports: [
     FormsModule,
-    DropdownComponent
+    DropdownComponent,
+    DatePickerComponent
   ],
   templateUrl: './agent-info.html'
 })
@@ -212,6 +214,13 @@ export class PageAgentInfoComponent implements OnInit {
     this.bankQrUrl.set(
       this.profileService.generateVietQrUrl(this.bankForm())
     );
+  }
+
+  onDateOfBirthChange(value: string): void {
+    this.personalForm.update(v => ({
+      ...v,
+      dateOfBirth: value
+    }));
   }
 
   private patchPersonalForm(data: MyProfileResponse): void {

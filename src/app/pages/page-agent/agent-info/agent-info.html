@@ -22,23 +22,23 @@
   </div>
   }
 
-  <div class="rounded-md border border-blue-100 bg-white">
-    <div class="flex border-b border-blue-100">
+  <div class="rounded-md border border-white/5 bg-[#171322]">
+    <div class="flex border-b border-white/5">
       <button type="button" (click)="setTab('personal')" class="px-5 py-3 text-sm font-medium transition"
-        [class.text-blue-700]="activeTab() === 'personal'" [class.border-b-2]="activeTab() === 'personal'"
-        [class.border-blue-600]="activeTab() === 'personal'" [class.text-gray-500]="activeTab() !== 'personal'">
+        [class.text-violet-700]="activeTab() === 'personal'" [class.border-b-2]="activeTab() === 'personal'"
+        [class.border-violet-600]="activeTab() === 'personal'" [class.text-gray-500]="activeTab() !== 'personal'">
         Thông tin cá nhân
       </button>
 
       <button type="button" (click)="setTab('bank')" class="px-5 py-3 text-sm font-medium transition"
-        [class.text-blue-700]="activeTab() === 'bank'" [class.border-b-2]="activeTab() === 'bank'"
-        [class.border-blue-600]="activeTab() === 'bank'" [class.text-gray-500]="activeTab() !== 'bank'">
+        [class.text-violet-700]="activeTab() === 'bank'" [class.border-b-2]="activeTab() === 'bank'"
+        [class.border-violet-600]="activeTab() === 'bank'" [class.text-gray-500]="activeTab() !== 'bank'">
         Thông tin tài khoản ngân hàng
       </button>
 
       <button type="button" (click)="setTab('store')" class="px-5 py-3 text-sm font-medium transition"
-        [class.text-blue-700]="activeTab() === 'store'" [class.border-b-2]="activeTab() === 'store'"
-        [class.border-blue-600]="activeTab() === 'store'" [class.text-gray-500]="activeTab() !== 'store'">
+        [class.text-violet-700]="activeTab() === 'store'" [class.border-b-2]="activeTab() === 'store'"
+        [class.border-violet-600]="activeTab() === 'store'" [class.text-gray-500]="activeTab() !== 'store'">
         Thông tin cửa hàng
       </button>
     </div>
@@ -48,7 +48,7 @@
       <div class="grid gap-6 lg:grid-cols-[220px_1fr]">
         <div>
           <label
-            class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-blue-100 bg-blue-50">
+            class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-white/5 bg-violet-50">
             @if (avatarPreview()) {
             <img [src]="avatarPreview()" class="h-full w-full object-cover" />
             } @else {
@@ -56,7 +56,7 @@
             }
 
             <div
-              class="absolute inset-0 flex items-center justify-center bg-blue-950/45 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
+              class="absolute inset-0 flex items-center justify-center bg-white/5 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
               Chọn ảnh
             </div>
 
@@ -67,37 +67,61 @@
         <div class="grid gap-4 md:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700">Họ tên</label>
-            <input type="text" [(ngModel)]="personalForm().fullName"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+            <input type="text" [(ngModel)]="personalForm().fullName" class="h-[42px] w-full rounded-lg border border-[#322a4a]
+                       bg-[#1a1628]
+                       px-3 text-sm text-white
+                       placeholder:text-gray-500
+                       outline-none transition
+                       hover:border-violet-500/60
+                       focus:border-violet-500
+                       focus:ring-2 focus:ring-violet-500/20" />
           </div>
 
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700">Số điện thoại</label>
-            <input type="text" [(ngModel)]="personalForm().phoneNumber"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+            <input type="text" [(ngModel)]="personalForm().phoneNumber" class="h-[42px] w-full rounded-lg border border-[#322a4a]
+                       bg-[#1a1628]
+                       px-3 text-sm text-white
+                       placeholder:text-gray-500
+                       outline-none transition
+                       hover:border-violet-500/60
+                       focus:border-violet-500
+                       focus:ring-2 focus:ring-violet-500/20" />
           </div>
 
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700">Giới tính</label>
-            <input type="text" [(ngModel)]="personalForm().gender"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+            <input type="text" [(ngModel)]="personalForm().gender" class="h-[42px] w-full rounded-lg border border-[#322a4a]
+                       bg-[#1a1628]
+                       px-3 text-sm text-white
+                       placeholder:text-gray-500
+                       outline-none transition
+                       hover:border-violet-500/60
+                       focus:border-violet-500
+                       focus:ring-2 focus:ring-violet-500/20" />
           </div>
 
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700">Ngày sinh</label>
-            <input type="date" [(ngModel)]="personalForm().dateOfBirth"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+            <app-date-picker [value]="personalForm().dateOfBirth" placeholder="Chọn ngày sinh"
+              (valueChange)="onDateOfBirthChange($event)"></app-date-picker>
           </div>
 
           <div class="md:col-span-2">
             <label class="mb-1 block text-sm font-medium text-gray-700">Địa chỉ</label>
-            <textarea rows="3" [(ngModel)]="personalForm().address"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500"></textarea>
+            <textarea rows="3" [(ngModel)]="personalForm().address" class="h-[42px] w-full rounded-lg border border-[#322a4a]
+                       bg-[#1a1628]
+                       px-3 text-sm text-white
+                       placeholder:text-gray-500
+                       outline-none transition
+                       hover:border-violet-500/60
+                       focus:border-violet-500
+                       focus:ring-2 focus:ring-violet-500/20"></textarea>
           </div>
 
           <div class="md:col-span-2 flex justify-end">
             <button type="button" (click)="savePersonalInfo()" [disabled]="!isPersonalChanged() || isSubmitting()"
-              class="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+              class="flex items-center justify-center gap-2 rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
               Lưu
             </button>
           </div>
@@ -120,14 +144,26 @@
 
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700">Số tài khoản</label>
-            <input type="text" [(ngModel)]="bankForm().accountNumber" (ngModelChange)="updateQr()"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+            <input type="text" [(ngModel)]="bankForm().accountNumber" (ngModelChange)="updateQr()" class="h-[42px] w-full rounded-lg border border-[#322a4a]
+                       bg-[#1a1628]
+                       px-3 text-sm text-white
+                       placeholder:text-gray-500
+                       outline-none transition
+                       hover:border-violet-500/60
+                       focus:border-violet-500
+                       focus:ring-2 focus:ring-violet-500/20" />
           </div>
 
           <div>
             <label class="mb-1 block text-sm font-medium text-gray-700">Tên chủ tài khoản</label>
-            <input type="text" [(ngModel)]="bankForm().accountHolderName" (ngModelChange)="updateQr()"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+            <input type="text" [(ngModel)]="bankForm().accountHolderName" (ngModelChange)="updateQr()" class="h-[42px] w-full rounded-lg border border-[#322a4a]
+                       bg-[#1a1628]
+                       px-3 text-sm text-white
+                       placeholder:text-gray-500
+                       outline-none transition
+                       hover:border-violet-500/60
+                       focus:border-violet-500
+                       focus:ring-2 focus:ring-violet-500/20" />
           </div>
 
           <label class="flex items-center gap-2 text-sm text-gray-700">
@@ -138,7 +174,7 @@
 
           <div class="md:col-span-2 flex justify-end">
             <button type="button" (click)="saveBankAccount()" [disabled]="!isBankChanged() || isSubmitting()"
-              class="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+              class="flex items-center justify-center gap-2 rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
               Lưu
             </button>
           </div>
@@ -165,7 +201,7 @@
       <div>
         @if (profile()?.store) {
         <div class="grid gap-6 md:grid-cols-[180px_1fr]">
-          <div class="h-36 overflow-hidden rounded-md border border-blue-100 bg-blue-50">
+          <div class="h-36 overflow-hidden rounded-md border border-white/5 bg-blue-50">
             @if (profile()?.store?.thumbnailUrl) {
             <img [src]="profile()?.store?.thumbnailUrl" class="h-full w-full object-cover" />
             }
@@ -173,23 +209,23 @@
 
           <div class="grid gap-4 md:grid-cols-2">
             <div>
-              <p class="text-sm text-gray-500">Tên cửa hàng</p>
-              <p class="mt-1 text-sm font-semibold text-gray-900">{{ profile()?.store?.storeName }}</p>
+              <p class="text-sm text-white">Tên cửa hàng</p>
+              <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.storeName }}</p>
             </div>
 
             <div>
-              <p class="text-sm text-gray-500">Số điện thoại</p>
-              <p class="mt-1 text-sm font-semibold text-gray-900">{{ profile()?.store?.phoneNumber || '-' }}</p>
+              <p class="text-sm text-white">Số điện thoại</p>
+              <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.phoneNumber || '-' }}</p>
             </div>
 
             <div class="md:col-span-2">
-              <p class="text-sm text-gray-500">Địa chỉ</p>
-              <p class="mt-1 text-sm font-semibold text-gray-900">{{ profile()?.store?.address || '-' }}</p>
+              <p class="text-sm text-white">Địa chỉ</p>
+              <p class="mt-1 text-sm font-semibold text-gray-500">{{ profile()?.store?.address || '-' }}</p>
             </div>
 
             <div class="md:col-span-2">
-              <p class="text-sm text-gray-500">Mô tả</p>
-              <p class="mt-1 text-sm text-gray-700">{{ profile()?.store?.description || '-' }}</p>
+              <p class="text-sm text-white">Mô tả</p>
+              <p class="mt-1 text-sm text-gray-500">{{ profile()?.store?.description || '-' }}</p>
             </div>
           </div>
         </div>

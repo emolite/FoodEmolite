@@ -21,7 +21,8 @@
 
       <ul class="space-y-0.5">
         <li>
-          <a [routerLink]="[urlEndpoint.AGENT_PROFILE]" routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
+          <a [routerLink]="[urlEndpoint.AGENT_PROFILE]"
+            routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
             class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-white/5 hover:text-white">
             <svg class="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
               <circle cx="10" cy="7" r="3" />
@@ -90,7 +91,8 @@
       </p>
       <ul class="space-y-0.5">
         <li>
-          <a [routerLink]="[urlEndpoint.AGENT_REVENUE]" routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
+          <a [routerLink]="[urlEndpoint.AGENT_REVENUE]"
+            routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
             class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-white/5 hover:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -106,24 +108,28 @@
     </div>
   </div>
 
-  <div class="border-t border-blue-50 px-3 py-4">
-    <div class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 transition-colors hover:bg-blue-50">
+  <div class="border-t border-[#322a4a] px-3 py-4">
+    <div class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 transition-colors hover:bg-violet-500/10">
       <div
-        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-600 text-xs font-semibold text-white">
+        class="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-violet-600 text-xs font-semibold text-white">
+        @if (profile()?.profile?.avatarUrl) {
+        <img [src]="profile()?.profile?.avatarUrl" class="h-full w-full object-cover" />
+        } @else {
         {{ authService.currentUser()?.username?.charAt(0) || 'U' }}
+        }
       </div>
 
       <div class="min-w-0 flex-1">
-        <p class="truncate text-sm font-semibold text-gray-800">
-          {{ authService.currentUser()?.username }}
+        <p class="truncate text-sm font-semibold text-white">
+          {{ profile()?.profile?.fullName || authService.currentUser()?.username }}
         </p>
         <p class="truncate text-[11px] text-gray-400">
-          {{ authService.currentUser()?.role }}
+          {{ profile()?.store?.storeName || "Chưa tạo cửa hàng"}}
         </p>
       </div>
 
       <button type="button" (click)="logout()"
-        class="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-blue-100 hover:text-blue-700"
+        class="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-violet-500/15 hover:text-violet-300"
         title="Đăng xuất">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15">
           <path d="M13 4.5h2.5a1 1 0 011 1v9a1 1 0 01-1 1H13" stroke-linecap="round" />

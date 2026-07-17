@@ -1,12 +1,12 @@
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-  <div class="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-md bg-white shadow-xl">
-    <div class="flex items-center justify-between border-b border-blue-100 px-5 py-4">
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+  <div class="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-md bg-[#171322] border border-[#322a4a] shadow-xl">
+    <div class="flex items-center justify-between border-b border-[#322a4a] px-5 py-4">
       <div>
-        <h2 class="text-base font-semibold text-gray-900">Chi tiết món ăn</h2>
-        <p class="mt-1 text-sm text-gray-500">Cập nhật thông tin món ăn</p>
+        <h2 class="text-base font-semibold text-violet-200">Chi tiết món ăn</h2>
+        <p class="mt-1 text-sm text-gray-400">Cập nhật thông tin món ăn</p>
       </div>
 
-      <button type="button" (click)="close()" class="text-gray-400 hover:text-gray-600">
+      <button type="button" (click)="close()" class="text-gray-400 transition hover:text-violet-300">
         ✕
       </button>
     </div>
@@ -14,15 +14,15 @@
     <div class="overflow-y-auto p-5">
       <div class="grid gap-5 md:grid-cols-[160px_1fr]">
         <label
-          class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-blue-100 bg-blue-50">
+          class="group relative flex h-36 w-36 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-[#322a4a] bg-[#1a1628]">
           @if (thumbnailPreview()) {
           <img [src]="thumbnailPreview()" class="h-full w-full object-cover" />
           } @else {
-          <span class="text-sm text-blue-400">Ảnh món</span>
+          <span class="text-sm text-violet-300">Ảnh món</span>
           }
 
           <div
-            class="absolute inset-0 flex items-center justify-center bg-blue-950/45 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
+            class="absolute inset-0 flex items-center justify-center bg-black/60 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
             Chọn ảnh
           </div>
 
@@ -31,59 +31,59 @@
 
         <div class="grid gap-4 md:grid-cols-2">
           <div class="md:col-span-2">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Tên món</label>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Tên món</label>
             <input type="text" [(ngModel)]="form().foodName"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+              class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
           </div>
 
           <div>
-            <label class="mb-1 block text-sm font-medium text-gray-700">Giá</label>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Giá</label>
             <input type="number" [(ngModel)]="form().price"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+              class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
           </div>
 
           <div>
-            <label class="mb-1 block text-sm font-medium text-gray-700">Số lượng</label>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Số lượng</label>
             <input type="number" [(ngModel)]="form().quantity"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+              class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
           </div>
 
           <div>
-            <label class="mb-1 block text-sm font-medium text-gray-700">Danh mục</label>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Danh mục</label>
             <app-dropdown [options]="categoryOptions" [(ngModel)]="form().storeFoodCategoryId"
               placeholder="Chọn danh mục">
             </app-dropdown>
           </div>
 
           <div class="md:col-span-2">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Mô tả</label>
+            <label class="mb-1 block text-sm font-medium text-gray-300">Mô tả</label>
             <textarea rows="3" [(ngModel)]="form().description"
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500"></textarea>
+              class="w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 py-2 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"></textarea>
           </div>
 
-          <label class="flex items-center gap-2 text-sm text-gray-700">
+          <label class="flex items-center gap-2 text-sm text-gray-300">
             <input type="checkbox" [(ngModel)]="form().isAvailable"
-              class="h-4 w-4 rounded border-blue-200 text-blue-600" />
+              class="h-4 w-4 rounded border-[#322a4a] bg-[#1a1628] text-violet-600" />
             Đang bán
           </label>
         </div>
       </div>
 
-      <div class="mt-5 rounded-md border border-blue-100 p-4">
+      <div class="mt-5 rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
         <div class="mb-3 flex items-center justify-between">
           <div>
-            <h3 class="text-sm font-semibold text-gray-800">Tùy chọn món</h3>
-            <p class="text-xs text-gray-500">Sửa nhóm option hoặc thêm option mới</p>
+            <h3 class="text-sm font-semibold text-violet-200">Tùy chọn món</h3>
+            <p class="text-xs text-gray-400">Sửa nhóm option hoặc thêm option mới</p>
           </div>
 
           <div class="flex items-center gap-2">
             <button type="button" (click)="addDefaultOptions()"
-              class="rounded-md border border-blue-100 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50">
+              class="rounded-md border border-[#322a4a] px-3 py-1.5 text-sm font-medium text-violet-300 transition hover:bg-violet-500/10">
               + Option mặc định
             </button>
 
             <button type="button" (click)="addOptionGroup()"
-              class="rounded-md bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-100">
+              class="rounded-md bg-violet-500/10 px-3 py-1.5 text-sm font-medium text-violet-300 transition hover:bg-violet-500/20">
               + Nhóm
             </button>
           </div>
@@ -91,20 +91,21 @@
 
         @for (group of form().optionGroups; track $index; let groupIndex = $index) {
         @if (!group.isDeleted) {
-        <div class="mb-4 rounded-md border border-gray-100 p-3">
+        <div class="mb-4 rounded-md border border-[#322a4a] bg-[#171322] p-3">
           <div class="mb-3 grid gap-2 md:grid-cols-[1fr_80px]">
             <input type="text" [(ngModel)]="group.groupName" placeholder="Tên nhóm: Vị, Đá, Size..."
-              class="w-full rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+              class="h-[42px] w-full rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
 
             <button type="button" (click)="removeOptionGroup(groupIndex)"
-              class="rounded-md px-2 py-1 text-sm text-red-500 hover:bg-red-50">
+              class="rounded-md px-2 py-1 text-sm text-red-400 transition hover:bg-red-500/10">
               Xóa
             </button>
           </div>
 
           <div class="mb-3 grid gap-3 md:grid-cols-[160px_1fr_1fr]">
-            <label class="flex items-center gap-2 text-sm text-gray-600">
-              <input type="checkbox" [(ngModel)]="group.isRequired" />
+            <label class="flex items-center gap-2 text-sm text-gray-300">
+              <input type="checkbox" [(ngModel)]="group.isRequired"
+                class="h-4 w-4 rounded border-[#322a4a] bg-[#1a1628] text-violet-600" />
               Bắt buộc
             </label>
           </div>
@@ -114,18 +115,19 @@
             @if (!option.isDeleted) {
             <div class="grid gap-2 md:grid-cols-[1fr_160px_110px_80px]">
               <input type="text" [(ngModel)]="option.optionName" placeholder="Tên option"
-                class="rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                class="h-[42px] rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
 
               <input type="number" [(ngModel)]="option.additionalPrice" placeholder="Giá thêm"
-                class="rounded-md border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                class="h-[42px] rounded-lg border border-[#322a4a] bg-[#1a1628] px-3 text-sm text-white placeholder:text-gray-500 outline-none transition hover:border-violet-500/60 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20" />
 
-              <label class="flex items-center gap-2 text-sm text-gray-600">
-                <input type="checkbox" [(ngModel)]="option.isAvailable" />
+              <label class="flex items-center gap-2 text-sm text-gray-300">
+                <input type="checkbox" [(ngModel)]="option.isAvailable"
+                  class="h-4 w-4 rounded border-[#322a4a] bg-[#1a1628] text-violet-600" />
                 Bán
               </label>
 
               <button type="button" (click)="removeOption(groupIndex, optionIndex)"
-                class="rounded-md text-sm text-red-500 hover:bg-red-50">
+                class="rounded-md text-sm text-red-400 transition hover:bg-red-500/10">
                 Xóa
               </button>
             </div>
@@ -134,7 +136,7 @@
           </div>
 
           <button type="button" (click)="addOption(groupIndex)"
-            class="mt-3 rounded-md border border-blue-100 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50">
+            class="mt-3 rounded-md border border-[#322a4a] px-3 py-1.5 text-sm text-violet-300 transition hover:bg-violet-500/10">
             + Option
           </button>
         </div>
@@ -143,20 +145,20 @@
       </div>
     </div>
 
-    <div class="flex justify-between gap-2 border-t border-blue-100 px-5 py-4">
+    <div class="flex justify-between gap-2 border-t border-[#322a4a] px-5 py-4">
       <button type="button" (click)="delete()" [disabled]="isSubmitting"
-        class="rounded-md border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50">
+        class="rounded-md border border-red-500/30 px-4 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/10 disabled:opacity-50">
         Xóa
       </button>
 
       <div class="flex gap-2">
         <button type="button" (click)="close()"
-          class="rounded-md border border-blue-100 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-blue-50">
+          class="rounded-md border border-[#322a4a] bg-[#1a1628] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:border-violet-500 hover:bg-violet-500/10">
           Hủy
         </button>
 
         <button type="button" (click)="submit()" [disabled]="isSubmitting"
-          class="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+          class="rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
           Lưu
         </button>
       </div>
