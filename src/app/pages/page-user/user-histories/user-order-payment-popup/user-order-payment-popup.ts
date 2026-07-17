@@ -41,8 +41,6 @@ export class UserOrderPaymentPopupComponent {
         this.loading.set(true);
 
         this.profileService.getStorePaymentInfo(
-            this.order().storeRefCode,
-            this.order().totalAmount,
             this.order().orderCode
         ).subscribe({
             next: response => {

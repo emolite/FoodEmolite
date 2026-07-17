@@ -21,11 +21,6 @@ import { StoreFoodCategoryService } from '../../../common/services/store-food-ca
 interface StoreFoodFilter {
     foodName: string;
     isAvailable: boolean | '';
-}
-
-interface StoreFoodFilter {
-    foodName: string;
-    isAvailable: boolean | '';
     categoryId: number | '';
 }
 
@@ -50,7 +45,7 @@ export class PageAgentFoodsComponent {
     storeRefCode = signal<string | null>(null);
 
     page = signal(1);
-    pageSize = signal(10);
+    pageSize = signal(30);
     totalPages = signal(1);
     loading = signal(false);
     isSubmitting = signal(false);
@@ -78,7 +73,7 @@ export class PageAgentFoodsComponent {
         label: string;
         value: number;
     }[] = [];
-    
+
     columns: TableColumn[] = [
         {
             key: 'index',
@@ -89,7 +84,7 @@ export class PageAgentFoodsComponent {
         {
             key: 'thumbnailUrl',
             label: 'Ảnh',
-            width: '90px',
+            width: '40px',
             align: 'center',
             type: 'image'
         },
@@ -114,19 +109,17 @@ export class PageAgentFoodsComponent {
             sortable: true
         },
         {
-            key: 'description',
-            label: 'Mô tả',
-            width: '220px'
-        },
-        {
             key: 'isAvailable',
             label: 'Trạng thái',
             width: '150px',
             align: 'center',
-            type: 'status',
-            trueText: 'Đang bán',
-            falseText: 'Ngừng bán'
-        }
+            type: 'toggle'
+        },
+        {
+            key: 'description',
+            label: 'Mô tả',
+            width: '220px'
+        },
     ];
 
     filterFields: FilterField[] = [];
@@ -169,55 +162,7 @@ export class PageAgentFoodsComponent {
     }
 
     rows(): TableRow[] {
-        const filter = this.filter();
-
-        let data = this.storeFoods().filter(food => {
-            const matchName =
-                !filter.foodName ||
-                food.foodName
-                    .toLowerCase()
-                    .includes(filter.foodName.toLowerCase());
-
-            const matchStatus =
-                filter.isAvailable === '' ||
-                food.isAvailable === filter.isAvailable;
-
-            return matchName && matchStatus;
-        });
-
-        if (this.sortBy()) {
-            data = [...data].sort((a, b) => {
-                let aValue: string | number = '';
-                let bValue: string | number = '';
-
-                if (this.sortBy() === 'foodName') {
-                    aValue = a.foodName.toLowerCase();
-                    bValue = b.foodName.toLowerCase();
-                }
-
-                if (this.sortBy() === 'price') {
-                    aValue = a.price;
-                    bValue = b.price;
-                }
-
-                if (this.sortBy() === 'quantity') {
-                    aValue = a.quantity;
-                    bValue = b.quantity;
-                }
-
-                if (aValue < bValue) {
-                    return this.asc() ? -1 : 1;
-                }
-
-                if (aValue > bValue) {
-                    return this.asc() ? 1 : -1;
-                }
-
-                return 0;
-            });
-        }
-
-        return data.map((food, index) => ({
+        return this.storeFoods().map((food, index) => ({
             index: (this.page() - 1) * this.pageSize() + index + 1,
             id: food.id,
             refCode: food.refCode,
@@ -299,6 +244,8 @@ export class PageAgentFoodsComponent {
             this.filter().categoryId || null,
             this.page(),
             this.pageSize(),
+            this.sortBy() || null,
+            this.asc()
         ).subscribe({
             next: response => {
                 this.storeFoods.set(response.items);
@@ -377,6 +324,61 @@ export class PageAgentFoodsComponent {
         }, 200);
     }
 
+    onToggleAvailable(event: { row: TableRow; value: boolean }): void {
+        const id = Number(event.row['id']);
+        const food = this.storeFoods().find(f => f.id === id);
+
+        if (!food) return;
+
+        const previousValue = food.isAvailable;
+        this.storeFoods.update(list =>
+            list.map(f => f.id === id ? { ...f, isAvailable: event.value } : f)
+        );
+
+        const request: UpdateStoreFoodRequest = {
+            foodName: food.foodName,
+            description: food.description,
+            price: food.price,
+            quantity: food.quantity,
+            isAvailable: event.value,
+            storeFoodCategoryId: food.storeFoodCategoryId,
+            optionGroups: food.optionGroups?.map(g => ({
+                id: g.id,
+                groupName: g.groupName,
+                isRequired: g.isRequired,
+                minSelect: g.minSelect,
+                maxSelect: g.maxSelect,
+                sortOrder: g.sortOrder,
+                isDeleted: false,
+                options: g.options?.map(o => ({
+                    id: o.id,
+                    optionName: o.optionName,
+                    additionalPrice: o.additionalPrice,
+                    isAvailable: o.isAvailable,
+                    sortOrder: o.sortOrder,
+                    isDeleted: false
+                })) ?? []
+            })) ?? []
+        };
+
+        this.storeFoodService.update(id, request).subscribe({
+            next: response => {
+                if (!response.isSuccess) {
+                    this.storeFoods.update(list =>
+                        list.map(f => f.id === id ? { ...f, isAvailable: previousValue } : f)
+                    );
+                    this.toastService.error(response.message);
+                }
+            },
+            error: () => {
+                this.storeFoods.update(list =>
+                    list.map(f => f.id === id ? { ...f, isAvailable: previousValue } : f)
+                );
+                this.toastService.error('Cập nhật trạng thái thất bại');
+            }
+        });
+    }
+
     updateFood(request: UpdateStoreFoodRequest): void {
         const food = this.selectedFood();
 
@@ -434,17 +436,20 @@ export class PageAgentFoodsComponent {
 
     onFilterChange(value: StoreFoodFilter): void {
         this.filter.set(value);
+        this.page.set(1);
         this.loadStoreFoods();
     }
 
     onSortChange(key: string): void {
         if (this.sortBy() === key) {
             this.asc.set(!this.asc());
-            return;
+        } else {
+            this.sortBy.set(key);
+            this.asc.set(true);
         }
 
-        this.sortBy.set(key);
-        this.asc.set(true);
+        this.page.set(1);
+        this.loadStoreFoods();
     }
 
     private formatCurrency(value: number): string {

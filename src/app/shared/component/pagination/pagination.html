@@ -1,95 +1,79 @@
 @if (variant() === 'admin') {
-  <div class="flex items-center justify-end gap-1 bg-gray-50 px-3 py-3">
 
-    <button
-      (click)="prev()"
-      [disabled]="currentPage() === 1"
-      class="w-9 h-9 rounded-md flex items-center justify-center border border-gray-200 bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-30">
+<div class="flex items-center justify-end gap-2 border-t border-[#322a4a] bg-[#1a1628] px-4 py-3">
 
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-      </svg>
-    </button>
+  <button
+    (click)="prev()"
+    [disabled]="currentPage() === 1"
+    class="flex h-9 w-9 items-center justify-center rounded-lg
+           border border-[#322a4a]
+           bg-[#171322]
+           text-violet-300
+           transition
+           hover:border-violet-500
+           hover:bg-violet-500/10
+           disabled:cursor-not-allowed
+           disabled:opacity-30">
 
-    @for (page of pages(); track $index) {
-      @if (page === '...') {
-        <span class="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">
-          ...
-        </span>
-      }
-      @else {
-        <button
-          (click)="go(page)"
-          class="w-9 h-9 rounded-md text-sm font-medium transition-all duration-200"
-          [class.bg-blue-600]="page === currentPage()"
-          [class.text-white]="page === currentPage()"
-          [class.bg-white]="page !== currentPage()"
-          [class.text-gray-700]="page !== currentPage()"
-          [class.border]="page !== currentPage()"
-          [class.border-gray-200]="page !== currentPage()"
-          [class.hover:bg-blue-50]="page !== currentPage()">
+    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+    </svg>
 
-          {{ page }}
-        </button>
-      }
+  </button>
+
+  @for (page of pages(); track $index) {
+
+    @if (page === '...') {
+
+    <span class="flex h-9 w-9 items-center justify-center text-sm text-gray-500">
+      ...
+    </span>
+
     }
 
-    <button
-      (click)="next()"
-      [disabled]="currentPage() === totalPages()"
-      class="w-9 h-9 rounded-md flex items-center justify-center border border-gray-200 bg-white text-blue-600 hover:bg-blue-50 disabled:opacity-30">
-
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-      </svg>
-    </button>
-
-  </div>
-}
-
-@else {
-  <div class="flex items-center justify-center gap-1 py-6">
+    @else {
 
     <button
-      (click)="prev()"
-      [disabled]="currentPage() === 1"
-      class="w-9 h-9 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 disabled:opacity-25">
+      (click)="go(page)"
+      class="h-9 w-9 rounded-lg text-sm font-medium transition"
 
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-      </svg>
+      [class.bg-violet-600]="page === currentPage()"
+      [class.text-white]="page === currentPage()"
+
+      [class.border]="page !== currentPage()"
+      [class.border-[#322a4a]]="page !== currentPage()"
+      [class.bg-[#171322]]="page !== currentPage()"
+      [class.text-gray-300]="page !== currentPage()"
+      [class.hover:border-violet-500]="page !== currentPage()"
+      [class.hover:bg-violet-500/10]="page !== currentPage()">
+
+      {{ page }}
+
     </button>
 
-    @for (page of pages(); track $index) {
-      @if (page === '...') {
-        <span class="w-9 h-9 flex items-center justify-center text-white/25 text-sm">
-          ...
-        </span>
-      }
-      @else {
-        <button
-          (click)="go(page)"
-          class="w-9 h-9 rounded-lg text-sm font-semibold transition-all duration-200"
-          [class.bg-violet-600]="page === currentPage()"
-          [class.text-white]="page === currentPage()"
-          [class.text-white/40]="page !== currentPage()"
-          [class.hover:bg-white/10]="page !== currentPage()"
-          [class.hover:text-white]="page !== currentPage()">
-
-          {{ page }}
-        </button>
-      }
     }
 
-    <button
-      (click)="next()"
-      [disabled]="currentPage() === totalPages()"
-      class="w-9 h-9 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 disabled:opacity-25">
+  }
 
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-      </svg>
-    </button>
+  <button
+    (click)="next()"
+    [disabled]="currentPage() === totalPages()"
+    class="flex h-9 w-9 items-center justify-center rounded-lg
+           border border-[#322a4a]
+           bg-[#171322]
+           text-violet-300
+           transition
+           hover:border-violet-500
+           hover:bg-violet-500/10
+           disabled:cursor-not-allowed
+           disabled:opacity-30">
 
-  </div>
+    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+    </svg>
+
+  </button>
+
+</div>
+
 }

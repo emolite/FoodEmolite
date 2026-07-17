@@ -3,8 +3,10 @@ import { Observable } from 'rxjs';
 import { API_ENDPOINT } from '../constants/api-endpoint';
 import { ApiService } from '../constants/api.service';
 import { BaseResponse, BaseTableResponse } from '../models/base-response.model';
+import { BaseSearchRequest } from '../models/base-search.model';
 import {
   CreateStoreFoodRequest,
+  GetStoreFoodsRequest,
   StoreFoodOptionGroupRequest,
   StoreFoodOptionRequest,
   StoreFoodResponse,
@@ -35,25 +37,23 @@ export class StoreFoodService {
     storeFoodCategoryId: number | null,
     page: number,
     pageSize: number,
+    sortBy: string | null = null,
+    asc: boolean = false
   ): Observable<BaseTableResponse<StoreFoodResponse>> {
-    const body: {
-      storeRefCode: string;
-      page: number;
-      pageSize: number;
-      storeFoodCategoryId?: number;
-    } = {
-      storeRefCode,
+    const request: BaseSearchRequest<GetStoreFoodsRequest> = {
       page,
       pageSize,
+      sortBy,
+      asc,
+      searchParams: {
+        storeRefCode,
+        storeFoodCategoryId: storeFoodCategoryId ?? undefined
+      }
     };
 
-    if (storeFoodCategoryId != null) {
-      body.storeFoodCategoryId = storeFoodCategoryId;
-    }
-
-    return this.apiService.post<BaseTableResponse<StoreFoodResponse>, typeof body>(
+    return this.apiService.post<BaseTableResponse<StoreFoodResponse>, BaseSearchRequest<GetStoreFoodsRequest>>(
       API_ENDPOINT.STORE_FOOD.BY_STORE,
-      body
+      request
     );
   }
 
@@ -128,7 +128,7 @@ export class StoreFoodService {
     formData.append('IsAvailable', String(request.isAvailable));
     formData.append('Description', request.description ?? '');
     formData.append('StoreFoodCategoryId', String(request.storeFoodCategoryId));
-    
+
     if (request.thumbnailFile) {
       formData.append('ThumbnailFile', request.thumbnailFile);
     }

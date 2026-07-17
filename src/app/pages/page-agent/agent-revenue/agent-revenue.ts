@@ -73,6 +73,19 @@ export class AgentRevenueComponent {
     readonly groupBy = signal<RevenueGroupBy>('day');
 
     readonly data = signal<AgentRevenueResponse | null>(null);
+    openFromDatePicker = false;
+    openToDatePicker = false;
+
+    fromCalendarMonth = new Date().getMonth();
+    fromCalendarYear = new Date().getFullYear();
+
+    toCalendarMonth = new Date().getMonth();
+    toCalendarYear = new Date().getFullYear();
+
+    calendarMonth = new Date().getMonth();
+    calendarYear = new Date().getFullYear();
+
+    readonly weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
     readonly groupByOptions: DropdownOption[] = [
         {
@@ -137,6 +150,16 @@ export class AgentRevenueComponent {
 
     onGroupByChange(value: unknown): void {
         this.groupBy.set(value as RevenueGroupBy);
+    }
+
+    toggleFromDatePicker() {
+        this.openFromDatePicker = !this.openFromDatePicker;
+        this.openToDatePicker = false;
+    }
+
+    toggleToDatePicker() {
+        this.openToDatePicker = !this.openToDatePicker;
+        this.openFromDatePicker = false;
     }
 
     formatCurrency(value: number): string {
@@ -315,6 +338,197 @@ export class AgentRevenueComponent {
                 }
             ]
         };
+    }
+
+    previousMonth(): void {
+        if (this.calendarMonth === 0) {
+            this.calendarMonth = 11;
+            this.calendarYear--;
+        } else {
+            this.calendarMonth--;
+        }
+    }
+
+    nextMonth(): void {
+        if (this.calendarMonth === 11) {
+            this.calendarMonth = 0;
+            this.calendarYear++;
+        } else {
+            this.calendarMonth++;
+        }
+    }
+
+    previousFromMonth() {
+        this.fromCalendarMonth--;
+
+        if (this.fromCalendarMonth < 0) {
+            this.fromCalendarMonth = 11;
+            this.fromCalendarYear--;
+        }
+    }
+
+    nextFromMonth() {
+        this.fromCalendarMonth++;
+
+        if (this.fromCalendarMonth > 11) {
+            this.fromCalendarMonth = 0;
+            this.fromCalendarYear++;
+        }
+    }
+
+    previousToMonth() {
+        this.toCalendarMonth--;
+
+        if (this.toCalendarMonth < 0) {
+            this.toCalendarMonth = 11;
+            this.toCalendarYear--;
+        }
+    }
+
+    nextToMonth() {
+        this.toCalendarMonth++;
+
+        if (this.toCalendarMonth > 11) {
+            this.toCalendarMonth = 0;
+            this.toCalendarYear++;
+        }
+    }
+
+    formatDateDisplay(value: string): string {
+        if (!value) {
+            return '';
+        }
+
+        const date = new Date(value);
+
+        return date.toLocaleDateString('vi-VN');
+    }
+
+    getCalendarDays(month: number, year: number) {
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+
+        const startDay = (firstDay.getDay() + 6) % 7;
+
+        const days: {
+            value: string;
+            label: number;
+            isCurrentMonth: boolean;
+            isToday: boolean;
+        }[] = [];
+
+        const prevMonthLastDay = new Date(
+            year,
+            month,
+            0
+        ).getDate();
+
+        for (let i = startDay - 1; i >= 0; i--) {
+            const d = prevMonthLastDay - i;
+
+            const date = new Date(
+                year,
+                month - 1,
+                d
+            );
+
+            days.push({
+                value: this.toDateValue(date),
+                label: d,
+                isCurrentMonth: false,
+                isToday: this.isToday(date)
+            });
+        }
+
+        for (let d = 1; d <= lastDay.getDate(); d++) {
+            const date = new Date(
+                year,
+                month,
+                d
+            );
+
+            days.push({
+                value: this.toDateValue(date),
+                label: d,
+                isCurrentMonth: true,
+                isToday: this.isToday(date)
+            });
+        }
+
+        while (days.length < 42) {
+            const next = days.length - (startDay + lastDay.getDate()) + 1;
+
+            const date = new Date(
+                year,
+                month + 1,
+                next
+            );
+
+            days.push({
+                value: this.toDateValue(date),
+                label: next,
+                isCurrentMonth: false,
+                isToday: this.isToday(date)
+            });
+        }
+
+        return days;
+    }
+
+    selectFromDate(value: string): void {
+        this.fromDate.set(value);
+        this.openFromDatePicker = false;
+    }
+
+    clearFromDate(): void {
+        this.fromDate.set('');
+        this.openFromDatePicker = false;
+    }
+
+    selectTodayFrom(): void {
+        const today = this.toDateValue(new Date());
+
+        this.fromDate.set(today);
+
+        this.fromCalendarMonth = new Date().getMonth();
+        this.fromCalendarYear = new Date().getFullYear();
+
+        this.openFromDatePicker = false;
+    }
+
+    selectToDate(value: string): void {
+        this.toDate.set(value);
+        this.openToDatePicker = false;
+    }
+
+    clearToDate(): void {
+        this.toDate.set('');
+        this.openToDatePicker = false;
+    }
+
+    selectTodayTo(): void {
+        const today = this.toDateValue(new Date());
+
+        this.toDate.set(today);
+
+        this.toCalendarMonth = new Date().getMonth();
+        this.toCalendarYear = new Date().getFullYear();
+        
+        this.openToDatePicker = false;
+    }
+
+    private toDateValue(date: Date): string {
+        return date.toISOString().split('T')[0];
+    }
+
+    private isToday(date: Date): boolean {
+        const today = new Date();
+
+        return (
+            today.getFullYear() === date.getFullYear() &&
+            today.getMonth() === date.getMonth() &&
+            today.getDate() === date.getDate()
+        );
     }
 
     private readonly orderStatusMap: Record<string, string> = {

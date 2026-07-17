@@ -8,6 +8,7 @@ import {
   BankAccountResponse,
   CreateAccountProfileRequest,
   CreateBankAccountRequest,
+  GuestProfileResponse,
   MyProfileResponse,
   StorePaymentInfoResponse,
   UpdateAccountProfileRequest,
@@ -27,13 +28,18 @@ export class ProfileService {
     );
   }
 
-  getStorePaymentInfo(
-    storeRefCode: string,
-    amount: number,
-    orderCode: string
-  ): Observable<BaseResponse<StorePaymentInfoResponse>> {
-    return this.apiService.get<BaseResponse<StorePaymentInfoResponse>>(
-      API_ENDPOINT.PROFILE.STORE_PAYMENT(storeRefCode, amount, orderCode)
+  getGuestProfile(deviceId: string) {
+    return this.apiService.get<BaseResponse<GuestProfileResponse>>(
+      API_ENDPOINT.PROFILE.GUEST_PROFILE,
+      {
+        deviceId
+      }
+    );
+  }
+
+  getStorePaymentInfo(orderCode: string) {
+    return this.apiService.get<any>(
+      API_ENDPOINT.PROFILE.STORE_PAYMENT(orderCode)
     );
   }
 

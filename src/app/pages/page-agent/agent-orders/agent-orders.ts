@@ -94,7 +94,7 @@ export class PageAgentOrdersComponent {
         {
             key: 'orderCode',
             label: 'Mã đơn',
-            width: '150px',
+            width: '200px',
             align: 'left'
         },
         {

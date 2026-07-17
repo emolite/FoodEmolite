@@ -17,7 +17,7 @@ export interface TableColumn {
     width?: string;
     align?: 'left' | 'center' | 'right';
     sortable?: boolean;
-    type?: 'image' | 'status' | 'date' | 'checkbox' | 'badge';
+    type?: 'image' | 'status' | 'date' | 'checkbox' | 'badge' | 'toggle';
     trueText?: string;
     falseText?: string;
 }

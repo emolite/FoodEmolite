@@ -1,28 +1,29 @@
-<nav class="fixed left-0 top-0 z-30 flex h-screen w-60 shrink-0 flex-col border-r border-blue-100 bg-white">
-  <div class="flex h-16 items-center gap-3 border-b border-blue-50 px-5">
-    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-blue-600">
-      <svg class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="none">
-        <path d="M4 5.5A2.5 2.5 0 016.5 3h7A2.5 2.5 0 0116 5.5v9A2.5 2.5 0 0113.5 17h-7A2.5 2.5 0 014 14.5v-9z"
-          stroke="currentColor" stroke-width="1.7" />
-        <path d="M7 7h6M7 10h6M7 13h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-      </svg>
-    </div>
+<nav class="fixed left-0 top-0 z-30 flex h-screen w-60 shrink-0 flex-col border-r border-white/5 bg-[#130f21]">
+  <div class="flex h-16 items-center gap-3  px-5">
+    <button type="button" class="flex shrink-0 items-center gap-3 text-left cursor-pointer">
 
-    <span class="text-sm font-semibold text-gray-900">
-      Food Emolite
-    </span>
+      <div class="flex h-12 w-12 items-center justify-center rounded-md bg-violet-600 text-sm font-bold text-white">
+        <img src="ei2.webp" class="h-8 w-8 rounded-md object-cover" />
+      </div>
+
+      <div class="hidden sm:block">
+        <p class="text-base font-bold tracking-tight leading-none text-white">Food</p>
+        <p class="text-xs text-violet-400 font-medium tracking-widest uppercase">Emolite</p>
+      </div>
+    </button>
   </div>
 
   <div class="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-4">
     <div>
-      <p class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-blue-400">
+      <p class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-white/30">
         Đại lý
       </p>
 
       <ul class="space-y-0.5">
         <li>
-          <a [routerLink]="[urlEndpoint.AGENT_PROFILE]" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
-            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-700">
+          <a [routerLink]="[urlEndpoint.AGENT_PROFILE]"
+            routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
+            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-white/5 hover:text-white">
             <svg class="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
               <circle cx="10" cy="7" r="3" />
               <path d="M4 17a6 6 0 0112 0" stroke-linecap="round" />
@@ -34,28 +35,27 @@
     </div>
 
     <div>
-      <p class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-blue-400">
+      <p class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-white/30">
         Quản lý
       </p>
 
       <ul class="space-y-0.5">
         <li>
-          <a [routerLink]="[urlEndpoint.AGENT_FOOD_CATEGORIES]" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
-            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-700">
+          <a [routerLink]="[urlEndpoint.AGENT_FOOD_CATEGORIES]"
+            routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
+            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-white/5 hover:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="lucide lucide-store-icon lucide-store">
-              <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" />
-              <path
-                d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" />
-              <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
+              class="lucide lucide-book-minus-icon lucide-book-minus">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+              <path d="M9 10h6" />
             </svg>
             Danh sách danh mục
           </a>
         </li>
         <li>
-          <a [routerLink]="[urlEndpoint.AGENT_FOODS]" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
-            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-700">
+          <a [routerLink]="[urlEndpoint.AGENT_FOODS]" routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
+            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-white/5 hover:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="lucide lucide-store-icon lucide-store">
@@ -68,9 +68,17 @@
           </a>
         </li>
         <li>
-          <a [routerLink]="[urlEndpoint.AGENT_ORDERS]" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
-            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-700">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+          <a [routerLink]="[urlEndpoint.AGENT_ORDERS]" routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
+            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-white/5 hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-package-icon lucide-package">
+              <path
+                d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+              <path d="M12 22V12" />
+              <polyline points="3.29 7 12 12 20.71 7" />
+              <path d="m7.5 4.27 9 5.15" />
+            </svg>
             Danh sách đơn hàng
           </a>
         </li>
@@ -78,13 +86,14 @@
     </div>
 
     <div>
-      <p class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-blue-400">
+      <p class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-white/30">
         Thống kê và Báo cáo
       </p>
       <ul class="space-y-0.5">
         <li>
-          <a [routerLink]="[urlEndpoint.AGENT_REVENUE]" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
-            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-700">
+          <a [routerLink]="[urlEndpoint.AGENT_REVENUE]"
+            routerLinkActive="bg-violet-500/15 text-violet-300 font-semibold"
+            class="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-white/5 hover:text-white">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="lucide lucide-circle-dollar-sign-icon lucide-circle-dollar-sign">
@@ -99,24 +108,28 @@
     </div>
   </div>
 
-  <div class="border-t border-blue-50 px-3 py-4">
-    <div class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 transition-colors hover:bg-blue-50">
+  <div class="border-t border-[#322a4a] px-3 py-4">
+    <div class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 transition-colors hover:bg-violet-500/10">
       <div
-        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-600 text-xs font-semibold text-white">
+        class="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-violet-600 text-xs font-semibold text-white">
+        @if (profile()?.profile?.avatarUrl) {
+        <img [src]="profile()?.profile?.avatarUrl" class="h-full w-full object-cover" />
+        } @else {
         {{ authService.currentUser()?.username?.charAt(0) || 'U' }}
+        }
       </div>
 
       <div class="min-w-0 flex-1">
-        <p class="truncate text-sm font-semibold text-gray-800">
-          {{ authService.currentUser()?.username }}
+        <p class="truncate text-sm font-semibold text-white">
+          {{ profile()?.profile?.fullName || authService.currentUser()?.username }}
         </p>
         <p class="truncate text-[11px] text-gray-400">
-          {{ authService.currentUser()?.role }}
+          {{ profile()?.store?.storeName || "Chưa tạo cửa hàng"}}
         </p>
       </div>
 
       <button type="button" (click)="logout()"
-        class="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-blue-100 hover:text-blue-700"
+        class="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-violet-500/15 hover:text-violet-300"
         title="Đăng xuất">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15">
           <path d="M13 4.5h2.5a1 1 0 011 1v9a1 1 0 01-1 1H13" stroke-linecap="round" />

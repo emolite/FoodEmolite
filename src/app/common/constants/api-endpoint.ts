@@ -26,9 +26,10 @@ export const API_ENDPOINT = {
     LIST_ACC: 'profile/accounts-users',
     LIST_ACC_AGENTS: 'profile/accounts-agents',
     ME: 'profile/me',
+    GUEST_PROFILE: 'profile/guest-profile',
     ACCOUNT_PROFILE: 'profile/account-profile',
     BANK_ACCOUNTS: 'profile/bank-accounts',
-    STORE_PAYMENT: (storeRefCode: string, amount: number, orderCode: string) => `profile/store-payment/${storeRefCode}?amount=${amount}&orderCode=${encodeURIComponent(orderCode)}`
+    STORE_PAYMENT: (orderCode: string) => `profile/store-payment/${encodeURIComponent(orderCode)}`
   },
   ORDER: {
     BASE: 'orders',
@@ -40,7 +41,8 @@ export const API_ENDPOINT = {
     ORDER_CANCEL: (id: number) => `orders/${id}/cancel`,
     PRINT: 'orders/print',
     BY_STORE: 'orders/store/search',
-    PAYMENT_STATUS: (orderCode: string) => `orders/${orderCode}/payment-status`
+    PAYMENT_STATUS: (orderCode: string) => `orders/${orderCode}/payment-status`,
+    PENDING_ORDER: 'orders/pending-order'
   },
   REVENUE: {
     ADMIN: 'revenue/admin',

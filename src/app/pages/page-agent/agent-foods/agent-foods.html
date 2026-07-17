@@ -1,7 +1,7 @@
 <div class="space-y-6">
   <div class="flex items-start justify-between gap-4">
     <div>
-      <h1 class="text-lg font-medium leading-5 text-gray-900">
+      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
         Danh Sách Món Ăn
       </h1>
       <p class="mt-2 text-md leading-4 text-gray-500">
@@ -10,7 +10,14 @@
     </div>
 
     <button type="button" (click)="openCreateModal()" [disabled]="!storeRefCode()"
-      class="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+      class="flex items-center justify-center gap-2 rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-circle-plus-icon lucide-circle-plus">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M8 12h8" />
+        <path d="M12 8v8" />
+      </svg>
       Thêm món ăn
     </button>
   </div>
@@ -20,7 +27,8 @@
   <div></div>
   <app-table [columns]="columns" [rows]="rows()" [currentPage]="page()" [totalPages]="totalPages()"
     [loading]="loading() || isDetailLoading()" [sortBy]="sortBy()" [asc]="asc()" emptyText="Không có món ăn"
-    (rowClick)="openDetail($event)" (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)">
+    (rowClick)="openDetail($event)" (pageChange)="onPageChange($event)" (sortChange)="onSortChange($event)"
+    (toggleChange)="onToggleAvailable($event)">
   </app-table>
 </div>
 

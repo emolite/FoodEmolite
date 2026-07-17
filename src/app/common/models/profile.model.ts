@@ -91,3 +91,8 @@ export interface UserProfileResponse {
   account: AccountResponse;
   profile: AccountProfileResponse | null;
 }
+
+export interface GuestProfileResponse {
+    customerId: number;
+    customerName: string;
+}
