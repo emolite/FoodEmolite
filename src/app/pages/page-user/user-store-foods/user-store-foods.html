@@ -513,53 +513,53 @@
 </aside>
 }
 
-@if (isConfirmOrderOpen()) {
+<!-- Popup A: Nhập tên khách (chỉ hiện khi chưa có tên) -->
+@if (isGuestNameOpen()) {
 <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-
     <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-[#130f21] p-5 shadow-2xl">
+        <h2 class="text-lg font-semibold text-white">Thông tin khách hàng</h2>
+        <p class="mt-2 text-sm text-white/40">Bạn đang đặt đơn với tư cách khách.</p>
 
-        <h2 class="text-lg font-semibold text-white">
-            Xác nhận đặt đơn
-        </h2>
-
-        <p class="mt-2 text-sm text-white/40">
-            Bạn có chắc muốn tạo đơn hàng này không?
-        </p>
-
-        @if (!isLoggedIn() && !hasGuestProfile()) {
         <div class="mt-5">
-
-            <label class="mb-2 block text-sm font-medium text-white/80">
-                Tên khách hàng
-            </label>
-
+            <label class="mb-2 block text-sm font-medium text-white/80">Tên khách hàng</label>
             <input type="text" [value]="guestCustomerName()"
-                (input)="updateGuestCustomerName($any($event.target).value)" placeholder="Nhập tên của bạn"
+                (input)="updateGuestCustomerName($any($event.target).value)"
+                placeholder="Nhập tên của bạn"
                 class="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-violet-500/40" />
-
-            <p class="mt-2 text-xs text-white/40">
-                Bạn đang đặt đơn với tư cách khách.
-            </p>
-
         </div>
-        }
 
         <div class="mt-6 flex justify-end gap-3">
+            <button type="button" (click)="closeGuestNamePopup()"
+                class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10">
+                Hủy
+            </button>
+            <button type="button" (click)="submitGuestName()"
+                class="rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-500">
+                Tiếp theo
+            </button>
+        </div>
+    </div>
+</div>
+}
 
+<!-- Popup B: Cảnh báo xác nhận đặt đơn (luôn hiện, không còn phần nhập tên) -->
+@if (isConfirmOrderOpen()) {
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-[#130f21] p-5 shadow-2xl">
+        <h2 class="text-lg font-semibold text-white">Xác nhận đặt đơn</h2>
+        <p class="mt-2 text-sm text-white/40">Bạn có chắc muốn tạo đơn hàng này không?</p>
+
+        <div class="mt-6 flex justify-end gap-3">
             <button type="button" (click)="closeConfirmOrder()"
                 class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10">
                 Hủy
             </button>
-
             <button type="button" (click)="confirmOrder()"
                 class="rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-500">
                 Xác nhận
             </button>
-
         </div>
-
     </div>
-
 </div>
 }
 

@@ -37,6 +37,16 @@ export class ProfileService {
     );
   }
 
+  updateGuestProfile(deviceId: string, customerName: string) {
+    return this.apiService.put(
+      API_ENDPOINT.PROFILE.GUEST_PROFILE,
+      {
+        deviceId,
+        customerName
+      }
+    );
+  }
+
   getStorePaymentInfo(orderCode: string) {
     return this.apiService.get<any>(
       API_ENDPOINT.PROFILE.STORE_PAYMENT(orderCode)

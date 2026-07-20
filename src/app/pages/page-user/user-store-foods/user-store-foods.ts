@@ -65,7 +65,9 @@ export class PageUserStoreFoodsComponent {
     isMobileCartOpen = signal(false);
     orderNote = signal('');
 
-    isConfirmOrderOpen = signal(false);
+    hadGuestProfileOnOpen = signal(false);
+    isGuestNameOpen = signal(false);      // popup A - nhập tên
+    isConfirmOrderOpen = signal(false);   // popup B - cảnh báo xác nhận
     isOptionPopupOpen = signal(false);
     selectingCartIndex = signal<number | null>(null);
 
@@ -344,22 +346,39 @@ export class PageUserStoreFoodsComponent {
             return;
         }
 
+        // Chưa đăng nhập và chưa có tên -> hỏi tên trước
+        if (!this.isLoggedIn() && !this.hasGuestProfile()) {
+            this.isGuestNameOpen.set(true);
+            return;
+        }
+
+        // Đã có tên (hoặc đã login) -> đi thẳng vào cảnh báo xác nhận
         this.isConfirmOrderOpen.set(true);
+    }
+
+    submitGuestName(): void {
+        if (!this.guestCustomerName().trim()) {
+            this.toastService.error('Vui lòng nhập tên khách hàng');
+            return;
+        }
+
+        this.isGuestNameOpen.set(false);
+        this.isConfirmOrderOpen.set(true);
+    }
+
+    closeGuestNamePopup(): void {
+        this.isGuestNameOpen.set(false);
+    }
+
+    confirmOrder(): void {
+        this.isConfirmOrderOpen.set(false);
+        this.createOrder();
     }
 
     closeConfirmOrder(): void {
         this.isConfirmOrderOpen.set(false);
     }
 
-    confirmOrder(): void {
-        if (!this.isLoggedIn() && !this.guestCustomerName().trim()) {
-            this.toastService.error('Vui lòng nhập tên khách hàng');
-            return;
-        }
-
-        this.isConfirmOrderOpen.set(false);
-        this.createOrder();
-    }
 
     hasMissingRequiredOptions(): boolean {
         return this.cart().some(item => this.isCartItemMissingRequiredOption(item));
