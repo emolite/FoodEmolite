@@ -1,39 +1,39 @@
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-  <div class="w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
-    <div class="flex items-start justify-between border-b border-gray-200 px-6 py-5">
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+  <div class="w-full max-w-2xl rounded-2xl border border-white/10 bg-[#1a1035] shadow-2xl">
+    <div class="flex items-start justify-between border-b border-white/10 px-6 py-5">
       <div>
-        <h2 class="text-lg font-semibold leading-5 text-gray-900">
+        <h2 class="font-display text-xl font-bold tracking-wide text-white">
           Thêm Cửa Hàng
         </h2>
-        <p class="mt-2 text-md leading-4 text-gray-500">
+        <p class="mt-2 text-sm leading-5 text-white/40">
           Nhập thông tin cửa hàng mới
         </p>
       </div>
 
       <button type="button" (click)="close()"
-        class="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700">
+        class="cursor-pointer rounded-lg p-2 text-white/40 transition hover:bg-white/10 hover:text-white">
         ✕
       </button>
     </div>
 
     <div class="space-y-5 px-6 py-5">
       <div>
-        <label class="mb-2 block text-sm font-medium text-gray-700">
+        <label class="mb-2 block text-sm font-medium text-white/60">
           Ảnh đại diện cửa hàng
         </label>
 
         <div class="flex items-center gap-4">
           <div
-            class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+            class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5">
             @if (previewUrl()) {
             <img [src]="previewUrl()" class="h-full w-full object-cover">
             } @else {
-            <span class="text-xs text-gray-400">Chưa có ảnh</span>
+            <span class="text-xs text-white/30">Chưa có ảnh</span>
             }
           </div>
 
           <label
-            class="cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+            class="cursor-pointer rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10">
             Chọn ảnh
             <input type="file" accept="image/*" class="hidden" (change)="onFileChange($event)">
           </label>
@@ -42,7 +42,7 @@
 
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
-          <label class="mb-2 block text-sm font-medium text-gray-700">
+          <label class="mb-2 block text-sm font-medium text-white/60">
             Đại lý sở hữu
           </label>
 
@@ -53,48 +53,48 @@
           </app-dropdown>
         </div>
         <div>
-          <label class="mb-2 block text-sm font-medium text-gray-700">
+          <label class="mb-2 block text-sm font-medium text-white/60">
             Tên cửa hàng
           </label>
           <input type="text" [ngModel]="formStoreName()" (ngModelChange)="formStoreName.set($event)"
-            class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400">
+            class="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-violet-500/50">
         </div>
 
         <div>
-          <label class="mb-2 block text-sm font-medium text-gray-700">
+          <label class="mb-2 block text-sm font-medium text-white/60">
             Số điện thoại
           </label>
           <input type="text" [ngModel]="formPhoneNumber()" (ngModelChange)="formPhoneNumber.set($event)"
-            class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400">
+            class="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-violet-500/50">
         </div>
       </div>
 
       <div>
-        <label class="mb-2 block text-sm font-medium text-gray-700">
+        <label class="mb-2 block text-sm font-medium text-white/60">
           Địa chỉ
         </label>
         <input type="text" [ngModel]="formAddress()" (ngModelChange)="formAddress.set($event)"
-          class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400">
+          class="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-violet-500/50">
       </div>
 
       <div>
-        <label class="mb-2 block text-sm font-medium text-gray-700">
+        <label class="mb-2 block text-sm font-medium text-white/60">
           Mô tả
         </label>
         <textarea rows="4" [ngModel]="formDescription()" (ngModelChange)="formDescription.set($event)"
-          class="w-full resize-none rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400">
+          class="w-full resize-none rounded-md border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-violet-500/50">
         </textarea>
       </div>
     </div>
 
-    <div class="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-5">
+    <div class="flex items-center justify-end gap-3 border-t border-white/10 px-6 py-5">
       <button type="button" (click)="close()"
-        class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+        class="cursor-pointer rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10">
         Huỷ
       </button>
 
       <button type="button" (click)="submit()" [disabled]="isSubmitting()"
-        class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-60">
+        class="cursor-pointer rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-500 disabled:opacity-60">
         {{ isSubmitting() ? 'Đang lưu...' : 'Thêm cửa hàng' }}
       </button>
     </div>

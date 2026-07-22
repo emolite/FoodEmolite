@@ -1,7 +1,10 @@
-<div class="flex h-screen flex-col bg-[#0f0d1a]">
+<div class="font-dialogue flex h-screen flex-col bg-[#0f0d1a]">
   <app-user-topbar></app-user-topbar>
 
-  <main class="min-h-0 flex-1 overflow-hidden">
+  <main class="custom-scroll min-h-0 flex-1 overflow-y-auto">
     <router-outlet></router-outlet>
+    @if (showFooter()) {
+    <app-user-footer></app-user-footer>
+    }
   </main>
 </div>

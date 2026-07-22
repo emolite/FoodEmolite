@@ -27,6 +27,7 @@ export interface CartItemOption {
 }
 
 interface CartItem {
+    id: number;
     food: StoreFoodResponse;
     quantity: number;
     note: string;
@@ -51,6 +52,7 @@ export class PageUserStoreFoodsComponent {
     private readonly selectedStoreService = inject(SelectedStoreService);
     private readonly guestService = inject(GuestService)
     private paymentInterval: any;
+    private nextCartItemId = 1;
 
     categories = signal<StoreFoodCategoryResponse[]>([]);
     selectedCategoryId = signal<number | null>(null);
@@ -69,7 +71,8 @@ export class PageUserStoreFoodsComponent {
     isGuestNameOpen = signal(false);      // popup A - nhập tên
     isConfirmOrderOpen = signal(false);   // popup B - cảnh báo xác nhận
     isOptionPopupOpen = signal(false);
-    selectingCartIndex = signal<number | null>(null);
+    selectingCartId = signal<number | null>(null);
+    pendingFood = signal<StoreFoodResponse | null>(null);
 
     guestCustomerName = computed(() => this.guestService.customerName());
 
@@ -78,9 +81,39 @@ export class PageUserStoreFoodsComponent {
 
     isLoggedIn = computed(() => this.authService.isLoggedIn());
 
+    selectedStoreInfo = computed(() => this.selectedStoreService.storeInfo());
+
     totalQuantity = computed(() =>
         this.cart().reduce((total, item) => total + item.quantity, 0)
     );
+
+    activePopupFood = computed(() => {
+        const editingId = this.selectingCartId();
+
+        if (editingId !== null) {
+            return this.cart().find(item => item.id === editingId)?.food ?? null;
+        }
+
+        return this.pendingFood();
+    });
+
+    activePopupOptions = computed(() => {
+        const editingId = this.selectingCartId();
+
+        if (editingId !== null) {
+            return this.cart().find(item => item.id === editingId)?.selectedOptions ?? [];
+        }
+
+        return [];
+    });
+
+    qrImageUrl = computed(() => {
+        const url = this.qrData()?.vietQrUrl;
+
+        if (!url) return null;
+
+        return url.replace(/-(compact2|compact|print)\.png/, '-qr_only.png');
+    });
 
     totalAmount = computed(() =>
         this.cart().reduce((total, item) => {
@@ -218,13 +251,14 @@ export class PageUserStoreFoodsComponent {
         );
 
         if (existed) {
-            this.increase(food.id);
+            this.increase(existed.id);
             return;
         }
 
         this.cart.update(items => [
             ...items,
             {
+                id: this.nextCartItemId++,
                 food,
                 quantity: 1,
                 note: '',
@@ -234,21 +268,21 @@ export class PageUserStoreFoodsComponent {
         ]);
     }
 
-    increase(foodId: number): void {
+    increase(cartItemId: number): void {
         this.cart.update(items =>
             items.map(item =>
-                item.food.id === foodId
+                item.id === cartItemId
                     ? { ...item, quantity: item.quantity + 1 }
                     : item
             )
         );
     }
 
-    decrease(foodId: number): void {
+    decrease(cartItemId: number): void {
         this.cart.update(items =>
             items
                 .map(item =>
-                    item.food.id === foodId
+                    item.id === cartItemId
                         ? { ...item, quantity: item.quantity - 1 }
                         : item
                 )
@@ -256,30 +290,30 @@ export class PageUserStoreFoodsComponent {
         );
     }
 
-    setQuantity(foodId: number, quantity: number): void {
+    setQuantity(cartItemId: number, quantity: number): void {
         const nextQuantity = !quantity || quantity < 1
             ? 1
             : Math.floor(quantity);
 
         this.cart.update(items =>
             items.map(item =>
-                item.food.id === foodId
+                item.id === cartItemId
                     ? { ...item, quantity: nextQuantity }
                     : item
             )
         );
     }
 
-    remove(foodId: number): void {
+    remove(cartItemId: number): void {
         this.cart.update(items =>
-            items.filter(item => item.food.id !== foodId)
+            items.filter(item => item.id !== cartItemId)
         );
     }
 
-    updateNote(foodId: number, note: string): void {
+    updateNote(cartItemId: number, note: string): void {
         this.cart.update(items =>
             items.map(item =>
-                item.food.id === foodId
+                item.id === cartItemId
                     ? { ...item, note }
                     : item
             )
@@ -308,12 +342,12 @@ export class PageUserStoreFoodsComponent {
         }
     }
 
-    onQuantityInput(foodId: number, input: HTMLInputElement): void {
+    onQuantityInput(cartItemId: number, input: HTMLInputElement): void {
         const sanitizedValue = input.value.replace(/\D/g, '');
 
         if (!sanitizedValue) {
             input.value = '1';
-            this.setQuantity(foodId, 1);
+            this.setQuantity(cartItemId, 1);
             return;
         }
 
@@ -321,20 +355,21 @@ export class PageUserStoreFoodsComponent {
 
         if (quantity < 1) {
             input.value = '1';
-            this.setQuantity(foodId, 1);
+            this.setQuantity(cartItemId, 1);
             return;
         }
 
         input.value = quantity.toString();
-        this.setQuantity(foodId, quantity);
+        this.setQuantity(cartItemId, quantity);
     }
 
-    openOptionPopup(foodId: number): void {
-        const index = this.cart().findIndex(item => item.food.id === foodId);
+    openOptionPopup(cartItemId: number): void {
+        const exists = this.cart().some(item => item.id === cartItemId);
 
-        if (index < 0) return;
+        if (!exists) return;
 
-        this.selectingCartIndex.set(index);
+        this.pendingFood.set(null);
+        this.selectingCartId.set(cartItemId);
         this.isOptionPopupOpen.set(true);
     }
 
@@ -399,25 +434,65 @@ export class PageUserStoreFoodsComponent {
     }
 
     applyOptions(options: CartItemOption[]): void {
-        const index = this.selectingCartIndex();
+        const editingId = this.selectingCartId();
 
-        if (index === null) return;
+        if (editingId !== null) {
+            this.cart.update(items =>
+                items.map(item =>
+                    item.id === editingId
+                        ? { ...item, selectedOptions: options }
+                        : item
+                )
+            );
 
-        this.cart.update(items =>
-            items.map((item, itemIndex) =>
-                itemIndex === index
-                    ? { ...item, selectedOptions: options }
-                    : item
-            )
+            this.closeOptionPopup();
+            return;
+        }
+
+        const food = this.pendingFood();
+
+        if (!food) {
+            this.closeOptionPopup();
+            return;
+        }
+
+        const existed = this.cart().find(item =>
+            item.food.id === food.id &&
+            this.sameOptions(item.selectedOptions, options)
         );
 
-        this.isOptionPopupOpen.set(false);
-        this.selectingCartIndex.set(null);
+        if (existed) {
+            this.increase(existed.id);
+        } else {
+            this.cart.update(items => [
+                ...items,
+                {
+                    id: this.nextCartItemId++,
+                    food,
+                    quantity: 1,
+                    note: '',
+                    selectedOptions: options,
+                    isDetailLoaded: true
+                }
+            ]);
+        }
+
+        this.closeOptionPopup();
+    }
+
+    private sameOptions(a: CartItemOption[], b: CartItemOption[]): boolean {
+        if (a.length !== b.length) return false;
+
+        const aIds = a.map(option => option.optionId).sort();
+        const bIds = b.map(option => option.optionId).sort();
+
+        return aIds.every((id, index) => id === bIds[index]);
     }
 
     closeOptionPopup(): void {
         this.isOptionPopupOpen.set(false);
-        this.selectingCartIndex.set(null);
+        this.selectingCartId.set(null);
+        this.pendingFood.set(null);
     }
 
     createOrder(): void {
@@ -539,6 +614,13 @@ export class PageUserStoreFoodsComponent {
     }
 
     flyToCart(food: StoreFoodResponse): void {
+
+        if (this.hasOptions(food)) {
+            this.pendingFood.set(food);
+            this.selectingCartId.set(null);
+            this.isOptionPopupOpen.set(true);
+            return;
+        }
 
         // Desktop
         if (window.innerWidth >= 1024) {

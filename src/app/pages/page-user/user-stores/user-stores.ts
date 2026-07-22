@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { StoreService } from '../../../common/services/store.service';
 import { ToastService } from '../../../common/services/toast.service';
@@ -22,6 +22,8 @@ export class PageUserStoresComponent {
 
   page = signal(1);
   pageSize = signal(20);
+
+  featuredStore = computed<StoreResponse | null>(() => this.stores()[0] ?? null);
 
   constructor() {
     this.loadStores();
@@ -48,7 +50,7 @@ export class PageUserStoresComponent {
   }
 
   openStoreFoods(store: StoreResponse): void {
-    this.selectedStoreService.setStoreRefCode(store.refCode);
+    this.selectedStoreService.setStore(store);
     this.router.navigate([
       '/',
       URL_ENDPOINT.USER,
