@@ -17,7 +17,7 @@ export const URL_ENDPOINT = {
   AGENT_REVENUE: 'revenue',
 
   USER: 'user',
-  USER_STORES: 'stores',
+  USER_STORES: 'welcome',
   USER_STORE_FOODS: 'store-foods',
   USER_ORDER: 'order',
   USER_HISTORY: 'history'

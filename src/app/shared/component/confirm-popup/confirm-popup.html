@@ -1,21 +1,21 @@
-<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
-  <div class="w-full max-w-md rounded-xl bg-white shadow-2xl">
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+  <div class="w-full max-w-md rounded-2xl border border-white/10 bg-[#1a1035] shadow-2xl">
     <div class="px-6 py-5">
-      <h2 class="text-lg font-semibold leading-5 text-gray-900">
+      <h2 class="font-display text-xl font-bold tracking-wide text-white">
         {{ title() }}
       </h2>
 
-      <p class="mt-3 text-sm leading-5 text-gray-500">
+      <p class="mt-3 text-sm leading-5 text-white/50">
         {{ message() }}
       </p>
     </div>
 
-    <div class="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
+    <div class="flex items-center justify-end gap-3 border-t border-white/10 px-6 py-4">
       <button
         type="button"
         (click)="cancelled.emit()"
         [disabled]="isSubmitting()"
-        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-60">
+        class="cursor-pointer rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10 disabled:opacity-60">
         {{ cancelText() }}
       </button>
 
@@ -23,7 +23,7 @@
         type="button"
         (click)="confirmed.emit()"
         [disabled]="isSubmitting()"
-        class="rounded-md border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60">
+        class="cursor-pointer rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/20 disabled:opacity-60">
         {{ isSubmitting() ? 'Đang xử lý...' : confirmText() }}
       </button>
     </div>

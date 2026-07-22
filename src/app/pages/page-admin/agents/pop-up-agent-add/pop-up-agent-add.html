@@ -1,14 +1,14 @@
 <div
-    class="store-detail-backdrop fixed inset-0 z-50 bg-black/40"
+    class="store-detail-backdrop fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
     [class.store-detail-backdrop-open]="isOpen()"
 >
     <div
-        class="store-detail-panel absolute right-0 top-0 flex h-full w-[520px] flex-col bg-white shadow-2xl"
+        class="store-detail-panel absolute right-0 top-0 flex h-full w-[520px] flex-col border-l border-white/10 bg-[#1a1035] shadow-2xl"
         [class.store-detail-panel-open]="isOpen()"
     >
-        <div class="flex h-14 items-center justify-between border-b border-gray-200 px-6">
+        <div class="flex h-14 items-center justify-between border-b border-white/10 px-6">
             <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-violet-600/15 text-violet-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -19,7 +19,7 @@
                     </svg>
                 </div>
 
-                <h2 class="text-lg font-semibold text-gray-900">
+                <h2 class="font-display text-xl font-bold tracking-wide text-white">
                     Thêm Đại Lý
                 </h2>
             </div>
@@ -27,7 +27,7 @@
             <button
                 type="button"
                 (click)="close()"
-                class="text-2xl leading-none text-gray-500 transition hover:text-gray-900 cursor-pointer"
+                class="text-2xl leading-none text-white/40 transition hover:text-white cursor-pointer"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -38,19 +38,19 @@
             </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-6 py-6">
+        <div class="custom-scroll flex-1 overflow-y-auto px-6 py-6">
             <div>
-                <h3 class="text-lg font-semibold text-gray-900">
+                <h3 class="font-display text-lg font-bold tracking-wide text-white">
                     Tạo tài khoản đại lý
                 </h3>
-                <p class="mt-1 text-sm text-gray-500">
+                <p class="mt-1 text-sm text-white/40">
                     Nhập thông tin tài khoản đăng nhập cho đại lý mới
                 </p>
             </div>
 
             <div class="mt-8 space-y-4">
                 <div class="grid grid-cols-[130px_1fr] items-center gap-4">
-                    <label class="text-sm text-gray-500">
+                    <label class="text-sm text-white/40">
                         Tên đăng nhập
                     </label>
 
@@ -58,13 +58,13 @@
                         type="text"
                         [ngModel]="username()"
                         (ngModelChange)="username.set($event)"
-                        class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-gray-500"
+                        class="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-violet-500/50"
                         placeholder="Nhập tên đăng nhập"
                     />
                 </div>
 
                 <div class="grid grid-cols-[130px_1fr] items-start gap-4">
-                    <label class="pt-2 text-sm text-gray-500">
+                    <label class="pt-2 text-sm text-white/40">
                         Email
                     </label>
 
@@ -74,24 +74,24 @@
                             [ngModel]="email()"
                             (ngModelChange)="email.set($event)"
                             (blur)="onEmailBlur()"
-                            class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-gray-500"
+                            class="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-violet-500/50"
                             placeholder="Nhập email"
                         />
 
                         @if (emailChecking()) {
-                        <p class="mt-1 text-xs text-gray-400">
+                        <p class="mt-1 text-xs text-white/30">
                             Đang kiểm tra email...
                         </p>
                         }
 
                         @if (emailChecked() && emailExists()) {
-                        <p class="mt-1 text-xs text-red-500">
+                        <p class="mt-1 text-xs text-red-400">
                             Email này đã tồn tại
                         </p>
                         }
 
                         @if (emailChecked() && !emailExists()) {
-                        <p class="mt-1 text-xs text-green-600">
+                        <p class="mt-1 text-xs text-emerald-400">
                             Email có thể sử dụng
                         </p>
                         }
@@ -99,7 +99,7 @@
                 </div>
 
                 <div class="grid grid-cols-[130px_1fr] items-center gap-4">
-                    <label class="text-sm text-gray-500">
+                    <label class="text-sm text-white/40">
                         Mật khẩu
                     </label>
 
@@ -107,13 +107,13 @@
                         type="password"
                         [ngModel]="password()"
                         (ngModelChange)="password.set($event)"
-                        class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-gray-500"
+                        class="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-violet-500/50"
                         placeholder="Nhập mật khẩu"
                     />
                 </div>
 
                 <div class="grid grid-cols-[130px_1fr] items-start gap-4">
-                    <label class="pt-2 text-sm text-gray-500">
+                    <label class="pt-2 text-sm text-white/40">
                         Nhập lại mật khẩu
                     </label>
 
@@ -122,12 +122,12 @@
                             type="password"
                             [ngModel]="confirmPassword()"
                             (ngModelChange)="confirmPassword.set($event)"
-                            class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-gray-500"
+                            class="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-violet-500/50"
                             placeholder="Nhập lại mật khẩu"
                         />
 
                         @if (confirmPassword() && !isPasswordMatched) {
-                        <p class="mt-1 text-xs text-red-500">
+                        <p class="mt-1 text-xs text-red-400">
                             Mật khẩu nhập lại không khớp
                         </p>
                         }
@@ -136,18 +136,18 @@
             </div>
 
             @if (touched() && !canSubmit) {
-            <div class="mt-6 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+            <div class="mt-6 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
                 Vui lòng nhập đầy đủ thông tin hợp lệ trước khi tạo đại lý.
             </div>
             }
         </div>
 
-        <div class="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-6 py-4">
+        <div class="flex items-center justify-between border-t border-white/10 bg-white/3 px-6 py-4">
             <button
                 type="button"
                 (click)="close()"
                 [disabled]="isSubmitting"
-                class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-60 cursor-pointer"
+                class="cursor-pointer rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/10 disabled:opacity-60"
             >
                 Huỷ
             </button>
@@ -156,7 +156,7 @@
                 type="button"
                 (click)="submit()"
                 [disabled]="!canSubmit"
-                class="rounded-lg bg-gray-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                class="cursor-pointer rounded-lg bg-violet-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
                 {{ isSubmitting ? 'Đang tạo...' : 'Tạo Đại Lý' }}
             </button>

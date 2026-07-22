@@ -11,11 +11,13 @@ import {
   ApexChart,
   ApexDataLabels,
   ApexFill,
+  ApexGrid,
   ApexLegend,
   ApexNonAxisChartSeries,
   ApexPlotOptions,
   ApexResponsive,
   ApexStroke,
+  ApexTheme,
   ApexTooltip,
   ApexXAxis,
   ApexYAxis,
@@ -32,10 +34,14 @@ import {
   DropdownComponent,
   DropdownOption
 } from '../../../shared/component/dropdown/dropdown';
+import { DatePickerComponent } from '../../../shared/component/date-picker/date-picker';
 
 export type LineChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
+  theme: ApexTheme;
+  colors: string[];
+  grid: ApexGrid;
   xaxis: ApexXAxis;
   yaxis: ApexYAxis;
   stroke: ApexStroke;
@@ -47,6 +53,8 @@ export type LineChartOptions = {
 export type DonutChartOptions = {
   series: ApexNonAxisChartSeries;
   chart: ApexChart;
+  theme: ApexTheme;
+  colors: string[];
   labels: string[];
   legend: ApexLegend;
   tooltip: ApexTooltip;
@@ -62,7 +70,8 @@ export type DonutChartOptions = {
     CommonModule,
     FormsModule,
     NgApexchartsModule,
-    DropdownComponent
+    DropdownComponent,
+    DatePickerComponent
   ],
   templateUrl: './revenue.html'
 })
@@ -226,7 +235,15 @@ export class RevenueComponent {
         zoom: {
           enabled: false
         },
-        fontFamily: 'inherit'
+        fontFamily: 'inherit',
+        foreColor: '#9ca3af'
+      },
+      theme: {
+        mode: 'dark'
+      },
+      colors: ['#a78bfa', '#e879f9'],
+      grid: {
+        borderColor: 'rgba(255,255,255,0.06)'
       },
       stroke: {
         curve: 'smooth',
@@ -242,7 +259,7 @@ export class RevenueComponent {
         categories: [],
         labels: {
           style: {
-            colors: '#6b7280',
+            colors: '#9ca3af',
             fontSize: '12px'
           }
         }
@@ -254,7 +271,7 @@ export class RevenueComponent {
               ? `${Math.round(value / 1000000)}tr`
               : `${Math.round(value)}`,
           style: {
-            colors: '#6b7280',
+            colors: '#9ca3af',
             fontSize: '12px'
           }
         }
@@ -283,13 +300,18 @@ export class RevenueComponent {
       chart: {
         type: 'donut',
         height: 330,
-        fontFamily: 'inherit'
+        fontFamily: 'inherit',
+        foreColor: '#9ca3af'
       },
+      theme: {
+        mode: 'dark'
+      },
+      colors: ['#a78bfa', '#e879f9', '#34d399', '#fbbf24'],
       legend: {
         position: 'bottom',
         fontSize: '13px',
         labels: {
-          colors: '#374151'
+          colors: '#d1d5db'
         }
       },
       dataLabels: {
@@ -307,9 +329,13 @@ export class RevenueComponent {
             size: '68%',
             labels: {
               show: true,
+              value: {
+                color: '#ffffff'
+              },
               total: {
                 show: true,
                 label: 'Tổng',
+                color: '#c4b5fd',
                 formatter: () => this.formatCurrency(this.totalRevenue())
               }
             }
