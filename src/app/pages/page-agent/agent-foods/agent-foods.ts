@@ -17,6 +17,7 @@ import {
 import { PopUpAgentFoodAddComponent } from './pop-up-agent-food-add/pop-up-agent-food-add';
 import { PopUpAgentFoodDetailComponent } from './pop-up-agent-food-detail/pop-up-agent-food-detail';
 import { StoreFoodCategoryService } from '../../../common/services/store-food-category.service';
+import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 
 interface StoreFoodFilter {
     foodName: string;
@@ -261,6 +262,19 @@ export class PageAgentFoodsComponent {
 
     openCreateModal(): void {
         this.isAddOpen.set(true);
+    }
+
+    copyOrderLink(): void {
+        const refCode = this.storeRefCode();
+
+        if (!refCode) return;
+
+        const url = `${window.location.origin}/${URL_ENDPOINT.USER}/${URL_ENDPOINT.USER_STORE_FOODS}/${URL_ENDPOINT.USER_ORDER}?storeRefCode=${refCode}`;
+
+        navigator.clipboard.writeText(url).then(
+            () => this.toastService.success('Đã sao chép link đặt món'),
+            () => this.toastService.error('Không thể sao chép link')
+        );
     }
 
     closeCreateModal(): void {

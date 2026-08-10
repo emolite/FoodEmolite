@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StoreFoodService } from '../../../common/services/store-food.service';
+import { StoreService } from '../../../common/services/store.service';
 import { ToastService } from '../../../common/services/toast.service';
 import { OrderService } from '../../../common/services/order.service';
 import { AuthService } from '../../../common/services/auth.service';
@@ -45,6 +46,7 @@ export class PageUserStoreFoodsComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly storeFoodService = inject(StoreFoodService);
+    private readonly storeService = inject(StoreService);
     private readonly toastService = inject(ToastService);
     private readonly orderService = inject(OrderService);
     private readonly authService = inject(AuthService);
@@ -59,6 +61,7 @@ export class PageUserStoreFoodsComponent {
     isQrPopupOpen = signal(false);
     qrData = signal<any>(null);
     storeRefCode = signal('');
+    isFromDirectLink = signal(false);
     foods = signal<StoreFoodResponse[]>([]);
     cart = signal<CartItem[]>([]);
 
@@ -127,14 +130,6 @@ export class PageUserStoreFoodsComponent {
     );
 
     constructor() {
-        const storeRefCode = this.selectedStoreService.storeRefCode() ?? '';
-
-        if (!storeRefCode) {
-            this.toastService.error('Không tìm thấy cửa hàng, vui lòng chọn lại');
-            this.back();
-            return;
-        }
-
         this.route.queryParamMap.subscribe(params => {
             const orderCode = params.get('orderCode');
             const resume = params.get('resume');
@@ -144,9 +139,48 @@ export class PageUserStoreFoodsComponent {
             }
         });
 
+        const linkStoreRefCode = this.route.snapshot.queryParamMap.get('storeRefCode');
+
+        if (linkStoreRefCode) {
+            this.isFromDirectLink.set(true);
+            this.loadStoreByRefCode(linkStoreRefCode);
+            return;
+        }
+
+        const storeRefCode = this.selectedStoreService.storeRefCode() ?? '';
+
+        if (!storeRefCode) {
+            this.toastService.error('Không tìm thấy cửa hàng, vui lòng chọn lại');
+            return;
+        }
+
         this.storeRefCode.set(storeRefCode);
         this.loadCategories();
         this.loadFoods();
+    }
+
+    private loadStoreByRefCode(refCode: string): void {
+        this.loading.set(true);
+
+        this.storeService.getByRefCode(refCode).subscribe({
+            next: response => {
+                this.loading.set(false);
+
+                if (!response.isSuccess || !response.data) {
+                    this.toastService.error('Không tìm thấy cửa hàng, vui lòng chọn lại');
+                    return;
+                }
+
+                this.selectedStoreService.setStore(response.data);
+                this.storeRefCode.set(response.data.refCode);
+                this.loadCategories();
+                this.loadFoods();
+            },
+            error: () => {
+                this.loading.set(false);
+                this.toastService.error('Không tìm thấy cửa hàng, vui lòng chọn lại');
+            }
+        });
     }
 
     selectCategory(
@@ -572,20 +606,20 @@ export class PageUserStoreFoodsComponent {
         this.guestService.customerName().trim().length > 0
     );
 
-    openMobileCart(): void {
-        this.isMobileCartOpen.set(true);
-    }
-
-    closeMobileCart(): void {
-        this.isMobileCartOpen.set(false);
-    }
-
     back(): void {
         this.router.navigate([
             '/',
             URL_ENDPOINT.USER,
             URL_ENDPOINT.USER_STORES
         ]);
+    }
+
+    openMobileCart(): void {
+        this.isMobileCartOpen.set(true);
+    }
+
+    closeMobileCart(): void {
+        this.isMobileCartOpen.set(false);
     }
 
     getItemAmount(item: CartItem): number {
