@@ -9,7 +9,8 @@ export const API_ENDPOINT = {
   STORE: {
     BASE: 'stores',
     DETAIL: (id: number) => `stores/${id}`,
-    OWNER: (ownerRefCode: string) => `stores/owner/${ownerRefCode}`
+    OWNER: (ownerRefCode: string) => `stores/owner/${ownerRefCode}`,
+    BY_REF: (refCode: string) => `stores/ref/${refCode}`
   },
   STORE_FOOD: {
     BASE: 'store-foods',

@@ -36,6 +36,14 @@ export class StoreService {
     );
   }
 
+  getByRefCode(
+    refCode: string,
+  ): Observable<BaseResponse<StoreResponse>> {
+    return this.apiService.get<BaseResponse<StoreResponse>>(
+      API_ENDPOINT.STORE.BY_REF(refCode)
+    );
+  }
+
   create(
     request: CreateStoreRequest
   ): Observable<BaseResponse<string>> {
