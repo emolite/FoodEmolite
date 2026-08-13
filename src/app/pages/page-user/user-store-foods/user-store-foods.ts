@@ -1,17 +1,29 @@
 import {
     Component,
     HostListener,
+    OnDestroy,
     computed,
+    effect,
     inject,
     signal
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StoreFoodService } from '../../../common/services/store-food.service';
 import { StoreService } from '../../../common/services/store.service';
 import { ToastService } from '../../../common/services/toast.service';
 import { OrderService } from '../../../common/services/order.service';
 import { AuthService } from '../../../common/services/auth.service';
+import { PromotionService } from '../../../common/services/promotion.service';
+import { RealtimeService } from '../../../common/services/realtime.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
+import { PromotionResponse } from '../../../common/models/promotion.model';
+import { SelectedGiftRequest } from '../../../common/models/order.model';
+import {
+    PromotionalPriceInfo,
+    getEligibleGiftPromotions,
+    getPromotionalPrice
+} from '../../../common/utils/promotion-pricing';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { PopUpUserFoodOptionsComponent } from './pop-up-user-food-options/pop-up-user-food-options';
 import { StoreFoodCategoryService } from '../../../common/services/store-food-category.service';
@@ -42,7 +54,7 @@ interface CartItem {
     templateUrl: './user-store-foods.html',
     styleUrl: './user-store-foods.css'
 })
-export class PageUserStoreFoodsComponent {
+export class PageUserStoreFoodsComponent implements OnDestroy {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly storeFoodService = inject(StoreFoodService);
@@ -53,8 +65,15 @@ export class PageUserStoreFoodsComponent {
     private readonly categoryService = inject(StoreFoodCategoryService);
     private readonly selectedStoreService = inject(SelectedStoreService);
     private readonly guestService = inject(GuestService)
+    private readonly promotionService = inject(PromotionService);
+    private readonly realtimeService = inject(RealtimeService);
     private paymentInterval: any;
     private nextCartItemId = 1;
+
+    activePromotions = signal<PromotionResponse[]>([]);
+    selectedGifts = signal<SelectedGiftRequest[]>([]);
+    promoCodeInput = signal('');
+    appliedPromoCode = signal<string | null>(null);
 
     categories = signal<StoreFoodCategoryResponse[]>([]);
     selectedCategoryId = signal<number | null>(null);
@@ -118,6 +137,13 @@ export class PageUserStoreFoodsComponent {
         return url.replace(/-(compact2|compact|print)\.png/, '-qr_only.png');
     });
 
+    /** Promotion đang active mà khách được áp dụng: không cần mã, hoặc có mã và khách đã nhập đúng. */
+    applicablePromotions = computed(() =>
+        this.activePromotions().filter(promo =>
+            !promo.promotionCode || promo.promotionCode === this.appliedPromoCode()
+        )
+    );
+
     totalAmount = computed(() =>
         this.cart().reduce((total, item) => {
             const optionAmount = item.selectedOptions.reduce(
@@ -125,11 +151,51 @@ export class PageUserStoreFoodsComponent {
                 0
             );
 
-            return total + (item.food.price + optionAmount) * item.quantity;
+            const pricing = getPromotionalPrice(item.food.id, item.food.price, this.applicablePromotions());
+
+            return total + (pricing.effectivePrice + optionAmount) * item.quantity;
         }, 0)
     );
 
+    /** Chương trình "Mua X tặng Y" mà giỏ hàng hiện tại đã đủ điều kiện nhận quà. */
+    eligibleGiftPromotions = computed(() =>
+        getEligibleGiftPromotions(this.applicablePromotions(), this.totalAmount(), this.totalQuantity())
+    );
+
     constructor() {
+        effect(() => {
+            const eligibleIds = new Set(this.eligibleGiftPromotions().map(p => p.id));
+
+            this.selectedGifts.update(list =>
+                list.filter(g => eligibleIds.has(g.promotionId))
+            );
+        });
+
+        this.realtimeService.connect();
+
+        this.realtimeService.promotionStatusChanged$
+            .pipe(takeUntilDestroyed())
+            .subscribe(notification => {
+                if (notification.storeRefCode === this.storeRefCode()) {
+                    this.loadActivePromotions();
+                }
+            });
+
+        this.realtimeService.foodQuantityChanged$
+            .pipe(takeUntilDestroyed())
+            .subscribe(notification => {
+                if (notification.storeRefCode !== this.storeRefCode()) {
+                    return;
+                }
+
+                this.foods.update(list =>
+                    list.map(f => f.id === notification.storeFoodId
+                        ? { ...f, quantity: notification.quantity }
+                        : f
+                    )
+                );
+            });
+
         this.route.queryParamMap.subscribe(params => {
             const orderCode = params.get('orderCode');
             const resume = params.get('resume');
@@ -157,6 +223,68 @@ export class PageUserStoreFoodsComponent {
         this.storeRefCode.set(storeRefCode);
         this.loadCategories();
         this.loadFoods();
+        this.loadActivePromotions();
+        this.realtimeService.joinPublicStoreGroup(storeRefCode);
+    }
+
+    loadActivePromotions(): void {
+        const refCode = this.storeRefCode();
+
+        if (!refCode) {
+            return;
+        }
+
+        this.promotionService.getActiveByStore(refCode).subscribe({
+            next: response => {
+                if (response.isSuccess && response.data) {
+                    this.activePromotions.set(response.data);
+                }
+            }
+        });
+    }
+
+    applyPromoCode(): void {
+        const code = this.promoCodeInput().trim();
+
+        if (!code) {
+            return;
+        }
+
+        const matched = this.activePromotions().find(promo =>
+            promo.promotionCode?.toLowerCase() === code.toLowerCase()
+        );
+
+        if (!matched) {
+            this.toastService.error('Mã giảm giá không hợp lệ hoặc đã hết hạn');
+            return;
+        }
+
+        this.appliedPromoCode.set(matched.promotionCode);
+        this.toastService.success(`Đã áp dụng mã "${matched.promotionCode}"`);
+    }
+
+    removePromoCode(): void {
+        this.appliedPromoCode.set(null);
+        this.promoCodeInput.set('');
+    }
+
+    selectGift(promotionId: number, storeFoodId: number): void {
+        this.selectedGifts.update(list => [
+            ...list.filter(g => g.promotionId !== promotionId),
+            { promotionId, storeFoodId }
+        ]);
+    }
+
+    clearGiftSelection(promotionId: number): void {
+        this.selectedGifts.update(list => list.filter(g => g.promotionId !== promotionId));
+    }
+
+    getSelectedGiftFoodId(promotionId: number): number | null {
+        return this.selectedGifts().find(g => g.promotionId === promotionId)?.storeFoodId ?? null;
+    }
+
+    getFoodPricing(food: StoreFoodResponse): PromotionalPriceInfo {
+        return getPromotionalPrice(food.id, food.price, this.applicablePromotions());
     }
 
     private loadStoreByRefCode(refCode: string): void {
@@ -175,6 +303,8 @@ export class PageUserStoreFoodsComponent {
                 this.storeRefCode.set(response.data.refCode);
                 this.loadCategories();
                 this.loadFoods();
+                this.loadActivePromotions();
+                this.realtimeService.joinPublicStoreGroup(response.data.refCode);
             },
             error: () => {
                 this.loading.set(false);
@@ -196,6 +326,8 @@ export class PageUserStoreFoodsComponent {
             clearInterval(this.paymentInterval);
             this.paymentInterval = null;
         }
+
+        this.realtimeService.disconnect();
     }
 
     @HostListener('document:mousemove', ['$event'])
@@ -547,7 +679,9 @@ export class PageUserStoreFoodsComponent {
                     optionName: option.optionName,
                     additionalPrice: option.additionalPrice
                 }))
-            }))
+            })),
+            selectedGifts: this.selectedGifts(),
+            promoCode: this.appliedPromoCode()
         };
 
         const createOrder$ = this.isLoggedIn()
@@ -573,6 +707,9 @@ export class PageUserStoreFoodsComponent {
                     return;
                 }
                 this.cart.set([]);
+                this.selectedGifts.set([]);
+                this.appliedPromoCode.set(null);
+                this.promoCodeInput.set('');
                 this.closeMobileCart();
 
                 this.orderService.getStorePaymentInfo(
@@ -628,7 +765,9 @@ export class PageUserStoreFoodsComponent {
             0
         );
 
-        return (item.food.price + optionAmount) * item.quantity;
+        const pricing = this.getFoodPricing(item.food);
+
+        return (pricing.effectivePrice + optionAmount) * item.quantity;
     }
 
     getOptionText(item: CartItem): string {

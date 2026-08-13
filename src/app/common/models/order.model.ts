@@ -2,6 +2,13 @@ export interface CreateOrderRequest {
   storeRefCode: string;
   note?: string | null;
   items: CreateOrderItemRequest[];
+  selectedGifts?: SelectedGiftRequest[];
+  promoCode?: string | null;
+}
+
+export interface SelectedGiftRequest {
+  promotionId: number;
+  storeFoodId: number;
 }
 
 export interface CreateOrderItemRequest {

@@ -20,6 +20,7 @@ import { AgentRevenueComponent } from './pages/page-agent/agent-revenue/agent-re
 import { RevenueComponent } from './pages/page-admin/revenue/revenue';
 import { PageOrderSuccessComponent } from './pages/page-user/order-success/order-success';
 import { PageAgentFoodCategoriesComponent } from './pages/page-agent/agent-food-categories/agent-food-categories';
+import { PageAgentPromotionsComponent } from './pages/page-agent/agent-promotions/agent-promotions';
 
 export const routes: Routes = [
   {
@@ -121,6 +122,13 @@ export const routes: Routes = [
         component: PageAgentOrdersComponent,
         data: {
           title: 'Danh sách đơn hàng'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_PROMOTIONS,
+        component: PageAgentPromotionsComponent,
+        data: {
+          title: 'Chương trình khuyến mãi'
         }
       },
       {

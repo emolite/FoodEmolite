@@ -1,9 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppTableComponent } from '../../../shared/component/table/table';
 import { FilterComponent } from '../../../shared/component/filter/filter';
 import { ToastService } from '../../../common/services/toast.service';
 import { StoreFoodService } from '../../../common/services/store-food.service';
 import { ProfileService } from '../../../common/services/profile.service';
+import { RealtimeService } from '../../../common/services/realtime.service';
+import { PromotionService } from '../../../common/services/promotion.service';
 import { FilterField } from '../../../common/models/front-end/filter/filter-field.model';
 import {
     TableColumn,
@@ -14,6 +17,8 @@ import {
     StoreFoodResponse,
     UpdateStoreFoodRequest
 } from '../../../common/models/store-food.model';
+import { PromotionResponse } from '../../../common/models/promotion.model';
+import { getPromotionalPrice } from '../../../common/utils/promotion-pricing';
 import { PopUpAgentFoodAddComponent } from './pop-up-agent-food-add/pop-up-agent-food-add';
 import { PopUpAgentFoodDetailComponent } from './pop-up-agent-food-detail/pop-up-agent-food-detail';
 import { StoreFoodCategoryService } from '../../../common/services/store-food-category.service';
@@ -40,6 +45,10 @@ export class PageAgentFoodsComponent {
     private readonly profileService = inject(ProfileService);
     private readonly toastService = inject(ToastService);
     private readonly categoryService = inject(StoreFoodCategoryService);
+    private readonly realtimeService = inject(RealtimeService);
+    private readonly promotionService = inject(PromotionService);
+
+    activePromotions = signal<PromotionResponse[]>([]);
 
     storeFoods = signal<StoreFoodResponse[]>([]);
     selectedFood = signal<StoreFoodResponse | null>(null);
@@ -98,9 +107,16 @@ export class PageAgentFoodsComponent {
         {
             key: 'price',
             label: 'Giá',
-            width: '130px',
+            width: '160px',
             align: 'right',
             sortable: true
+        },
+        {
+            key: 'promotionBadge',
+            label: 'Khuyến mãi',
+            width: '120px',
+            align: 'center',
+            type: 'badge'
         },
         {
             key: 'quantity',
@@ -160,21 +176,55 @@ export class PageAgentFoodsComponent {
     constructor() {
         this.updateFilterFields();
         this.loadMyStore();
+
+        this.realtimeService.foodQuantityChanged$
+            .pipe(takeUntilDestroyed())
+            .subscribe(notification => {
+                if (notification.storeRefCode !== this.storeRefCode()) {
+                    return;
+                }
+
+                this.storeFoods.update(list =>
+                    list.map(f => f.id === notification.storeFoodId
+                        ? { ...f, quantity: notification.quantity }
+                        : f
+                    )
+                );
+            });
+
+        this.realtimeService.promotionStatusChanged$
+            .pipe(takeUntilDestroyed())
+            .subscribe(notification => {
+                if (notification.storeRefCode !== this.storeRefCode()) {
+                    return;
+                }
+
+                this.loadActivePromotions();
+            });
     }
 
     rows(): TableRow[] {
-        return this.storeFoods().map((food, index) => ({
-            index: (this.page() - 1) * this.pageSize() + index + 1,
-            id: food.id,
-            refCode: food.refCode,
-            storeRefCode: food.storeRefCode,
-            thumbnailUrl: food.thumbnailUrl,
-            foodName: food.foodName,
-            price: this.formatCurrency(food.price),
-            quantity: food.quantity,
-            description: food.description ?? '',
-            isAvailable: food.isAvailable
-        }));
+        return this.storeFoods().map((food, index) => {
+            const pricing = getPromotionalPrice(food.id, food.price, this.activePromotions());
+
+            return {
+                index: (this.page() - 1) * this.pageSize() + index + 1,
+                id: food.id,
+                refCode: food.refCode,
+                storeRefCode: food.storeRefCode,
+                thumbnailUrl: food.thumbnailUrl,
+                foodName: food.foodName,
+                price: pricing.hasPromotion
+                    ? `${this.formatCurrency(pricing.effectivePrice)} (gốc ${this.formatCurrency(pricing.originalPrice)})`
+                    : this.formatCurrency(food.price),
+                promotionBadge: pricing.hasPromotion
+                    ? { text: 'Đang KM', value: 'PROMO' }
+                    : { text: '—', value: '' },
+                quantity: food.quantity,
+                description: food.description ?? '',
+                isAvailable: food.isAvailable
+            };
+        });
     }
 
     loadMyStore(): void {
@@ -191,10 +241,27 @@ export class PageAgentFoodsComponent {
                 this.storeRefCode.set(response.data.store.refCode);
                 this.loadCategories();
                 this.loadStoreFoods();
+                this.loadActivePromotions();
             },
             error: () => {
                 this.loading.set(false);
                 this.toastService.error('Không tải được thông tin đại lý');
+            }
+        });
+    }
+
+    loadActivePromotions(): void {
+        const refCode = this.storeRefCode();
+
+        if (!refCode) {
+            return;
+        }
+
+        this.promotionService.getActiveByStore(refCode).subscribe({
+            next: response => {
+                if (response.isSuccess && response.data) {
+                    this.activePromotions.set(response.data);
+                }
             }
         });
     }
