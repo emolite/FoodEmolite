@@ -1,0 +1,81 @@
+<div class="space-y-6">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="md:text-[20px] font-semibold text-violet-400 uppercase tracking-widest">
+        Chương Trình Khuyến Mãi
+      </h1>
+
+      <p class="mt-2 text-md leading-4 text-gray-500">
+        Quản lý các chương trình khuyến mãi của cửa hàng
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="openCreateModal()"
+      class="flex items-center justify-between gap-2 rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-circle-plus-icon lucide-circle-plus">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M8 12h8" />
+        <path d="M12 8v8" />
+      </svg>
+      Tạo khuyến mãi
+    </button>
+  </div>
+
+  <app-filter
+    [fields]="filterFields"
+    [initialValues]="filter()"
+    (filterChange)="onFilterChange($event)">
+  </app-filter>
+  <div></div>
+  <app-table
+    [columns]="columns"
+    [rows]="rows()"
+    [currentPage]="page()"
+    [totalPages]="totalPages()"
+    [loading]="loading()"
+    [sortBy]="sortBy()"
+    [asc]="asc()"
+    emptyText="Chưa có chương trình khuyến mãi"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowClick)="openDetail($event)">
+  </app-table>
+</div>
+
+@if (isAddOpen()) {
+  <app-pop-up-agent-promotion-add
+    [foodOptions]="foodOptions()"
+    [isSubmitting]="isSubmitting()"
+    [editingPromotion]="editingPromotion()"
+    (closed)="closeCreateModal()"
+    (submitted)="savePromotion($event)">
+  </app-pop-up-agent-promotion-add>
+}
+
+@if (isDetailRendered() && selectedPromotion()) {
+  <app-pop-up-agent-promotion-detail
+    [promotion]="selectedPromotion()!"
+    [isOpen]="isDetailOpen()"
+    [isSubmitting]="isSubmitting()"
+    (closed)="closeDetail()"
+    (pause)="requestPause($event)"
+    (resume)="requestResume($event)"
+    (cancel)="requestCancel($event)"
+    (delete)="requestDelete($event)"
+    (edit)="openEditFromDetail($event)">
+  </app-pop-up-agent-promotion-detail>
+}
+
+@if (isConfirmOpen()) {
+  <app-confirm-popup
+    [title]="confirmTitle()"
+    [message]="confirmMessage()"
+    [isSubmitting]="isSubmitting()"
+    (confirmed)="submitConfirm()"
+    (cancelled)="closeConfirm()">
+  </app-confirm-popup>
+}

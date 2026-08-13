@@ -48,5 +48,14 @@ export const API_ENDPOINT = {
   REVENUE: {
     ADMIN: 'revenue/admin',
     AGENT: 'revenue/agent'
+  },
+  PROMOTION: {
+    BASE: 'promotions',
+    SEARCH: 'promotions/search',
+    DETAIL: (id: number) => `promotions/${id}`,
+    PAUSE: (id: number) => `promotions/${id}/pause`,
+    RESUME: (id: number) => `promotions/${id}/resume`,
+    CANCEL: (id: number) => `promotions/${id}/cancel`,
+    ACTIVE_BY_STORE: (storeRefCode: string) => `promotions/store/${storeRefCode}/active`
   }
 } as const;

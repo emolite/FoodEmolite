@@ -111,6 +111,24 @@ export class AppTableComponent {
       case 'PAID':
         return 'bg-green-100 text-green-700';
 
+      case 'DRAFT':
+        return 'bg-gray-100 text-gray-700';
+
+      case 'SCHEDULED':
+        return 'bg-blue-100 text-blue-700';
+
+      case 'ACTIVE':
+        return 'bg-green-100 text-green-700';
+
+      case 'PAUSED':
+        return 'bg-yellow-100 text-yellow-700';
+
+      case 'ENDED':
+        return 'bg-red-100 text-red-700';
+
+      case 'PROMO':
+        return 'bg-fuchsia-100 text-fuchsia-700';
+
       default:
         return 'bg-gray-100 text-gray-700';
     }

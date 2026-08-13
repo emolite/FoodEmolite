@@ -1,9 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppTableComponent } from '../../../shared/component/table/table';
 import { FilterComponent } from '../../../shared/component/filter/filter';
 import { ToastService } from '../../../common/services/toast.service';
 import { OrderService } from '../../../common/services/order.service';
 import { ProfileService } from '../../../common/services/profile.service';
+import { RealtimeService } from '../../../common/services/realtime.service';
 import { FilterField } from '../../../common/models/front-end/filter/filter-field.model';
 import {
     TableColumn,
@@ -43,6 +45,7 @@ export class PageAgentOrdersComponent {
     private readonly profileService = inject(ProfileService);
     private readonly toastService = inject(ToastService);
     private readonly sanitizer = inject(DomSanitizer);
+    private readonly realtimeService = inject(RealtimeService);
 
     orders = signal<OrderResponse[]>([]);
     selectedOrder = signal<OrderResponse | null>(null);
@@ -196,6 +199,20 @@ export class PageAgentOrdersComponent {
 
     constructor() {
         this.loadMyStore();
+
+        this.realtimeService.newOrder$
+            .pipe(takeUntilDestroyed())
+            .subscribe(notification => {
+                if (notification.storeRefCode !== this.storeRefCode()) {
+                    return;
+                }
+
+                this.toastService.success(`Đơn hàng mới: ${notification.orderCode}`);
+
+                if (this.page() === 1) {
+                    this.loadOrders();
+                }
+            });
     }
 
     rows(): TableRow[] {

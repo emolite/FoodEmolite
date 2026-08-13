@@ -4,4 +4,48 @@
       {{ title() }}
     </h1>
   </div>
+
+  <div class="relative">
+    <button
+      type="button"
+      (click)="toggleNotifications()"
+      class="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-300 transition hover:bg-white/5 hover:text-white"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 0 0-4-5.65V5a2 2 0 1 0-4 0v.35A6 6 0 0 0 6 11v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" />
+      </svg>
+
+      @if (unreadCount() > 0) {
+        <span class="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
+          {{ unreadCount() }}
+        </span>
+      }
+    </button>
+
+    @if (isNotificationsOpen()) {
+      <div class="absolute right-0 mt-2 w-80 rounded-xl border border-white/10 bg-[#161226] shadow-xl">
+        <div class="border-b border-white/5 px-4 py-3">
+          <h2 class="text-sm font-semibold text-white">Đơn hàng mới</h2>
+        </div>
+
+        <div class="max-h-96 overflow-y-auto">
+          @if (notifications().length === 0) {
+            <p class="px-4 py-6 text-center text-xs text-gray-500">Chưa có đơn hàng mới</p>
+          } @else {
+            @for (notification of notifications(); track notification.id) {
+              <div class="border-b border-white/5 px-4 py-3 last:border-b-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-white">{{ notification.orderCode }}</span>
+                  <span class="text-xs text-gray-500">{{ formatTime(notification.createdAt) }}</span>
+                </div>
+                <p class="mt-1 text-xs text-gray-400">
+                  {{ notification.customerName }} · {{ formatCurrency(notification.totalAmount) }}
+                </p>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
 </header>

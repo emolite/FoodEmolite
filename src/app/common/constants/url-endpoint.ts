@@ -14,6 +14,7 @@ export const URL_ENDPOINT = {
   AGENT_FOODS: 'foods',
   AGENT_FOOD_CATEGORIES: 'categories',
   AGENT_ORDERS: 'orders',
+  AGENT_PROMOTIONS: 'promotions',
   AGENT_REVENUE: 'revenue',
 
   USER: 'user',

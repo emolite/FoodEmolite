@@ -1,0 +1,188 @@
+<div class="fixed inset-0 z-40 bg-black/60 transition-opacity" [class.opacity-100]="isOpen()"
+    [class.opacity-0]="!isOpen()" (click)="close()">
+</div>
+
+<div class="fixed right-0 top-0 z-50 h-screen w-full max-w-xl bg-[#171322] shadow-xl transition-transform duration-200 border-l border-[#322a4a]"
+    [class.translate-x-0]="isOpen()" [class.translate-x-full]="!isOpen()">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-[#322a4a] px-5 py-4">
+            <div>
+                <h2 class="text-lg font-semibold text-violet-200">
+                    {{ promotion().name }}
+                </h2>
+
+                <p class="mt-1 text-sm text-gray-400">
+                    {{ getPromotionTypeText(promotion().promotionType) }}
+                </p>
+            </div>
+
+            <button type="button" (click)="close()"
+                class="h-9 w-9 rounded-md text-gray-400 transition hover:bg-violet-500/15 hover:text-violet-300">
+                ✕
+            </button>
+        </div>
+
+        <div class="min-h-0 flex-1 space-y-5 overflow-y-auto p-5">
+            <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-violet-200">
+                        Thông tin chung
+                    </h3>
+
+                    <span class="rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-medium text-violet-300">
+                        {{ getStatusText(promotion().status) }}
+                    </span>
+                </div>
+
+                <div class="mt-3 space-y-2 text-sm">
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Mã KM</span>
+                        <span class="font-medium text-white">
+                            {{ promotion().promotionCode || 'Không có' }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Thời gian áp dụng</span>
+                        <span class="text-right font-medium text-white">
+                            {{ formatDate(promotion().startDate) }}
+                            →
+                            {{ promotion().endDate ? formatDate(promotion().endDate!) : 'Không giới hạn' }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Khung giờ</span>
+                        <span class="font-medium text-white">
+                            {{ getTimeRangeText(promotion()) }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Ngày áp dụng</span>
+                        <span class="text-right font-medium text-white">
+                            {{ getDaysOfWeekText(promotion().daysOfWeekMask) }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between gap-3">
+                        <span class="text-gray-400">Điều kiện</span>
+                        <span class="text-right font-medium text-white">
+                            {{ getConditionText(promotion()) }}
+                        </span>
+                    </div>
+
+                    @if (promotion().description) {
+                    <div class="border-t border-[#322a4a] pt-2">
+                        <p class="text-gray-400">Mô tả</p>
+                        <p class="mt-1 text-white">
+                            {{ promotion().description }}
+                        </p>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            @if (promotion().promotionType === 'FIXED_PRICE') {
+            <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
+                <h3 class="text-sm font-semibold text-violet-200">
+                    Danh sách món đồng giá
+                </h3>
+
+                <div class="mt-3 space-y-2">
+                    @for (item of promotion().fixedPriceItems; track item.id) {
+                    <div class="flex items-center justify-between gap-3 rounded-md border border-[#322a4a] bg-[#171322] px-3 py-2 text-sm">
+                        <span class="truncate text-gray-200">{{ item.foodName }}</span>
+                        <div class="flex shrink-0 items-center gap-2">
+                            <span class="text-gray-500 line-through">{{ formatCurrency(item.originalPrice) }}</span>
+                            <span class="font-semibold text-violet-300">{{ formatCurrency(item.fixedPrice) }}</span>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
+            @if (promotion().promotionType === 'PRODUCT_DISCOUNT') {
+            <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
+                <h3 class="text-sm font-semibold text-violet-200">
+                    Danh sách món giảm giá
+                </h3>
+
+                <div class="mt-3 space-y-2">
+                    @for (item of promotion().discountItems; track item.id) {
+                    <div class="flex items-center justify-between gap-3 rounded-md border border-[#322a4a] bg-[#171322] px-3 py-2 text-sm">
+                        <span class="truncate text-gray-200">{{ item.foodName }}</span>
+                        <div class="flex shrink-0 items-center gap-2">
+                            <span class="text-gray-500 line-through">{{ formatCurrency(item.originalPrice) }}</span>
+                            <span class="font-semibold text-violet-300">
+                                @if (item.discountType === 'PERCENT') {
+                                -{{ item.discountValue }}%
+                                } @else {
+                                -{{ formatCurrency(item.discountValue) }}
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
+            @if (promotion().promotionType === 'BUY_X_GET_Y') {
+            <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
+                <h3 class="text-sm font-semibold text-violet-200">
+                    Danh sách quà tặng (Y)
+                </h3>
+
+                <div class="mt-3 space-y-2">
+                    @for (item of promotion().giftItems; track item.id) {
+                    <div class="flex items-center justify-between gap-3 rounded-md border border-[#322a4a] bg-[#171322] px-3 py-2 text-sm">
+                        <span class="truncate text-gray-200">{{ item.foodName }}</span>
+                        <span class="shrink-0 font-semibold text-violet-300">Tặng {{ item.giftQuantity }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-[#322a4a] px-5 py-4">
+            @if (promotion().status === 'DRAFT') {
+            <button type="button" (click)="onDelete()" [disabled]="isSubmitting()"
+                class="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50">
+                Xoá bản nháp
+            </button>
+
+            <button type="button" (click)="onEdit()" [disabled]="isSubmitting()"
+                class="rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
+                Chỉnh sửa / Kích hoạt
+            </button>
+            }
+
+            @if (promotion().status === 'SCHEDULED' || promotion().status === 'ACTIVE') {
+            <button type="button" (click)="onPause()" [disabled]="isSubmitting()"
+                class="rounded-md border border-[#322a4a] bg-[#1a1628] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:border-violet-500 hover:bg-violet-500/10 disabled:cursor-not-allowed disabled:opacity-50">
+                Tạm dừng
+            </button>
+
+            <button type="button" (click)="onCancel()" [disabled]="isSubmitting()"
+                class="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50">
+                Huỷ chương trình
+            </button>
+            }
+
+            @if (promotion().status === 'PAUSED') {
+            <button type="button" (click)="onResume()" [disabled]="isSubmitting()"
+                class="rounded-md bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
+                Tiếp tục
+            </button>
+
+            <button type="button" (click)="onCancel()" [disabled]="isSubmitting()"
+                class="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50">
+                Huỷ chương trình
+            </button>
+            }
+        </div>
+    </div>
+</div>
