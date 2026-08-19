@@ -21,6 +21,10 @@ import { RevenueComponent } from './pages/page-admin/revenue/revenue';
 import { PageOrderSuccessComponent } from './pages/page-user/order-success/order-success';
 import { PageAgentFoodCategoriesComponent } from './pages/page-agent/agent-food-categories/agent-food-categories';
 import { PageAgentPromotionsComponent } from './pages/page-agent/agent-promotions/agent-promotions';
+import { AgentProductRevenueComponent } from './pages/page-agent/agent-product-revenue/agent-product-revenue';
+import { ProductRevenueComponent } from './pages/page-admin/product-revenue/product-revenue';
+import { PageAgentCustomersComponent } from './pages/page-agent/agent-customers/agent-customers';
+import { CustomersComponent } from './pages/page-admin/customers/customers';
 
 export const routes: Routes = [
   {
@@ -84,6 +88,20 @@ export const routes: Routes = [
           title: 'Doanh thu'
         }
       },
+      {
+        path: URL_ENDPOINT.ADMIN_PRODUCT_REVENUE,
+        component: ProductRevenueComponent,
+        data: {
+          title: 'Doanh thu sản phẩm'
+        }
+      },
+      {
+        path: URL_ENDPOINT.ADMIN_CUSTOMERS,
+        component: CustomersComponent,
+        data: {
+          title: 'Danh sách khách hàng'
+        }
+      },
     ]
   },
 
@@ -136,6 +154,20 @@ export const routes: Routes = [
         component: AgentRevenueComponent,
         data: {
           title: 'Thống kê'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_PRODUCT_REVENUE,
+        component: AgentProductRevenueComponent,
+        data: {
+          title: 'Doanh thu sản phẩm'
+        }
+      },
+      {
+        path: URL_ENDPOINT.AGENT_CUSTOMERS,
+        component: PageAgentCustomersComponent,
+        data: {
+          title: 'Danh sách khách hàng'
         }
       },
     ]

@@ -129,6 +129,12 @@ export class AppTableComponent {
       case 'PROMO':
         return 'bg-fuchsia-100 text-fuchsia-700';
 
+      case 'GUEST':
+        return 'bg-blue-100 text-blue-700';
+
+      case 'MEMBER':
+        return 'bg-green-100 text-green-700';
+
       default:
         return 'bg-gray-100 text-gray-700';
     }

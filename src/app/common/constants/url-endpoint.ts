@@ -8,6 +8,8 @@ export const URL_ENDPOINT = {
   ADMIN_USERS: 'users',
   ADMIN_AGENTS: 'agents',
   ADMIN_REVENUE: 'revenue',
+  ADMIN_PRODUCT_REVENUE: 'product-revenue',
+  ADMIN_CUSTOMERS: 'customers',
 
   AGENT: 'agent',
   AGENT_PROFILE: 'profile',
@@ -16,6 +18,8 @@ export const URL_ENDPOINT = {
   AGENT_ORDERS: 'orders',
   AGENT_PROMOTIONS: 'promotions',
   AGENT_REVENUE: 'revenue',
+  AGENT_PRODUCT_REVENUE: 'product-revenue',
+  AGENT_CUSTOMERS: 'customers',
 
   USER: 'user',
   USER_STORES: 'welcome',
