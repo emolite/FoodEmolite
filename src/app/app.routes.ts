@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { URL_ENDPOINT } from './common/constants/url-endpoint';
+import { roleRedirectGuard } from './common/guard/role-redirect.guard';
 
 import { PageLoginComponent } from './pages/page-login/login/login';
 import { PageRegisterComponent } from './pages/page-login/register/register';
@@ -29,8 +30,9 @@ import { CustomersComponent } from './pages/page-admin/customers/customers';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: `${URL_ENDPOINT.USER}/${URL_ENDPOINT.USER_STORES}`,
-    pathMatch: 'full'
+    pathMatch: 'full',
+    canActivate: [roleRedirectGuard],
+    children: []
   },
   {
     path: URL_ENDPOINT.LOGIN,
