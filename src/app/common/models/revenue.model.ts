@@ -32,3 +32,20 @@ export interface AgentRevenueResponse {
   lineChart: RevenueLineChartItem[];
   pieChart: RevenuePieChartItem[];
 }
+
+export interface TopSellingProduct {
+  storeFoodId: number;
+  foodName: string;
+  thumbnailUrl: string | null;
+  quantitySold: number;
+  revenue: number;
+  storeRefCode: string;
+  storeName: string;
+}
+
+export interface ProductRevenueSearchRequest {
+  fromDate?: string | null;
+  toDate?: string | null;
+  keyword?: string | null;
+  storeRefCode?: string | null;
+}

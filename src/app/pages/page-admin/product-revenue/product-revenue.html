@@ -1,0 +1,87 @@
+<div class="space-y-6">
+
+  <div>
+    <h1 class="text-[20px] font-semibold uppercase tracking-widest text-violet-400">
+      Doanh Thu Sản Phẩm
+    </h1>
+
+    <p class="mt-2 text-md leading-4 text-gray-400">
+      Top sản phẩm bán chạy và doanh thu theo sản phẩm trên toàn hệ thống
+    </p>
+  </div>
+
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-4 shadow-lg">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+      <div>
+        <label class="mb-2 block text-sm font-medium text-violet-200">Từ ngày</label>
+        <app-date-picker [value]="fromDate()" placeholder="Chọn ngày" (valueChange)="fromDate.set($event)">
+        </app-date-picker>
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-medium text-violet-200">Đến ngày</label>
+        <app-date-picker [value]="toDate()" placeholder="Chọn ngày" (valueChange)="toDate.set($event)">
+        </app-date-picker>
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-medium text-violet-200">Cửa hàng</label>
+        <app-dropdown [options]="storeOptions()" placeholder="Toàn bộ cửa hàng" [value]="selectedStoreRefCode()"
+          (changed)="onStoreChange($event)">
+        </app-dropdown>
+      </div>
+
+      <div class="flex items-end gap-2">
+        <button type="button" (click)="applyFilter()" [disabled]="loadingChart() || loadingTable()"
+          class="rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50">
+          {{ (loadingChart() || loadingTable()) ? 'Đang tải...' : 'Lọc' }}
+        </button>
+
+        <button type="button" (click)="resetFilter()" [disabled]="loadingChart() || loadingTable()"
+          class="rounded-lg border border-[#322a4a] bg-[#1a1628] px-4 py-2.5 text-sm font-medium text-gray-200 transition hover:border-violet-500 hover:bg-violet-500/10 disabled:opacity-50">
+          Đặt lại
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5 shadow-lg">
+    <h2 class="text-base font-semibold text-violet-200">Top 10 sản phẩm bán chạy</h2>
+    <p class="mt-1 text-sm text-gray-400">Mỗi thanh đại diện cho một sản phẩm, chiều dài theo số lượng bán</p>
+
+    <div class="mt-6">
+      @if (loadingChart()) {
+      <div class="flex h-[380px] items-center justify-center text-sm text-gray-500">
+        Đang tải dữ liệu...
+      </div>
+      } @else if (topProducts().length === 0) {
+      <div
+        class="flex h-[380px] items-center justify-center rounded-xl border border-dashed border-[#322a4a] text-sm text-gray-500">
+        Chưa có dữ liệu bán hàng trong khoảng thời gian này
+      </div>
+      } @else {
+      <apx-chart [series]="barChartOptions.series!" [chart]="barChartOptions.chart!"
+        [plotOptions]="barChartOptions.plotOptions!" [dataLabels]="barChartOptions.dataLabels!"
+        [xaxis]="barChartOptions.xaxis!" [yaxis]="barChartOptions.yaxis!" [tooltip]="barChartOptions.tooltip!"
+        [grid]="barChartOptions.grid!" [colors]="barChartOptions.colors!">
+      </apx-chart>
+      }
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-[#322a4a] bg-[#171322] p-5 shadow-lg">
+    <h2 class="text-base font-semibold text-violet-200">Doanh thu theo sản phẩm</h2>
+
+    <div class="mt-4">
+      <app-filter [fields]="filterFields" [initialValues]="filter()" (filterChange)="onFilterChange($event)">
+      </app-filter>
+    </div>
+
+    <div class="mt-4">
+      <app-table [columns]="productColumns" [rows]="productRows()" [currentPage]="page()" [totalPages]="totalPages()"
+        [loading]="loadingTable()" emptyText="Chưa có dữ liệu" (pageChange)="onPageChange($event)">
+      </app-table>
+    </div>
+  </div>
+
+</div>

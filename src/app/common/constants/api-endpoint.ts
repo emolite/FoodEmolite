@@ -45,9 +45,17 @@ export const API_ENDPOINT = {
     PAYMENT_STATUS: (orderCode: string) => `orders/${orderCode}/payment-status`,
     PENDING_ORDER: 'orders/pending-order'
   },
+  CUSTOMER: {
+    AGENT_SEARCH: 'customers/agent/search',
+    ADMIN_SEARCH: 'customers/admin/search'
+  },
   REVENUE: {
     ADMIN: 'revenue/admin',
-    AGENT: 'revenue/agent'
+    AGENT: 'revenue/agent',
+    AGENT_TOP_PRODUCTS: 'revenue/agent/top-products',
+    AGENT_PRODUCTS_SEARCH: 'revenue/agent/products/search',
+    ADMIN_TOP_PRODUCTS: 'revenue/admin/top-products',
+    ADMIN_PRODUCTS_SEARCH: 'revenue/admin/products/search'
   },
   PROMOTION: {
     BASE: 'promotions',
