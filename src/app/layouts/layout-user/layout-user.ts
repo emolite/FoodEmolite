@@ -4,6 +4,7 @@ import { filter } from 'rxjs';
 import { UserTopbarComponent } from "./user-topbar/user-topbar";
 import { UserFooterComponent } from "./user-footer/user-footer";
 import { URL_ENDPOINT } from '../../common/constants/url-endpoint';
+import { ThemeService } from '../../common/services/theme.service';
 
 @Component({
   selector: 'app-layout-user',
@@ -17,6 +18,8 @@ import { URL_ENDPOINT } from '../../common/constants/url-endpoint';
 export class LayoutUserComponent {
   private readonly router = inject(Router);
   private readonly welcomePath = `/${URL_ENDPOINT.USER}/${URL_ENDPOINT.USER_STORES}`;
+
+  readonly themeService = inject(ThemeService);
 
   showFooter = signal(this.isWelcomeUrl(this.router.url));
 

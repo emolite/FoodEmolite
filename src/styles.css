@@ -63,3 +63,162 @@
     transform: translate(15px, -20px) scale(1.08);
   }
 }
+
+/* ==========================================================================
+   USER-FACING LIGHT THEME ("tông xanh trắng")
+   Dark mode = the existing design, completely untouched (no HTML edits).
+   Toggling [data-theme="light"] on .user-theme-scope (see layout-user)
+   re-points the exact same Tailwind utility classes already used across
+   every page-user template to a blue/white palette instead. Nothing here
+   fires unless that attribute is present, so dark mode is byte-identical
+   to before.
+   ========================================================================== */
+
+/* Transition lives on the root wrapper only — NOT on every descendant.
+   Animating background/color/shadow on hundreds of nested elements at once
+   (every card, every line of text) overloads the compositor and causes
+   visible stutter / stuck-color repaint glitches. A single fade on the
+   root is enough to read as "switching theme" without that cost. */
+.user-theme-scope {
+  transition: background-color .3s ease;
+}
+
+.user-theme-scope[data-theme="light"] {
+  --u-ink: 15 39 68;
+  --u-accent: 37 99 235;
+  --u-accent-strong: 29 78 216;
+  --u-accent-soft: 59 130 246;
+  --u-accent2: 14 165 233;
+  --u-accent2-strong: 2 132 199;
+
+  color-scheme: light;
+}
+
+/* ---- page / surface backgrounds ---- */
+.user-theme-scope[data-theme="light"] .bg-\[\#0f0d1a\] { background-color: #eef4fb; }
+.user-theme-scope[data-theme="light"] .bg-\[\#070511\],
+.user-theme-scope[data-theme="light"] .bg-\[\#0c0a16\] { background-color: #dbe9fb; }
+.user-theme-scope[data-theme="light"] .bg-\[\#130f21\],
+.user-theme-scope[data-theme="light"] .bg-\[\#1a1035\] { background-color: #ffffff; }
+.user-theme-scope[data-theme="light"] .bg-\[\#141124\],
+.user-theme-scope[data-theme="light"] .bg-\[\#171429\] { background-color: #f3f8ff; }
+.user-theme-scope[data-theme="light"] .bg-\[\#1d1830\],
+.user-theme-scope[data-theme="light"] .bg-\[\#201b39\],
+.user-theme-scope[data-theme="light"] .hover\:bg-\[\#292347\]:hover { background-color: #e8f1fd; }
+.user-theme-scope[data-theme="light"] .border-\[\#0f0d1a\] { border-color: #eef4fb; }
+.user-theme-scope[data-theme="light"] .from-\[\#0f0d1a\] { --tw-gradient-from: #eef4fb; }
+.user-theme-scope[data-theme="light"] .to-\[\#0f0d1a\] { --tw-gradient-to: #eef4fb; }
+.user-theme-scope[data-theme="light"] .via-\[\#1a1035\] { --tw-gradient-via: #ffffff; }
+
+/* ---- ink text (white -> navy, same opacity ladder) ---- */
+.user-theme-scope[data-theme="light"] .text-white,
+.user-theme-scope[data-theme="light"] .hover\:text-white:hover { color: rgb(var(--u-ink)); }
+.user-theme-scope[data-theme="light"] .text-white\/80 { color: rgb(var(--u-ink) / 80%); }
+.user-theme-scope[data-theme="light"] .text-white\/70,
+.user-theme-scope[data-theme="light"] .hover\:text-white\/70:hover { color: rgb(var(--u-ink) / 70%); }
+.user-theme-scope[data-theme="light"] .text-white\/60 { color: rgb(var(--u-ink) / 62%); }
+.user-theme-scope[data-theme="light"] .text-white\/55 { color: rgb(var(--u-ink) / 58%); }
+.user-theme-scope[data-theme="light"] .text-white\/50 { color: rgb(var(--u-ink) / 54%); }
+.user-theme-scope[data-theme="light"] .text-white\/45 { color: rgb(var(--u-ink) / 50%); }
+.user-theme-scope[data-theme="light"] .text-white\/40 { color: rgb(var(--u-ink) / 46%); }
+.user-theme-scope[data-theme="light"] .text-white\/35 { color: rgb(var(--u-ink) / 42%); }
+.user-theme-scope[data-theme="light"] .text-white\/30 { color: rgb(var(--u-ink) / 38%); }
+.user-theme-scope[data-theme="light"] .text-white\/25 { color: rgb(var(--u-ink) / 34%); }
+.user-theme-scope[data-theme="light"] .text-white\/20 { color: rgb(var(--u-ink) / 30%); }
+.user-theme-scope[data-theme="light"] .placeholder\:text-white\/30::placeholder { color: rgb(var(--u-ink) / 38%); }
+
+/* ---- subtle white overlays (bg/border/divide -> tinted blue) ---- */
+.user-theme-scope[data-theme="light"] .bg-white\/2 { background-color: rgb(var(--u-accent) / 3%); }
+.user-theme-scope[data-theme="light"] .bg-white\/3 { background-color: rgb(var(--u-accent) / 4%); }
+.user-theme-scope[data-theme="light"] .bg-white\/5,
+.user-theme-scope[data-theme="light"] .hover\:bg-white\/5:hover { background-color: rgb(var(--u-accent) / 6%); }
+.user-theme-scope[data-theme="light"] .bg-white\/10,
+.user-theme-scope[data-theme="light"] .hover\:bg-white\/10:hover { background-color: rgb(var(--u-accent) / 9%); }
+.user-theme-scope[data-theme="light"] .bg-white\/15,
+.user-theme-scope[data-theme="light"] .hover\:bg-white\/15:hover { background-color: rgb(var(--u-accent) / 12%); }
+.user-theme-scope[data-theme="light"] .bg-white\/20 { background-color: rgb(var(--u-accent) / 16%); }
+.user-theme-scope[data-theme="light"] .bg-white,
+.user-theme-scope[data-theme="light"] .focus\:bg-white:focus { background-color: #ffffff; }
+.user-theme-scope[data-theme="light"] .border-white\/5 { border-color: rgb(var(--u-accent) / 12%); }
+.user-theme-scope[data-theme="light"] .border-white\/10 { border-color: rgb(var(--u-accent) / 18%); }
+.user-theme-scope[data-theme="light"] .divide-white\/5 > :not([hidden]) ~ :not([hidden]) { border-color: rgb(var(--u-accent) / 12%); }
+
+/* ---- brand accent: violet -> blue ---- */
+.user-theme-scope[data-theme="light"] .text-violet-200,
+.user-theme-scope[data-theme="light"] .text-violet-300,
+.user-theme-scope[data-theme="light"] .text-violet-700,
+.user-theme-scope[data-theme="light"] .hover\:text-violet-200:hover,
+.user-theme-scope[data-theme="light"] .hover\:text-violet-300:hover { color: rgb(var(--u-accent-strong)); }
+.user-theme-scope[data-theme="light"] .text-violet-300\/50 { color: rgb(var(--u-accent-strong) / 50%); }
+.user-theme-scope[data-theme="light"] .text-violet-300\/60 { color: rgb(var(--u-accent-strong) / 60%); }
+.user-theme-scope[data-theme="light"] .text-violet-400 { color: rgb(var(--u-accent)); }
+.user-theme-scope[data-theme="light"] .text-violet-500\/70 { color: rgb(var(--u-accent) / 70%); }
+
+.user-theme-scope[data-theme="light"] .bg-violet-500,
+.user-theme-scope[data-theme="light"] .hover\:bg-violet-500:hover { background-color: rgb(var(--u-accent-soft)); }
+.user-theme-scope[data-theme="light"] .bg-violet-500\/5,
+.user-theme-scope[data-theme="light"] .hover\:bg-violet-500\/5:hover { background-color: rgb(var(--u-accent) / 5%); }
+.user-theme-scope[data-theme="light"] .bg-violet-500\/10,
+.user-theme-scope[data-theme="light"] .hover\:bg-violet-500\/10:hover { background-color: rgb(var(--u-accent) / 10%); }
+.user-theme-scope[data-theme="light"] .bg-violet-500\/20 { background-color: rgb(var(--u-accent) / 20%); }
+.user-theme-scope[data-theme="light"] .bg-violet-600 { background-color: rgb(var(--u-accent)); }
+.user-theme-scope[data-theme="light"] .bg-violet-600\/15 { background-color: rgb(var(--u-accent) / 15%); }
+.user-theme-scope[data-theme="light"] .bg-violet-600\/20 { background-color: rgb(var(--u-accent) / 20%); }
+
+.user-theme-scope[data-theme="light"] .border-violet-400\/25 { border-color: rgb(var(--u-accent-soft) / 25%); }
+.user-theme-scope[data-theme="light"] .border-violet-500 { border-color: rgb(var(--u-accent)); }
+.user-theme-scope[data-theme="light"] .border-violet-500\/15 { border-color: rgb(var(--u-accent) / 15%); }
+.user-theme-scope[data-theme="light"] .border-violet-500\/20,
+.user-theme-scope[data-theme="light"] .hover\:border-violet-500\/20:hover { border-color: rgb(var(--u-accent) / 20%); }
+.user-theme-scope[data-theme="light"] .border-violet-500\/25,
+.user-theme-scope[data-theme="light"] .hover\:border-violet-500\/25:hover { border-color: rgb(var(--u-accent) / 25%); }
+.user-theme-scope[data-theme="light"] .border-violet-500\/30,
+.user-theme-scope[data-theme="light"] .hover\:border-violet-500\/30:hover { border-color: rgb(var(--u-accent) / 30%); }
+.user-theme-scope[data-theme="light"] .border-violet-500\/40,
+.user-theme-scope[data-theme="light"] .hover\:border-violet-500\/40:hover,
+.user-theme-scope[data-theme="light"] .focus\:border-violet-500\/40:focus { border-color: rgb(var(--u-accent) / 45%); }
+
+.user-theme-scope[data-theme="light"] .ring-violet-500\/20 { --tw-ring-color: rgb(var(--u-accent) / 20%); }
+.user-theme-scope[data-theme="light"] .ring-violet-500\/30 { --tw-ring-color: rgb(var(--u-accent) / 30%); }
+
+.user-theme-scope[data-theme="light"] .from-violet-400,
+.user-theme-scope[data-theme="light"] .hover\:from-violet-500:hover { --tw-gradient-from: rgb(var(--u-accent-soft)); }
+.user-theme-scope[data-theme="light"] .from-violet-600,
+.user-theme-scope[data-theme="light"] .from-violet-700,
+.user-theme-scope[data-theme="light"] .from-violet-900 { --tw-gradient-from: rgb(var(--u-accent)); }
+
+.user-theme-scope[data-theme="light"] .shadow-violet-500\/10 { --tw-shadow-color: rgb(var(--u-accent) / 10%); }
+.user-theme-scope[data-theme="light"] .shadow-violet-600\/25 { --tw-shadow-color: rgb(var(--u-accent) / 25%); }
+.user-theme-scope[data-theme="light"] .shadow-violet-600\/30,
+.user-theme-scope[data-theme="light"] .hover\:shadow-violet-600\/30:hover { --tw-shadow-color: rgb(var(--u-accent) / 30%); }
+.user-theme-scope[data-theme="light"] .hover\:shadow-violet-600\/40:hover { --tw-shadow-color: rgb(var(--u-accent) / 40%); }
+.user-theme-scope[data-theme="light"] .shadow-violet-900\/40,
+.user-theme-scope[data-theme="light"] .hover\:shadow-violet-900\/30:hover { --tw-shadow-color: rgb(var(--u-accent) / 18%); }
+.user-theme-scope[data-theme="light"] .shadow-violet-950\/40,
+.user-theme-scope[data-theme="light"] .hover\:shadow-violet-950\/30:hover { --tw-shadow-color: rgb(var(--u-accent) / 15%); }
+
+/* ---- secondary accent: fuchsia -> sky ---- */
+.user-theme-scope[data-theme="light"] .text-fuchsia-200,
+.user-theme-scope[data-theme="light"] .text-fuchsia-300,
+.user-theme-scope[data-theme="light"] .hover\:text-fuchsia-300:hover { color: rgb(var(--u-accent2-strong)); }
+.user-theme-scope[data-theme="light"] .text-fuchsia-400 { color: rgb(var(--u-accent2)); }
+
+.user-theme-scope[data-theme="light"] .bg-fuchsia-500\/5,
+.user-theme-scope[data-theme="light"] .hover\:bg-fuchsia-500\/10:hover { background-color: rgb(var(--u-accent2) / 8%); }
+.user-theme-scope[data-theme="light"] .bg-fuchsia-500\/10 { background-color: rgb(var(--u-accent2) / 10%); }
+.user-theme-scope[data-theme="light"] .bg-fuchsia-500\/15 { background-color: rgb(var(--u-accent2) / 15%); }
+.user-theme-scope[data-theme="light"] .bg-fuchsia-500\/20 { background-color: rgb(var(--u-accent2) / 20%); }
+.user-theme-scope[data-theme="light"] .bg-fuchsia-600 { background-color: rgb(var(--u-accent2-strong)); }
+.user-theme-scope[data-theme="light"] .bg-fuchsia-600\/15 { background-color: rgb(var(--u-accent2-strong) / 15%); }
+
+.user-theme-scope[data-theme="light"] .border-fuchsia-500 { border-color: rgb(var(--u-accent2)); }
+.user-theme-scope[data-theme="light"] .border-fuchsia-500\/20 { border-color: rgb(var(--u-accent2) / 20%); }
+.user-theme-scope[data-theme="light"] .hover\:border-fuchsia-400\/40:hover { border-color: rgb(var(--u-accent2) / 40%); }
+
+.user-theme-scope[data-theme="light"] .to-fuchsia-400,
+.user-theme-scope[data-theme="light"] .hover\:to-fuchsia-500:hover { --tw-gradient-to: rgb(var(--u-accent2)); }
+.user-theme-scope[data-theme="light"] .to-fuchsia-600,
+.user-theme-scope[data-theme="light"] .to-fuchsia-700 { --tw-gradient-to: rgb(var(--u-accent2-strong)); }
+
+/* ---- misc: gray dropdown panels stay light, just tidy divider to match ---- */
+.user-theme-scope[data-theme="light"] .via-violet-500\/40 { --tw-gradient-via: rgb(var(--u-accent) / 40%); }
