@@ -3,13 +3,10 @@ export const API_ENDPOINT = {
     LOGIN: 'auth/login',
     REGISTER: 'auth/register',
     VERIFY: 'auth/verify',
-    CHECK_EMAIL: 'auth/check-email',
-    CREATE_AGENT: 'auth/add-agent'
+    CHECK_EMAIL: 'auth/check-email'
   },
   STORE: {
     BASE: 'stores',
-    DETAIL: (id: number) => `stores/${id}`,
-    OWNER: (ownerRefCode: string) => `stores/owner/${ownerRefCode}`,
     BY_REF: (refCode: string) => `stores/ref/${refCode}`
   },
   STORE_FOOD: {
@@ -46,16 +43,12 @@ export const API_ENDPOINT = {
     PENDING_ORDER: 'orders/pending-order'
   },
   CUSTOMER: {
-    AGENT_SEARCH: 'customers/agent/search',
-    ADMIN_SEARCH: 'customers/admin/search'
+    AGENT_SEARCH: 'customers/agent/search'
   },
   REVENUE: {
-    ADMIN: 'revenue/admin',
     AGENT: 'revenue/agent',
     AGENT_TOP_PRODUCTS: 'revenue/agent/top-products',
-    AGENT_PRODUCTS_SEARCH: 'revenue/agent/products/search',
-    ADMIN_TOP_PRODUCTS: 'revenue/admin/top-products',
-    ADMIN_PRODUCTS_SEARCH: 'revenue/admin/products/search'
+    AGENT_PRODUCTS_SEARCH: 'revenue/agent/products/search'
   },
   PROMOTION: {
     BASE: 'promotions',

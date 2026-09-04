@@ -17,15 +17,6 @@ export interface RevenuePieChartItem {
   value: number;
 }
 
-export interface AdminRevenueResponse {
-  totalAgents: number;
-  totalUsers: number;
-  totalOrders: number;
-  totalRevenue: number;
-  lineChart: RevenueLineChartItem[];
-  pieChart: RevenuePieChartItem[];
-}
-
 export interface AgentRevenueResponse {
   totalOrders: number;
   totalRevenue: number;
