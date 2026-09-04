@@ -6,8 +6,9 @@ import { URL_ENDPOINT } from '../constants/url-endpoint';
 
 /**
  * Route "" chỉ tồn tại để quyết định trang chủ theo role — không tự redirect cứng về
- * user/welcome nữa. Khách (chưa đăng nhập) vẫn vào welcome; tài khoản đã đăng nhập
- * (Admin/Agent/User) được đưa thẳng vào khu vực của họ.
+ * user/welcome nữa. Khách (chưa đăng nhập) vẫn vào welcome; tài khoản Agent đã đăng nhập
+ * được đưa thẳng vào khu vực của họ. FE không còn trang admin (đã bỏ), nên tài khoản
+ * Admin cũng rơi về welcome như User.
  */
 export const roleRedirectGuard: CanActivateFn = () => {
     const authService = inject(AuthService);
@@ -26,8 +27,6 @@ export const roleRedirectGuard: CanActivateFn = () => {
             const role = response.data?.role;
 
             switch (role) {
-                case 'Admin':
-                    return router.createUrlTree([`/${URL_ENDPOINT.ADMIN}`]);
                 case 'Agent':
                     return router.createUrlTree([`/${URL_ENDPOINT.AGENT}`]);
                 default:

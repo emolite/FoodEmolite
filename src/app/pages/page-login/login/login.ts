@@ -63,10 +63,6 @@ export class PageLoginComponent {
             const role = verifyResponse.data.role;
 
             switch (role) {
-              case 'Admin':
-                this.router.navigateByUrl(URL_ENDPOINT.ADMIN);
-                break;
-
               case 'Agent':
                 this.router.navigateByUrl(URL_ENDPOINT.AGENT);
                 break;

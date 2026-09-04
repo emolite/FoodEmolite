@@ -24,15 +24,4 @@ export class CustomerService {
         );
     }
 
-    searchAdminCustomers(
-        request: BaseSearchRequest<CustomerSearchRequest>
-    ): Observable<BaseTableResponse<CustomerListItem>> {
-        return this.apiService.post<
-            BaseTableResponse<CustomerListItem>,
-            BaseSearchRequest<CustomerSearchRequest>
-        >(
-            API_ENDPOINT.CUSTOMER.ADMIN_SEARCH,
-            request
-        );
-    }
 }
