@@ -3,10 +3,16 @@ export interface CreateOrderRequest {
   note?: string | null;
   items: CreateOrderItemRequest[];
   selectedGifts?: SelectedGiftRequest[];
+  selectedStoreWideDiscounts?: SelectedStoreWideDiscountRequest[];
   promoCode?: string | null;
 }
 
 export interface SelectedGiftRequest {
+  promotionId: number;
+  storeFoodId: number;
+}
+
+export interface SelectedStoreWideDiscountRequest {
   promotionId: number;
   storeFoodId: number;
 }

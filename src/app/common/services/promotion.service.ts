@@ -41,6 +41,15 @@ export class PromotionService {
         );
     }
 
+    /** Khách hiện tại (theo deviceId nếu là khách vãng lai, hoặc theo token nếu đã đăng nhập) có đủ
+     * điều kiện dùng chương trình giảm giá "toàn bộ sản phẩm" đang active của cửa hàng hay không. */
+    checkStoreWideDiscountEligibility(storeRefCode: string, deviceId?: string | null): Observable<BaseResponse<boolean>> {
+        return this.apiService.get<BaseResponse<boolean>>(
+            API_ENDPOINT.PROMOTION.STORE_WIDE_DISCOUNT_ELIGIBILITY(storeRefCode),
+            deviceId ? { deviceId } : undefined
+        );
+    }
+
     create(request: CreatePromotionRequest): Observable<BaseResponse<string>> {
         return this.apiService.post<BaseResponse<string>, CreatePromotionRequest>(
             API_ENDPOINT.PROMOTION.BASE,

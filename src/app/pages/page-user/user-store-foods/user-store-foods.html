@@ -439,6 +439,13 @@
                             </p>
                             }
 
+                            @if (storeWideDiscountPromotions().length > 0 && uniqueCartFoods().length > 1 && !isStoreWideDiscountSelected(item.food.id)) {
+                            <button type="button" (click)="applyStoreWideDiscount(item.food.id)"
+                                class="mt-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-300 transition hover:bg-amber-500/20 cursor-pointer">
+                                Áp dụng ưu đãi giảm giá cho món này
+                            </button>
+                            }
+
                             @if (hasOptions(item.food)) {
                             <button type="button" (click)="openOptionPopup(item.id)"
                                 class="mt-2 flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/70 transition hover:border-violet-500/25 hover:bg-violet-500/10 cursor-pointer">
@@ -716,6 +723,13 @@
                             {{ formatCurrency(pricing.effectivePrice) }}
                         </span>
                     </p>
+                    }
+
+                    @if (storeWideDiscountPromotions().length > 0 && uniqueCartFoods().length > 1 && !isStoreWideDiscountSelected(item.food.id)) {
+                    <button type="button" (click)="applyStoreWideDiscount(item.food.id)"
+                        class="mt-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-300 transition hover:bg-amber-500/20 cursor-pointer">
+                        Áp dụng ưu đãi giảm giá cho món này
+                    </button>
                     }
 
                     @if (hasOptions(item.food)) {
