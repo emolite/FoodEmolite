@@ -57,6 +57,7 @@ export const API_ENDPOINT = {
     PAUSE: (id: number) => `promotions/${id}/pause`,
     RESUME: (id: number) => `promotions/${id}/resume`,
     CANCEL: (id: number) => `promotions/${id}/cancel`,
-    ACTIVE_BY_STORE: (storeRefCode: string) => `promotions/store/${storeRefCode}/active`
+    ACTIVE_BY_STORE: (storeRefCode: string) => `promotions/store/${storeRefCode}/active`,
+    STORE_WIDE_DISCOUNT_ELIGIBILITY: (storeRefCode: string) => `promotions/store/${storeRefCode}/store-wide-discount-eligibility`
   }
 } as const;

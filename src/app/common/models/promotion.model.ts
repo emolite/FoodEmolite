@@ -67,6 +67,10 @@ export interface PromotionResponse {
     conditionType: PromotionConditionType;
     conditionMinAmount: number | null;
     conditionMinQuantity: number | null;
+    applyToAllProducts: boolean;
+    discountType: PromotionDiscountType | null;
+    discountValue: number | null;
+    maxDiscountAmount: number | null;
     createdAt: string;
     fixedPriceItems: PromotionFixedPriceItemResponse[];
     discountItems: PromotionDiscountItemResponse[];
@@ -87,6 +91,10 @@ export interface CreatePromotionRequest {
     conditionType: PromotionConditionType;
     conditionMinAmount?: number | null;
     conditionMinQuantity?: number | null;
+    applyToAllProducts?: boolean;
+    discountType?: PromotionDiscountType | null;
+    discountValue?: number | null;
+    maxDiscountAmount?: number | null;
     fixedPriceItems: PromotionFixedPriceItemRequest[];
     discountItems: PromotionDiscountItemRequest[];
     giftItems: PromotionGiftItemRequest[];

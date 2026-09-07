@@ -47,6 +47,12 @@ interface PromotionFormState {
     conditionType: PromotionConditionType;
     conditionMinAmount: number;
     conditionMinQuantity: number;
+
+    // Chỉ dùng khi promotionType = PRODUCT_DISCOUNT
+    applyToAllProducts: boolean;
+    allDiscountType: PromotionDiscountType;
+    allDiscountValue: number;
+    allMaxDiscountAmount: number | null;
 }
 
 const DAY_LABELS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
@@ -86,7 +92,11 @@ export class PopUpAgentPromotionAddComponent implements OnInit {
         selectedDays: [true, true, true, true, true, true, true],
         conditionType: 'NONE',
         conditionMinAmount: 0,
-        conditionMinQuantity: 0
+        conditionMinQuantity: 0,
+        applyToAllProducts: false,
+        allDiscountType: 'PERCENT',
+        allDiscountValue: 0,
+        allMaxDiscountAmount: null
     });
 
     fixedPriceRows = signal<FixedPriceRow[]>([
@@ -127,7 +137,11 @@ export class PopUpAgentPromotionAddComponent implements OnInit {
             selectedDays,
             conditionType: promo.conditionType,
             conditionMinAmount: promo.conditionMinAmount ?? 0,
-            conditionMinQuantity: promo.conditionMinQuantity ?? 0
+            conditionMinQuantity: promo.conditionMinQuantity ?? 0,
+            applyToAllProducts: promo.applyToAllProducts,
+            allDiscountType: promo.discountType ?? 'PERCENT',
+            allDiscountValue: promo.discountValue ?? 0,
+            allMaxDiscountAmount: promo.maxDiscountAmount
         });
 
         if (promo.fixedPriceItems.length) {
@@ -176,6 +190,22 @@ export class PopUpAgentPromotionAddComponent implements OnInit {
 
     setConditionType(type: PromotionConditionType): void {
         this.form.update(v => ({ ...v, conditionType: type }));
+    }
+
+    toggleApplyToAllProducts(): void {
+        this.form.update(v => ({ ...v, applyToAllProducts: !v.applyToAllProducts }));
+    }
+
+    setAllDiscountType(type: PromotionDiscountType): void {
+        this.form.update(v => ({ ...v, allDiscountType: type }));
+    }
+
+    setAllDiscountValue(value: number): void {
+        this.form.update(v => ({ ...v, allDiscountValue: value }));
+    }
+
+    setAllMaxDiscountAmount(value: number | null): void {
+        this.form.update(v => ({ ...v, allMaxDiscountAmount: value }));
     }
 
     addFixedPriceRow(): void {
@@ -359,28 +389,40 @@ export class PopUpAgentPromotionAddComponent implements OnInit {
                 return;
             }
         } else if (value.promotionType === 'PRODUCT_DISCOUNT') {
-            discountItems = this.discountRows()
-                .filter(r => r.storeFoodId)
-                .map(r => ({
-                    storeFoodId: r.storeFoodId as number,
-                    discountType: r.discountType,
-                    discountValue: r.discountValue,
-                    maxDiscountAmount: r.discountType === 'PERCENT' ? (r.maxDiscountAmount || null) : null
-                }));
+            if (value.applyToAllProducts) {
+                if (value.allDiscountValue <= 0) {
+                    this.toastService.error('Mức giảm phải lớn hơn 0');
+                    return;
+                }
 
-            if (!discountItems.length) {
-                this.toastService.error('Vui lòng chọn ít nhất 1 món áp dụng giảm giá');
-                return;
-            }
+                if (value.allDiscountType === 'PERCENT' && value.allDiscountValue > 100) {
+                    this.toastService.error('Giảm theo % không được vượt quá 100%');
+                    return;
+                }
+            } else {
+                discountItems = this.discountRows()
+                    .filter(r => r.storeFoodId)
+                    .map(r => ({
+                        storeFoodId: r.storeFoodId as number,
+                        discountType: r.discountType,
+                        discountValue: r.discountValue,
+                        maxDiscountAmount: r.discountType === 'PERCENT' ? (r.maxDiscountAmount || null) : null
+                    }));
 
-            if (discountItems.some(item => item.discountValue <= 0)) {
-                this.toastService.error('Mức giảm phải lớn hơn 0');
-                return;
-            }
+                if (!discountItems.length) {
+                    this.toastService.error('Vui lòng chọn ít nhất 1 món áp dụng giảm giá');
+                    return;
+                }
 
-            if (discountItems.some(item => item.discountType === 'PERCENT' && item.discountValue > 100)) {
-                this.toastService.error('Giảm theo % không được vượt quá 100%');
-                return;
+                if (discountItems.some(item => item.discountValue <= 0)) {
+                    this.toastService.error('Mức giảm phải lớn hơn 0');
+                    return;
+                }
+
+                if (discountItems.some(item => item.discountType === 'PERCENT' && item.discountValue > 100)) {
+                    this.toastService.error('Giảm theo % không được vượt quá 100%');
+                    return;
+                }
             }
         } else {
             giftItems = this.giftRows()
@@ -421,6 +463,12 @@ export class PopUpAgentPromotionAddComponent implements OnInit {
             conditionType: value.conditionType,
             conditionMinAmount: value.conditionType === 'MIN_ORDER_AMOUNT' ? value.conditionMinAmount : null,
             conditionMinQuantity: value.conditionType === 'MIN_QUANTITY' ? value.conditionMinQuantity : null,
+            applyToAllProducts: value.promotionType === 'PRODUCT_DISCOUNT' ? value.applyToAllProducts : false,
+            discountType: value.promotionType === 'PRODUCT_DISCOUNT' && value.applyToAllProducts ? value.allDiscountType : null,
+            discountValue: value.promotionType === 'PRODUCT_DISCOUNT' && value.applyToAllProducts ? value.allDiscountValue : null,
+            maxDiscountAmount: value.promotionType === 'PRODUCT_DISCOUNT' && value.applyToAllProducts && value.allDiscountType === 'PERCENT'
+                ? (value.allMaxDiscountAmount || null)
+                : null,
             fixedPriceItems,
             discountItems,
             giftItems

@@ -105,6 +105,27 @@
 
             @if (promotion().promotionType === 'PRODUCT_DISCOUNT') {
             <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
+                @if (promotion().applyToAllProducts) {
+                <h3 class="text-sm font-semibold text-violet-200">
+                    Áp dụng cho toàn bộ sản phẩm
+                </h3>
+                <p class="mt-1 text-xs text-gray-400">
+                    Khách tự chọn 1 món bất kỳ trong đơn để nhận giảm giá lúc thanh toán — mỗi khách chỉ được dùng 1 lần.
+                </p>
+                <div class="mt-3 flex items-center gap-2 rounded-md border border-[#322a4a] bg-[#171322] px-3 py-2 text-sm">
+                    <span class="text-gray-300">Mức giảm</span>
+                    <span class="font-semibold text-violet-300">
+                        @if (promotion().discountType === 'PERCENT') {
+                        -{{ promotion().discountValue }}%
+                        @if (promotion().maxDiscountAmount) {
+                        (tối đa {{ formatCurrency(promotion().maxDiscountAmount!) }})
+                        }
+                        } @else {
+                        -{{ formatCurrency(promotion().discountValue!) }}
+                        }
+                    </span>
+                </div>
+                } @else {
                 <h3 class="text-sm font-semibold text-violet-200">
                     Danh sách món giảm giá
                 </h3>
@@ -126,6 +147,7 @@
                     </div>
                     }
                 </div>
+                }
             </div>
             }
 

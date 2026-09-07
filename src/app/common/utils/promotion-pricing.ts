@@ -63,6 +63,28 @@ export function getPromotionalPrice(
     };
 }
 
+/** Các chương trình "Giảm giá sản phẩm" áp dụng cho toàn bộ sản phẩm — khách tự chọn 1 món trong đơn để nhận giảm giá. */
+export function getStoreWideDiscountPromotions(activePromotions: PromotionResponse[]): PromotionResponse[] {
+    return activePromotions.filter(promo => promo.promotionType === 'PRODUCT_DISCOUNT' && promo.applyToAllProducts);
+}
+
+/** Giá sau khi áp dụng giảm giá "toàn bộ sản phẩm" của 1 chương trình lên 1 món có giá gốc cho trước. */
+export function computeStoreWideDiscountPrice(promo: PromotionResponse, originalPrice: number): number {
+    if (!promo.discountType || promo.discountValue == null) {
+        return originalPrice;
+    }
+
+    let discountAmount = promo.discountType === 'PERCENT'
+        ? (originalPrice * promo.discountValue) / 100
+        : promo.discountValue;
+
+    if (promo.discountType === 'PERCENT' && promo.maxDiscountAmount) {
+        discountAmount = Math.min(discountAmount, promo.maxDiscountAmount);
+    }
+
+    return Math.max(originalPrice - discountAmount, 0);
+}
+
 /** Các chương trình "Mua X tặng Y" mà giỏ hàng hiện tại đã đủ điều kiện nhận quà. */
 export function getEligibleGiftPromotions(
     activePromotions: PromotionResponse[],

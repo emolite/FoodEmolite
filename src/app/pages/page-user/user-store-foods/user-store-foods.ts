@@ -18,11 +18,13 @@ import { PromotionService } from '../../../common/services/promotion.service';
 import { RealtimeService } from '../../../common/services/realtime.service';
 import { StoreFoodResponse } from '../../../common/models/store-food.model';
 import { PromotionResponse } from '../../../common/models/promotion.model';
-import { SelectedGiftRequest } from '../../../common/models/order.model';
+import { SelectedGiftRequest, SelectedStoreWideDiscountRequest } from '../../../common/models/order.model';
 import {
     PromotionalPriceInfo,
     getEligibleGiftPromotions,
-    getPromotionalPrice
+    getPromotionalPrice,
+    getStoreWideDiscountPromotions,
+    computeStoreWideDiscountPrice
 } from '../../../common/utils/promotion-pricing';
 import { URL_ENDPOINT } from '../../../common/constants/url-endpoint';
 import { PopUpUserFoodOptionsComponent } from './pop-up-user-food-options/pop-up-user-food-options';
@@ -72,6 +74,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
 
     activePromotions = signal<PromotionResponse[]>([]);
     selectedGifts = signal<SelectedGiftRequest[]>([]);
+    selectedStoreWideDiscounts = signal<SelectedStoreWideDiscountRequest[]>([]);
     promoCodeInput = signal('');
     appliedPromoCode = signal<string | null>(null);
 
@@ -144,17 +147,56 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
         )
     );
 
+    /** Khách hiện tại (theo deviceId/tài khoản) có đủ điều kiện dùng KM "toàn bộ sản phẩm" hay không —
+     * mặc định false để không hiện UI rồi lại ẩn ngay khi API trả lời "không đủ điều kiện". */
+    storeWideDiscountEligible = signal(false);
+
+    /** Chương trình "Giảm giá sản phẩm" áp dụng toàn bộ sản phẩm — khách tự chọn 1 món trong giỏ để nhận giảm giá.
+     * Chỉ hiện khi khách đủ điều kiện dùng (đã kiểm tra qua API, xem checkStoreWideDiscountEligibility). */
+    storeWideDiscountPromotions = computed(() =>
+        this.storeWideDiscountEligible() ? getStoreWideDiscountPromotions(this.applicablePromotions()) : []
+    );
+
+    /** Danh sách món (không trùng) hiện có trong giỏ hàng, dùng để chọn món nhận giảm giá "toàn bộ sản phẩm". */
+    uniqueCartFoods = computed(() => {
+        const seen = new Set<number>();
+        const result: StoreFoodResponse[] = [];
+
+        for (const item of this.cart()) {
+            if (!seen.has(item.food.id)) {
+                seen.add(item.food.id);
+                result.push(item.food);
+            }
+        }
+
+        return result;
+    });
+
+    /** StoreFoodId -> giá đã giảm cho các món khách chọn nhận giảm giá "toàn bộ sản phẩm". */
+    storeWideDiscountPriceMap = computed(() => {
+        const map = new Map<number, number>();
+        const promotions = this.storeWideDiscountPromotions();
+
+        for (const selected of this.selectedStoreWideDiscounts()) {
+            const promo = promotions.find(p => p.id === selected.promotionId);
+            const food = this.uniqueCartFoods().find(f => f.id === selected.storeFoodId);
+
+            if (promo && food) {
+                map.set(selected.storeFoodId, computeStoreWideDiscountPrice(promo, food.price));
+            }
+        }
+
+        return map;
+    });
+
+    /** Chưa ai được chọn nhận giảm giá "toàn bộ sản phẩm" và giỏ hàng đang trống — hiện giá đã giảm
+     * trên TẤT CẢ món trong danh sách để khách biết CT áp dụng cho món nào cũng được. */
+    showStoreWideDiscountPreview = computed(() =>
+        this.storeWideDiscountPromotions().length > 0 && this.cart().length === 0
+    );
+
     totalAmount = computed(() =>
-        this.cart().reduce((total, item) => {
-            const optionAmount = item.selectedOptions.reduce(
-                (sum, option) => sum + option.additionalPrice,
-                0
-            );
-
-            const pricing = getPromotionalPrice(item.food.id, item.food.price, this.applicablePromotions());
-
-            return total + (pricing.effectivePrice + optionAmount) * item.quantity;
-        }, 0)
+        this.cart().reduce((total, item) => total + this.getLineTotal(item), 0)
     );
 
     /** Chương trình "Mua X tặng Y" mà giỏ hàng hiện tại đã đủ điều kiện nhận quà. */
@@ -169,6 +211,34 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
             this.selectedGifts.update(list =>
                 list.filter(g => eligibleIds.has(g.promotionId))
             );
+        });
+
+        // Tự động chọn/bỏ chọn món nhận giảm giá "toàn bộ sản phẩm": nếu giỏ chỉ còn đúng 1 món thì
+        // tự áp dụng luôn (không cần bấm); nếu có từ 2 món trở lên mà món đang chọn không còn trong
+        // giỏ, bỏ chọn để khách tự bấm "Áp dụng" trên món khác.
+        effect(() => {
+            const uniqueFoods = this.uniqueCartFoods();
+            const promo = this.storeWideDiscountPromotions()[0];
+
+            if (!promo || uniqueFoods.length === 0) {
+                if (this.selectedStoreWideDiscounts().length > 0) {
+                    this.selectedStoreWideDiscounts.set([]);
+                }
+                return;
+            }
+
+            const current = this.selectedStoreWideDiscounts().find(d => d.promotionId === promo.id);
+            const currentStillInCart = !!current && uniqueFoods.some(f => f.id === current.storeFoodId);
+
+            if (currentStillInCart) {
+                return;
+            }
+
+            if (uniqueFoods.length === 1) {
+                this.selectedStoreWideDiscounts.set([{ promotionId: promo.id, storeFoodId: uniqueFoods[0].id }]);
+            } else if (this.selectedStoreWideDiscounts().length > 0) {
+                this.selectedStoreWideDiscounts.set([]);
+            }
         });
 
         this.realtimeService.connect();
@@ -241,6 +311,23 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
                 }
             }
         });
+
+        this.checkStoreWideDiscountEligibility(refCode);
+    }
+
+    /** Kiểm tra khách hiện tại có đủ điều kiện dùng KM "toàn bộ sản phẩm" hay không, để chỉ hiện UI
+     * chọn giảm giá khi khách thực sự dùng được (đã từng đặt hàng/đã đăng nhập, chưa dùng CT đó). */
+    private checkStoreWideDiscountEligibility(refCode: string): void {
+        const deviceId = this.isLoggedIn() ? null : this.guestService.getGuestToken();
+
+        this.promotionService.checkStoreWideDiscountEligibility(refCode, deviceId).subscribe({
+            next: response => {
+                this.storeWideDiscountEligible.set(response.isSuccess && response.data === true);
+            },
+            error: () => {
+                this.storeWideDiscountEligible.set(false);
+            }
+        });
     }
 
     applyPromoCode(): void {
@@ -284,7 +371,60 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     getFoodPricing(food: StoreFoodResponse): PromotionalPriceInfo {
+        const overridePrice = this.storeWideDiscountPriceMap().get(food.id);
+
+        if (overridePrice !== undefined) {
+            return {
+                hasPromotion: true,
+                originalPrice: food.price,
+                effectivePrice: overridePrice
+            };
+        }
+
+        const promo = this.storeWideDiscountPromotions()[0];
+
+        if (promo && this.showStoreWideDiscountPreview()) {
+            return {
+                hasPromotion: true,
+                originalPrice: food.price,
+                effectivePrice: computeStoreWideDiscountPrice(promo, food.price)
+            };
+        }
+
         return getPromotionalPrice(food.id, food.price, this.applicablePromotions());
+    }
+
+    /** Tổng tiền 1 dòng giỏ hàng. Nếu món này được chọn nhận giảm giá "toàn bộ sản phẩm", CHỈ 1 đơn vị
+     * được tính giá đã giảm — phần còn lại (nếu số lượng > 1) vẫn tính giá bình thường (khớp logic BE). */
+    getLineTotal(item: CartItem): number {
+        const optionAmount = item.selectedOptions.reduce((sum, option) => sum + option.additionalPrice, 0);
+        const overridePrice = this.storeWideDiscountPriceMap().get(item.food.id);
+
+        if (overridePrice !== undefined) {
+            const baseUnitPrice = getPromotionalPrice(item.food.id, item.food.price, this.applicablePromotions()).effectivePrice;
+
+            return baseUnitPrice * (item.quantity - 1) + overridePrice + optionAmount * item.quantity;
+        }
+
+        const pricing = this.getFoodPricing(item.food);
+
+        return (pricing.effectivePrice + optionAmount) * item.quantity;
+    }
+
+    /** Bấm "Áp dụng" trên 1 món trong giỏ để chuyển giảm giá "toàn bộ sản phẩm" sang món đó — chỉ 1 món
+     * tại 1 thời điểm (chỉ tối đa 1 chương trình dạng này hoạt động cùng lúc mỗi cửa hàng). */
+    applyStoreWideDiscount(storeFoodId: number): void {
+        const promo = this.storeWideDiscountPromotions()[0];
+
+        if (!promo) {
+            return;
+        }
+
+        this.selectedStoreWideDiscounts.set([{ promotionId: promo.id, storeFoodId }]);
+    }
+
+    isStoreWideDiscountSelected(storeFoodId: number): boolean {
+        return this.selectedStoreWideDiscounts().some(d => d.storeFoodId === storeFoodId);
     }
 
     private loadStoreByRefCode(refCode: string): void {
@@ -681,6 +821,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
                 }))
             })),
             selectedGifts: this.selectedGifts(),
+            selectedStoreWideDiscounts: this.selectedStoreWideDiscounts(),
             promoCode: this.appliedPromoCode()
         };
 
@@ -708,9 +849,23 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
                 }
                 this.cart.set([]);
                 this.selectedGifts.set([]);
+                this.selectedStoreWideDiscounts.set([]);
                 this.appliedPromoCode.set(null);
                 this.promoCodeInput.set('');
+
+                // Đơn vừa tạo có thể đã dùng KM "toàn bộ sản phẩm" — kiểm tra lại để ẩn UI nếu đã dùng hết lượt.
+                const currentRefCode = this.storeRefCode();
+                if (currentRefCode) {
+                    this.checkStoreWideDiscountEligibility(currentRefCode);
+                }
                 this.closeMobileCart();
+
+                // Đơn 0đ (vd: được giảm giá hết) — khỏi tạo QR thanh toán, đơn coi như đã thanh toán luôn.
+                if (order.totalAmount <= 0 || order.paymentStatus === 'PAID') {
+                    this.toastService.success('Tạo đơn hàng thành công!');
+                    this.ordering.set(false);
+                    return;
+                }
 
                 this.orderService.getStorePaymentInfo(
                     order.orderCode
@@ -760,14 +915,7 @@ export class PageUserStoreFoodsComponent implements OnDestroy {
     }
 
     getItemAmount(item: CartItem): number {
-        const optionAmount = item.selectedOptions.reduce(
-            (sum, option) => sum + option.additionalPrice,
-            0
-        );
-
-        const pricing = this.getFoodPricing(item.food);
-
-        return (pricing.effectivePrice + optionAmount) * item.quantity;
+        return this.getLineTotal(item);
     }
 
     getOptionText(item: CartItem): string {

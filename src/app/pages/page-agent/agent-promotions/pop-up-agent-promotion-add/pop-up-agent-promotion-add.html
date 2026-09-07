@@ -238,7 +238,38 @@
       <!-- Giảm giá -->
       @if (form().promotionType === 'PRODUCT_DISCOUNT') {
       <div class="rounded-md border border-[#322a4a] bg-[#1a1628] p-4">
-        <div class="flex items-center justify-between">
+        <label class="flex cursor-pointer items-start gap-2.5">
+          <input type="checkbox" [checked]="form().applyToAllProducts" (change)="toggleApplyToAllProducts()"
+            class="mt-0.5 h-4 w-4 accent-violet-500" />
+          <span>
+            <span class="block text-sm font-semibold text-violet-200">Áp dụng cho toàn bộ sản phẩm</span>
+            <span class="block text-xs text-gray-400">
+              Không cần chọn sẵn danh sách món — khách sẽ tự chọn 1 món bất kỳ trong đơn để nhận giảm giá lúc thanh toán.
+              Mỗi khách (theo tài khoản hoặc thiết bị) chỉ được dùng 1 lần.
+            </span>
+          </span>
+        </label>
+
+        @if (form().applyToAllProducts) {
+        <div class="mt-3 grid grid-cols-3 gap-2 border-t border-[#322a4a] pt-3">
+          <select [ngModel]="form().allDiscountType" (ngModelChange)="setAllDiscountType($event)"
+            class="h-[38px] rounded-lg border border-[#322a4a] bg-[#171322] px-2 text-sm text-white outline-none">
+            <option value="PERCENT">Giảm %</option>
+            <option value="AMOUNT">Giảm tiền</option>
+          </select>
+
+          <input type="number" min="0" [ngModel]="form().allDiscountValue" (ngModelChange)="setAllDiscountValue($event)"
+            [placeholder]="form().allDiscountType === 'PERCENT' ? '% giảm' : 'Số tiền giảm'"
+            class="h-[38px] rounded-lg border border-[#322a4a] bg-[#171322] px-2 text-sm text-white outline-none" />
+
+          @if (form().allDiscountType === 'PERCENT') {
+          <input type="number" min="0" [ngModel]="form().allMaxDiscountAmount" (ngModelChange)="setAllMaxDiscountAmount($event)"
+            placeholder="Giảm tối đa (đ)"
+            class="h-[38px] rounded-lg border border-[#322a4a] bg-[#171322] px-2 text-sm text-white outline-none" />
+          }
+        </div>
+        } @else {
+        <div class="mt-3 flex items-center justify-between border-t border-[#322a4a] pt-3">
           <h3 class="text-sm font-semibold text-violet-200">Danh sách món giảm giá</h3>
           <div class="flex items-center gap-3">
             <button type="button" (click)="selectAllDiscountFoods()" class="text-xs font-medium text-violet-300 hover:text-violet-200">
@@ -284,6 +315,7 @@
           </div>
           }
         </div>
+        }
       </div>
       }
 
